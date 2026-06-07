@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: ollama-grasag-upsa
+    env: docker
+    dockerfilePath: ./ollama/Dockerfile
+    healthCheckPath: /health
+    plan: gpu-l4  # GPU L4 tier for better model performance
+    autoDeploy: true
