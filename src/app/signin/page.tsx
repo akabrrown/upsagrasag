@@ -45,7 +45,7 @@ export default function SignInPage() {
           {/* Logo */}
           <div className="flex justify-center mb-4">
             <Image
-              src="/grasag-upsa-logo.png"
+              src="/grasag-logo.jpeg"
               alt="GRASAG‑UPSA"
               width={80}
               height={80}

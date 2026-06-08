@@ -41,7 +41,7 @@ export default function Footer() {
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 overflow-hidden rounded-full bg-white relative">
                 <img
-                  src="/grasag-upsa-logo.png"
+                  src="/grasag-logo.jpeg"
                   alt="GRASAG UPSA Logo"
                   className="object-contain"
                   style={{ width: '100%', height: 'auto' }}

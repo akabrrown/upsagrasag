@@ -58,7 +58,7 @@ export default function Navbar() {
         <Link href="/" className="flex items-center gap-3">
           <div className="relative flex h-12 w-12 overflow-hidden rounded-full bg-background">
             <img
-              src="/grasag-upsa-logo.png"
+              src="/grasag-logo.jpeg"
               alt="GRASAG UPSA Logo"
               className="object-contain"
               style={{ width: '100%', height: 'auto' }}

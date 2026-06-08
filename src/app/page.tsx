@@ -83,7 +83,7 @@ export default function HomePage() {
           <div className="lg:col-span-5">
             <div className="site-card-light bg-white p-8">
               <div className="relative h-48 w-48 overflow-hidden rounded-full bg-neutral-100 shadow-inner mx-auto border-4 border-slate-50">
-                <img src="/grasag-upsa-logo.png" alt="GRASAG UPSA Logo" className="object-contain w-full h-full p-4" />
+                <img src="/grasag-logo.jpeg" alt="GRASAG UPSA Logo" className="object-contain w-full h-full p-4" />
               </div>
               <div className="mt-6 space-y-4 text-center">
                 <blockquote className="italic text-sm text-neutral-600">
