@@ -1,35 +1,17 @@
 import React from 'react';
 import Link from 'next/link';
 import { Mail, Phone, MapPin } from 'lucide-react';
+import Tooltip from './Tooltip';
 
 export default function Footer() {
   return (
     <footer className="w-full border-t border-neutral-800 bg-neutral-950 text-white">
-      {/* Newsletter / CTA banner */}
+      {/* Contact Us Button */}
       <div className="border-b border-neutral-800">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-md">
-              <h2 className="text-xl font-bold text-accent">Subscribe to GRASAG Newsletter</h2>
-              <p className="mt-2 text-sm text-neutral-400">
-                Receive weekly updates on opportunities, events, research grants, and welfare programs.
-              </p>
-            </div>
-            <form className="flex w-full max-w-md gap-3">
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                required
-                className="w-full rounded-xl border border-neutral-800 bg-neutral-900 p-4 text-sm text-white placeholder-white shadow-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-              />
-              <button
-                type="submit"
-                className="shrink-0 rounded-xl bg-accent px-5 py-3 text-sm font-bold text-white shadow-md hover:bg-accent/90 transition-all duration-200"
-              >
-                Subscribe
-              </button>
-            </form>
-          </div>
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 flex justify-center">
+          <Link href="/contact" className="rounded-xl bg-accent px-8 py-4 text-lg font-bold text-white shadow-md hover:bg-accent/90 transition-all duration-200">
+            Contact Us
+          </Link>
         </div>
       </div>
 
@@ -39,36 +21,14 @@ export default function Footer() {
           {/* Brand Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 overflow-hidden rounded-full bg-white relative">
-                <img
-                  src="/grasag-logo.jpeg"
-                  alt="GRASAG UPSA Logo"
-                  className="object-contain"
-                  style={{ width: '100%', height: 'auto' }}
-                />
+              <div className="flex h-20 w-68 overflow-hidden bg-white rounded-md relative">
+                <img src="/grasag-logo.jpeg" alt="GRASAG UPSA Logo" className="object-contain w-full h-full" />
               </div>
-              <span className="font-sans text-base font-bold text-accent uppercase tracking-wider">GRASAG-UPSA</span>
             </div>
             <p className="text-sm text-neutral-400 leading-relaxed">
               Graduate Students' Association of Ghana, University of Professional Studies, Accra. Building a resource-filled graduate community since 2012.
             </p>
-            <div className="flex items-center gap-4">
-              {[
-                { href: 'https://www.instagram.com/grasag_upsa?igsh=bWxtenV6NHY1djY0', iconUrl: 'https://cdn.simpleicons.org/instagram/fff' },
-                { href: 'https://x.com/grasag_upsa?s=21', iconUrl: 'https://cdn.simpleicons.org/x/fff' },
-                { href: 'https://www.facebook.com/share/1JHWgU7ich/?mibextid=wwXIfr', iconUrl: 'https://cdn.simpleicons.org/facebook/fff' },
-              ].map(({ href, iconUrl }, idx) => (
-                <Link
-                  key={idx}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-neutral-500 hover:text-white transition-colors"
-                >
-                  <img src={iconUrl} alt="social icon" width={20} height={20} className="inline-block hover:opacity-80 transition-opacity" />
-                </Link>
-              ))}
-            </div>
+            <Tooltip />
           </div>
 
           {/* Quick Links */}
@@ -114,7 +74,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/events" className="text-sm text-neutral-400 hover:text-accent transition-colors">
-                  Events & Congress
+                  Events & Programmes
                 </Link>
               </li>
               <li>

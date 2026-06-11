@@ -2,6 +2,26 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+@font-face {
+  font-family: "Lufga";
+  src: url("https://db.onlinewebfonts.com/t/9df35b2045f6e32dcfa5bbc421ed05b1.woff2") format("woff2"),
+       url("https://db.onlinewebfonts.com/t/9df35b2045f6e32dcfa5bbc421ed05b1.woff") format("woff"),
+       url("https://db.onlinewebfonts.com/t/9df35b2045f6e32dcfa5bbc421ed05b1.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lufga";
+  src: url("https://db.onlinewebfonts.com/t/adecc4bca5b2a9687481c342a4fe9f40.woff2") format("woff2"),
+       url("https://db.onlinewebfonts.com/t/adecc4bca5b2a9687481c342a4fe9f40.woff") format("woff"),
+       url("https://db.onlinewebfonts.com/t/adecc4bca5b2a9687481c342a4fe9f40.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --primary: #003366;
   --accent: #B8860B;
@@ -56,7 +76,7 @@
   --color-neutral-600: var(--neutral-600);
   --color-neutral-200: var(--neutral-200);
 
-  --font-sans: "Giga Sans", var(--font-geist-sans), system-ui, sans-serif;
+  --font-sans: "Lufga", var(--font-geist-sans), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
@@ -110,9 +130,12 @@ body {
   body {
     @apply bg-background text-foreground;
   }
-  html {
-    @apply font-sans;
-  }
+  html { @apply font-sans; }
+
+/* Ensure Lufga font applied globally */
+html, body {
+  font-family: "Lufga", system-ui, sans-serif;
+}
 }
 
 /* Custom premium styles */
@@ -140,11 +163,11 @@ body {
 
 /* Badges */
 .badge-accent {
-  @apply inline-flex items-center gap-1.5 rounded-full bg-[#B8860B]/10 px-3.5 py-1.5 text-xs font-bold text-[#B8860B] uppercase tracking-wider border border-[#B8860B]/20;
+  @apply inline-flex items-center gap-2 rounded-full bg-[#B8860B]/10 px-3.5 py-1.5 text-xs font-bold text-[#B8860B] uppercase tracking-wider border border-[#B8860B]/20;
 }
 
 .badge-primary {
-  @apply inline-flex items-center gap-1.5 rounded-full bg-[#003366]/10 px-3.5 py-1.5 text-xs font-bold text-[#003366] uppercase tracking-wider border border-[#003366]/20;
+  @apply inline-flex items-center gap-2 rounded-full bg-[#003366]/10 px-3.5 py-1.5 text-xs font-bold text-[#003366] uppercase tracking-wider border border-[#003366]/20;
 }
 
 /* Cards */
@@ -211,3 +234,6 @@ body {
 .force-white {
   color: #FFFFFF !important;
 }
+
+/* Ensure text inside UPSA blue cards is readable */
+.upsa-blue-card .text-primary { @apply text-white; }

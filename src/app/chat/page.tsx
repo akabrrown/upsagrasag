@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Trash2, ArrowLeft, HelpCircle } from 'lucide-react';
+import { Send, Bot, User, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 interface Message {
@@ -35,19 +35,20 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const suggestedQuestions = [
-    "What welfare schemes are available for graduate students?",
-    "How can I access the Past Question Bank?",
-    "Where is the GRASAG-UPSA secretariat located?",
-    "What are the requirements for MBA programs at UPSA?"
-  ];
-
-  // Persist messages to localStorage
+  // Auto-scroll to newest message
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('chatMessages', JSON.stringify(messages));
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  const handleSaveChat = () => {
+    const blob = new Blob([JSON.stringify(messages, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'chat-conversation.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const handleSend = async (textToSend: string) => {
     if (!textToSend.trim() || isLoading) return;
@@ -72,14 +73,13 @@ export default function ChatPage() {
     setMessages((prev) => [...prev, assistantMessage]);
 
     try {
-      const allMessages = [...messages, userMessage];
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          messages: allMessages.map((m) => ({
+          messages: [...messages, userMessage].map((m) => ({
             role: m.role,
             content: m.content
           }))
@@ -136,14 +136,42 @@ export default function ChatPage() {
         content: "Hello! I am your GRASAG-UPSA AI Assistant. Ask me anything about postgraduate programmes, welfare packages, past questions, registration, or campus events."
       }
     ]);
+    localStorage.removeItem('chatMessages');
   };
 
+  // Persist messages to localStorage
+  useEffect(() => {
+    localStorage.setItem('chatMessages', JSON.stringify(messages));
+  }, [messages]);
+
+  // Suggestion buttons component
+  const suggestedQuestions = [
+    "What programs are available?",
+    "How do I apply?",
+    "Scholarship info?",
+    "Campus events?",
+  ];
+
+  const suggestionButtons = (
+    <div className="flex flex-wrap gap-2 mb-4">
+      {suggestedQuestions.map((q) => (
+        <button
+          key={q}
+          onClick={() => handleSend(q)}
+          className="px-3 py-1 rounded-lg bg-accent/10 text-accent hover:bg-accent/20 transition"
+        >
+          {q}
+        </button>
+      ))}
+    </div>
+  );
+
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 h-[calc(100vh-14rem)] flex flex-col lg:flex-row gap-8 bg-background text-foreground">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 h-screen flex flex-col lg:flex-row gap-8 bg-background text-foreground">
       {/* Sidebar - Info / Suggestions */}
       <div className="w-full lg:w-80 flex flex-col gap-6 shrink-0">
-        <div className="site-card-dark">
-          <div className="flex items-center gap-3">
+        <div className="site-card-dark p-4 rounded-xl bg-white/5 backdrop-blur-lg border border-white/10">
+          <div className="flex items-center gap-3 mb-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent">
               <Bot className="h-5 w-5" />
             </div>
@@ -152,36 +180,15 @@ export default function ChatPage() {
               <p className="text-xs text-neutral-400">Always active assistant</p>
             </div>
           </div>
-          <p className="mt-4 text-xs text-neutral-600 leading-relaxed">
-            This chatbot connects to our self-hosted LLM running on Render. It is designed to assist you with all association queries without quota limits.
-          </p>
+          <h2 className="text-lg font-semibold text-primary mb-2">Quick Prompts</h2>
+          {suggestionButtons}
         </div>
-
-        <div className="site-card-light bg-white">
-          <div className="flex items-center gap-2 font-bold text-primary text-sm mb-4">
-            <HelpCircle className="h-4 w-4 text-accent" /> Suggested Questions
-          </div>
-          <div className="flex flex-col gap-2.5">
-            {suggestedQuestions.map((q) => (
-              <button
-                key={q}
-                onClick={() => handleSend(q)}
-                disabled={isLoading}
-                className="text-left text-xs rounded-xl border border-neutral-200 bg-slate-50 p-3 hover:bg-neutral-100 hover:text-accent transition-all duration-200"
-              >
-                {q}
-              </button>
-            ))}
-          </div>
-        </div>
-        
-        <div className="site-card-dark bg-slate-50">
-          <h2 className="font-bold text-primary text-sm">Upcoming Congress</h2>
-          <p className="mt-2 text-xs text-neutral-600 leading-relaxed">
-            <span className="font-bold text-accent">14th Annual GRASAG‑UPSA General Congress</span><br />
-            Join our research symposium, professional development panels, and networks. Ensure you register and reserve your delegates slot.
-          </p>
-        </div>
+        <button
+          onClick={handleSaveChat}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition"
+        >
+          Save Conversation
+        </button>
       </div>
 
       {/* Main Chat Container */}
@@ -199,7 +206,7 @@ export default function ChatPage() {
           </div>
           <button
             onClick={handleClear}
-            className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-neutral-500 hover:bg-neutral-100 hover:text-rose-600 transition-colors"
+            className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-neutral-500 hover:bg-neutral-100 hover:text-rose-600 transition-colors"
           >
             <Trash2 className="h-4 w-4" /> Clear chat
           </button>
@@ -212,9 +219,17 @@ export default function ChatPage() {
             return (
               <div
                 key={message.id}
-                className={`flex gap-4 max-w-2xl ${isAI ? 'mr-auto' : 'ml-auto flex-row-reverse'}`}
+                className={
+                  `flex gap-4 max-w-2xl ` +
+                  (isAI ? 'mr-auto' : 'ml-auto flex-row-reverse')
+                }
               >
-                <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${isAI ? 'bg-accent text-white' : 'bg-primary text-white'}`}>
+                <div
+                  className={
+                    `flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ` +
+                    (isAI ? 'bg-accent text-white' : 'bg-primary text-white')
+                  }
+                >
                   {isAI ? <Bot className="h-4 w-4" /> : <User className="h-4 w-4" />}
                 </div>
                 <div className={`rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-xs ${isAI ? 'bg-white border border-neutral-200 text-neutral-800' : 'bg-primary text-white'}`}>
@@ -249,12 +264,20 @@ export default function ChatPage() {
               disabled={isLoading}
               className="form-input"
             />
+            {/* Loading spinner */}
+            {isLoading && (
+              <div className="flex items-center gap-2 text-primary">
+                <Loader2 className="animate-spin h-5 w-5" />
+                Thinking...
+              </div>
+            )}
             <button
               type="submit"
               disabled={isLoading || !input.trim()}
-              className="btn-accent shrink-0"
+              className="btn-accent shrink-0 flex items-center gap-2"
             >
               <Send className="h-4 w-4" />
+              Send
             </button>
           </div>
         </form>

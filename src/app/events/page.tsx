@@ -27,7 +27,7 @@ export default function EventsPage() {
           Calendar
         </span>
         <h1 className="text-4xl font-extrabold text-primary sm:text-5xl">
-          Events & Congress
+          Events & Programmes
         </h1>
         <p className="text-sm text-neutral-500 max-w-xl mx-auto leading-relaxed">
           Reserve your seat and access registration details for our flagship annual congress, seminars, and networking nights.

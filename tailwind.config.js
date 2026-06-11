@@ -3,6 +3,7 @@ module.exports = {
   darkMode: false,
   content: [
     './src/**/*.{js,ts,jsx,tsx}',
+    './src/app/**/*.{js,ts,jsx,tsx}',
     './app/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
   ],
@@ -34,9 +35,13 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['"Giga Sans"', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
       },
+      spacing: { '1.5': '0.375rem', '2': '0.5rem' },
     },
+  },
+  corePlugins: {
+    gap: true,
   },
   plugins: [require('tailwindcss-animate')],
 };

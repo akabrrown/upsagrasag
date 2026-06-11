@@ -105,18 +105,18 @@ export default function ContactPage() {
                     <Icon className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-primary text-base">
+                    <h3 className="font-bold text-accent text-base">
                       {info.title}
                     </h3>
                     {info.href ? (
                       <a
                         href={info.href}
-                        className="mt-1 block text-sm text-primary hover:text-accent leading-relaxed transition-colors"
+                        className="mt-1 block text-sm text-accent hover:text-accent/80 leading-relaxed transition-colors"
                       >
                         {info.details}
                       </a>
                     ) : (
-                      <p className="mt-1 text-sm text-primary leading-relaxed">
+                      <p className="mt-1 text-sm text-accent leading-relaxed">
                         {info.details}
                       </p>
                     )}
@@ -128,7 +128,7 @@ export default function ContactPage() {
 
           {/* Guidelines Box */}
           <div className="rounded-2xl border border-accent/20 bg-accent/5 p-6 space-y-3">
-            <h3 className="font-bold text-accent text-sm flex items-center gap-1.5">
+            <h3 className="font-bold text-sm text-accent flex items-center gap-2">
               <ShieldCheck className="h-4.5 w-4.5" /> Advocacy & Welfare support
             </h3>
             <p className="text-xs text-neutral-600 leading-relaxed">
@@ -140,7 +140,7 @@ export default function ContactPage() {
         {/* Right Column: Contact Form */}
         <div className="lg:col-span-7">
               <div className="upsa-blue-card p-8">
-            <h2 className="text-xl font-bold text-primary flex items-center gap-2 mb-6">
+            <h2 className="text-xl font-bold text-accent flex items-center gap-2 mb-6">
               <MessageSquare className="h-5 w-5 text-accent" /> Send an Email Message
             </h2>
 
@@ -158,8 +158,8 @@ export default function ContactPage() {
 
               {/* Name & Email Group */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-primary">
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-bold text-accent">
                     Full Name <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -171,8 +171,8 @@ export default function ContactPage() {
                     className="form-input"
                   />
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-primary">
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-bold text-accent">
                     Email Address <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -187,8 +187,8 @@ export default function ContactPage() {
               </div>
 
               {/* Subject */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold text-primary">
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold text-accent">
                   Subject / Topic <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -202,8 +202,8 @@ export default function ContactPage() {
               </div>
 
               {/* Message */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold text-primary">
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold text-accent">
                   Message Details <span className="text-rose-500">*</span>
                 </label>
                 <textarea
@@ -220,7 +220,7 @@ export default function ContactPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="btn-primary w-full text-sm"
+                className="btn-accent w-full text-sm"
               >
                 {isSubmitting ? (
                   <>

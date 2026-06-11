@@ -1,26 +1,34 @@
-import Link from 'next/link';
-import { Home, Users, Calendar, Settings } from 'lucide-react';
+// app/admin/layout.tsx
+import React from 'react';
+import { supabase } from '@/lib/supabase';
+import { redirect } from 'next/navigation';
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  // Server‑side auth check using Supabase
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error || !user) {
+    redirect('/auth/login');
+  }
+  const role = (user as any).app_metadata?.role;
+  if (role !== 'admin') {
+    redirect('/unauthorized');
+  }
+
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
-      <aside className="w-64 border-r border-neutral-200 bg-slate-50 p-6">
-        <nav className="flex flex-col space-y-4">
-          <Link href="/admin/dashboard" className="flex items-center gap-2 text-primary hover:text-accent font-semibold transition-colors">
-            <Home className="h-5 w-5" /> Dashboard
-          </Link>
-          <Link href="/admin/users" className="flex items-center gap-2 text-primary hover:text-accent font-semibold transition-colors">
-            <Users className="h-5 w-5" /> Users
-          </Link>
-          <Link href="/admin/events" className="flex items-center gap-2 text-primary hover:text-accent font-semibold transition-colors">
-            <Calendar className="h-5 w-5" /> Events
-          </Link>
-          <Link href="/admin/settings" className="flex items-center gap-2 text-primary hover:text-accent font-semibold transition-colors">
-            <Settings className="h-5 w-5" /> Settings
-          </Link>
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Sidebar navigation – hidden on small screens */}
+      <aside className="w-64 bg-white border-r p-4 hidden md:block">
+        <nav className="space-y-2">
+          <a href="/admin/executives" className="block py-2 px-3 rounded hover:bg-gray-100">Executives</a>
+          <a href="/admin/opportunities" className="block py-2 px-3 rounded hover:bg-gray-100">Opportunities</a>
+          <a href="/admin/past-questions" className="block py-2 px-3 rounded hover:bg-gray-100">Past Questions</a>
+          <a href="/admin/resources" className="block py-2 px-3 rounded hover:bg-gray-100">Resources</a>
+          <a href="/admin/partners" className="block py-2 px-3 rounded hover:bg-gray-100">Partners</a>
+          <a href="/admin/chatbot-logs" className="block py-2 px-3 rounded hover:bg-gray-100">Chatbot Logs</a>
+          <a href="/admin/site-settings" className="block py-2 px-3 rounded hover:bg-gray-100">Site Settings</a>
         </nav>
       </aside>
-      <main className="flex-1 p-8 bg-white">
+      <main className="flex-1 p-6 overflow-y-auto">
         {children}
       </main>
     </div>

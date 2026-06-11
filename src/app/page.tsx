@@ -2,22 +2,28 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import {
-  ArrowRight,
-  Bot
-} from 'lucide-react';
+import { ArrowRight, Bot } from 'lucide-react';
+import { supabaseClient } from '@/lib/supabaseClient';
 
 export default function HomePage() {
+  // Countdown timer state
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
+  // Hero section state
+  const [hero, setHero] = useState({
+    title: '',
+    subtitle: '',
+    ctaText: '',
+    ctaLink: '',
+    imageUrl: '',
+  });
+
+  // Countdown effect
   useEffect(() => {
-    // Set target date for Annual Congress (e.g., Nov 15, 2026)
     const targetDate = new Date('Nov 15, 2026 09:00:00').getTime();
-
     const interval = setInterval(() => {
-      const now = new Date().getTime();
+      const now = Date.now();
       const difference = targetDate - now;
-
       const d = Math.floor(difference / (1000 * 60 * 60 * 24));
       const h = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
@@ -34,74 +40,153 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, []);
 
+  // Fetch hero content
+  useEffect(() => {
+    const fetchHero = async () => {
+      const { data, error } = await supabaseClient
+        .from('page_contents')
+        .select('title, body, image_url, cta_text, cta_link')
+        .eq('slug', 'home-hero')
+        .single();
+      if (!error && data) {
+        setHero({
+          title: data.title ?? '',
+          subtitle: data.body ?? '',
+          ctaText: data.cta_text ?? '',
+          ctaLink: data.cta_link ?? '',
+          imageUrl: data.image_url ?? '',
+        });
+      }
+    };
+    fetchHero();
+  }, []);
+
   const partners = [
-    { name: 'KPMG',    logo: 'https://cdn.simpleicons.org/kpmg/000?size=256' },
-    { name: 'PwC',     logo: 'https://cdn.simpleicons.org/pwc/000?size=256' },
-    { name: 'Deloitte',logo: 'https://cdn.simpleicons.org/deloitte/000?size=256' },
-    { name: 'ICAG',    logo: 'https://cdn.simpleicons.org/icag/000?size=256' },
-    { name: 'ACCA',    logo: 'https://cdn.simpleicons.org/acca/000?size=256' },
+    { name: 'KPMG', logo: '/KPMG-Symbol.png' },
+    { name: 'PwC', logo: '/images.png' },
+    { name: 'Deloitte', logo: '/download.png' },
+    { name: 'ICAG', logo: '/download%20(1).png' },
+    { name: 'ACCA', logo: '/download%20(2).png' },
   ];
+
+  // Slides will be defined after hero defaults
+  // Updated hero defaults for fallback when slide has no custom data
+  const heroTitle = hero.title || 'Partner with GRASAG-UPSA today';
+  const heroSubtitle = hero.subtitle || 'Join forces with GRASAG‑UPSA to shape graduate research, professional growth, and community impact across Ghana.';
+  const heroCtaText = hero.ctaText || 'Partner with us';
+  const heroCtaLink = hero.ctaLink || '/opportunities';
+  const heroBgStyle = hero.imageUrl
+    ? { backgroundImage: `url(${hero.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+    : {};
+
+  // Define hero slides
+  const slides = [
+    {
+      title: heroTitle,
+      subtitle: heroSubtitle,
+      ctaText: heroCtaText,
+      ctaLink: heroCtaLink,
+      bgStyle: { backgroundImage: 'url(/IMG_5244.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' },
+    },
+    {
+      title: 'Welcome to the Graduate Student Association of Ghana',
+      subtitle: 'Join us in fostering graduate research, professional growth, and community impact across Ghana.',
+      ctaText: 'Learn More',
+      ctaLink: '/about',
+      bgStyle: { backgroundImage: 'url(/IMG_5244.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' },
+    },
+  ];
+  const [slideIndex, setSlideIndex] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSlideIndex((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+  const currentSlide = slides[slideIndex];
+
+  const bgStyle = currentSlide?.bgStyle || {};
+  const sectionClass = `relative overflow-hidden px-4 py-8 lg:px-8 border-b border-neutral-100 flex items-center justify-center min-h-[25vh] ${!bgStyle.backgroundImage ? 'bg-gradient-to-br from-slate-50 via-slate-100/50 to-white' : ''}`;
 
   return (
     <div className="relative min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-slate-50 px-4 py-20 lg:px-8 border-b border-neutral-100">
-        <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent"></div>
-        <div className="mx-auto max-w-7xl relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
-          {/* Left Text Column */}
-          <div className="lg:col-span-7 space-y-6">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-primary leading-tight">
-              Welcome to the Graduate Student Association of Ghana - <span className="text-accent">University of Professional Studies Accra (UPSA) Chapter</span>
-            </h1>
-            <p className="text-lg text-neutral-600 max-w-xl leading-relaxed">
-              The Graduate Student Association of Ghana (GRASAG), University of Professional Studies Chapter, warmly welcomes all graduate students, stakeholders, and partners to our vibrant academic community.
+      <section className={sectionClass} style={bgStyle}>
+        {/* Dark overlay for readability */}
+        {bgStyle.backgroundImage && (
+          <div className="absolute inset-0 bg-black/40" />
+        )}
+        <div className="relative z-10 max-w-2xl text-center px-4">
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-white leading-tight">
+            {currentSlide.title}
+          </h1>
+          {currentSlide.subtitle && (
+            <p className="mt-2 text-base text-white/80">
+              {currentSlide.subtitle}
             </p>
-            <p className="text-lg text-neutral-600 max-w-xl leading-relaxed">
-              As a body representing graduate students, we are committed to promoting academic excellence, professional development, leadership, research, innovation, and student welfare. We serve as a platform that unites graduate students, amplifies their voices, and creates opportunities for personal and collective growth.
-            </p>
-            <p className="text-lg text-neutral-600 max-w-xl leading-relaxed">
-              Through seminars, conferences, mentorship programs, research initiatives, community engagements, and professional networking events, we strive to equip our members with the skills and exposure needed to excel both academically and professionally.
-            </p>
-            <p className="text-lg text-neutral-600 max-w-xl leading-relaxed">
-              We also recognize the importance of collaboration in achieving impactful results. Therefore, we warmly invite organizations, institutions, corporate bodies, alumni, and individuals who share our vision to partner with us in creating meaningful opportunities and lasting impact for graduate students.
-            </p>
-            <p className="text-lg text-neutral-600 max-w-xl leading-relaxed">
-              Together, we can build a stronger academic and professional community that nurtures future leaders and contributes positively to society.
-            </p>
-            <div className="flex flex-wrap gap-4 pt-2">
-              <Link
-                href="/opportunities"
-                className="btn-accent text-sm"
-              >
-                Explore Opportunities <ArrowRight className="h-4 w-4" />
+          )}
+          {currentSlide.ctaText && currentSlide.ctaLink && (
+            <div className="mt-4">
+              <Link href={currentSlide.ctaLink} className="inline-block bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition">
+                {currentSlide.ctaText}
               </Link>
             </div>
-          </div>
+          )}
+        </div>
+      </section>
 
-          {/* Right Welcome Card Column */}
-          <div className="lg:col-span-5">
-            <div className="site-card-light bg-white p-8">
-              <div className="relative h-48 w-48 overflow-hidden rounded-full bg-neutral-100 shadow-inner mx-auto border-4 border-slate-50">
-                <img src="/grasag-logo.jpeg" alt="GRASAG UPSA Logo" className="object-contain w-full h-full p-4" />
-              </div>
-              <div className="mt-6 space-y-4 text-center">
-                <blockquote className="italic text-sm text-neutral-600">
-                  "Graduate study is a journey of transformation. At GRASAG-UPSA, our commitment is to provide a support ecosystem that empowers you with research backing, professional excellence, and general welfare."
-                </blockquote>
-                <div>
-                  <h3 className="text-base font-bold text-neutral-900">Kofi Adu-Gyamfi</h3>
-                  <p className="text-xs font-semibold text-accent uppercase tracking-wide">President, GRASAG-UPSA</p>
+
+      {/* Welcome & About Section (Below Hero) */}
+      <section className="bg-neutral-50 border-y border-neutral-100">
+        <div className="mx-auto max-w-7xl px-4 py-16 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+
+            {/* President Photo – Left Side */}
+            <div className="flex justify-center lg:justify-start lg:order-2">
+              <div className="relative w-full max-w-lg overflow-hidden rounded-2xl">
+                <img
+                  src="/WhatsApp Image 2026-06-04 at 6.23.20 PM.jpeg"
+                  alt="President – Samuel Sasu Adonteng"
+                  className="object-cover w-full h-auto rounded-2xl"
+                />
+                <div className="pt-4 border-t border-neutral-200">
+                  <h3 className="text-lg font-bold text-neutral-900 italic">Samuel Sasu Adonteng</h3>
+                  <p className="text-sm font-semibold text-accent mt-1">GRASAG‑UPSA President</p>
                 </div>
               </div>
             </div>
-          </div>
 
+            {/* Welcome Text – Right Side */}
+            <div className="space-y-6 lg:order-1">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-primary leading-tight">
+                Welcome to the official website for the Graduate Students' Association of Ghana – UPSA.
+              </h2>
+
+              <div className="space-y-4 text-neutral-600 text-sm sm:text-base leading-relaxed">
+                <p>
+                  The Graduate Student Association of Ghana (GRASAG), University of Professional Studies Chapter, warmly welcomes all graduate students, stakeholders, and partners to our vibrant academic community.
+                </p>
+                <p>
+                  As a body representing graduate students, we are committed to promoting academic excellence, professional development, leadership, research, innovation, and student welfare. We serve as a platform that unites graduate students, amplifies their voices, and creates opportunities for personal and collective growth.
+                </p>
+                <p>
+                  Through seminars, conferences, mentorship programs, research initiatives, community engagements, and professional networking events, we strive to equip our members with the skills and exposure needed to excel both academically and professionally.
+                </p>
+                <p>
+                  We also recognize the importance of collaboration in achieving impactful results. Therefore, we warmly invite organizations, institutions, corporate bodies, alumni, and individuals who share our vision to partner with us in creating meaningful opportunities and lasting impact for graduate students.
+                </p>
+                <p>
+                  Together, we can build a stronger academic and professional community that nurtures future leaders and contributes positively to society.
+                </p>
+              </div>
+            </div>
+
+          </div>
         </div>
       </section>
 
       {/* Countdown & Events banner */}
-      <section className="mx-auto max-w-7xl px-4 py-16 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 pb-20 lg:px-8">
         <div className="relative rounded-3xl overflow-hidden gradient-bg text-white px-6 py-12 md:px-12 md:py-16 shadow-xl">
           <div className="absolute inset-0 bg-cover bg-center opacity-10 bg-[url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200')]"></div>
           <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
@@ -116,7 +201,7 @@ export default function HomePage() {
                 Join our research symposium, professional development panels, and networks. Ensure you register and reserve your delegates slot.
               </p>
             </div>
-            
+
             {/* Timer values */}
             <div className="flex flex-wrap gap-4 text-center">
               {[

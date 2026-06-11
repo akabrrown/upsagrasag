@@ -26,52 +26,40 @@ export default function Navbar() {
       href: '#',
       dropdown: [
         { name: 'Overview & Mission', href: '/about', icon: Info },
+        { name: 'Our Agenda', href: '/agenda', icon: Info },
         { name: 'Leadership & Executives', href: '/leadership', icon: Users },
-        { name: 'Membership Benefits', href: '/membership', icon: Heart },
-      ]
+      ],
     },
     {
-      name: 'Academics',
-      href: '#',
-      dropdown: [
-        { name: 'Academics', href: '/academics', icon: GraduationCap },
-        { name: 'Past Questions', href: '/past-questions', icon: FileText },
-      ]
-    },
-    {
-      name: 'Campus Hub',
+      name: 'Student Support',
       href: '#',
       dropdown: [
         { name: 'Opportunities', href: '/opportunities', icon: Briefcase },
         { name: 'Welfare', href: '/welfare', icon: Heart },
         { name: 'Resources', href: '/resources', icon: FileText },
-      ]
+        { name: 'Past Questions', href: '/academics/past-questions', icon: FileText },
+        { name: 'Tutorials', href: '/academics/tutorials', icon: GraduationCap },
+      ],
     },
-    { name: 'Events & Congress', href: '/events', icon: Calendar },
-    { name: 'Contact', href: '/contact', icon: PhoneCall },
+    { name: 'Events & Programmes', href: '/events', icon: Calendar },
+    { name: 'Research & Opportunities', href: '/research-and-opportunities', icon: Bot },
+    { name: 'Resources', href: '/resources', icon: FileText },
+    { name: 'News & Updates', href: '/news-updates', icon: Info },
+    
   ];
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-50 w-full h-12 flex items-center justify-between border-b border-border bg-background/80 backdrop-blur-md px-4">
+
         <Link href="/" className="flex items-center gap-3">
-          <div className="relative flex h-12 w-12 overflow-hidden rounded-full bg-background">
-            <img
-              src="/grasag-logo.jpeg"
-              alt="GRASAG UPSA Logo"
-              className="object-contain"
-              style={{ width: '100%', height: 'auto' }}
-            />
-          </div>
-          <div>
-            <h1 className="font-sans text-lg font-bold text-primary leading-tight">GRASAG-UPSA</h1>
-            <p className="text-xs font-semibold text-accent tracking-wide uppercase">The Nation's Premium</p>
+          <div className="relative flex h-12 w-72overflow-hidden bg-background">
+            <img src="/grasag-logo.jpeg" alt="GRASAG UPSA Logo" className="object-cover w-full h-full" />
           </div>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-1">
+<nav className="hidden lg:flex flex-1 justify-center items-center gap-1 mx-auto">
           {navItems.map((item) => {
             if (item.dropdown) {
               return (
@@ -112,12 +100,6 @@ export default function Navbar() {
             );
           })}
 
-          <Link
-            href="/chat"
-            className="flex h-14 w-14 items-center justify-center rounded-full bg-accent text-white shadow-lg hover:scale-105 hover:bg-accent/90 transition-all duration-200 ml-4"
-          >
-            <Bot className="h-6 w-6" />
-          </Link>
         </nav>
 
         {/* Mobile menu button */}
@@ -127,63 +109,56 @@ export default function Navbar() {
         >
           {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
-      </div>
-    </header>
+      </header>
 
-    {/* Mobile Menu */}
-    {isOpen && (
-      <div className="fixed top-20 inset-x-0 bottom-0 z-50 bg-background border-t border-border p-4 shadow-lg lg:hidden overflow-y-auto">
-        <div className="space-y-1">
-          {navItems.map((item) => {
-            if (item.dropdown) {
-              return (
-                <div key={item.name} className="space-y-1">
-                  <button
-                    onClick={() => toggleDropdown(item.name)}
-                    className="flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm font-bold text-neutral-700 hover:bg-neutral-50"
+      {/* Mobile Menu */}
+      {
+        isOpen && (
+          <div className="fixed top-20 inset-x-0 bottom-0 z-50 bg-background border-t border-border p-4 shadow-lg lg:hidden overflow-y-auto">
+            <div className="space-y-1">
+              {navItems.map((item) => {
+                if (item.dropdown) {
+                  return (
+                    <div key={item.name} className="space-y-1">
+                      <button
+                        onClick={() => toggleDropdown(item.name)}
+                        className="flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm font-bold text-neutral-700 hover:bg-neutral-50"
+                      >
+                        {item.name}
+                        <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${activeDropdown === item.name ? 'rotate-180' : ''}`} />
+                      </button>
+                      {activeDropdown === item.name && (
+                        <div className="pl-6 space-y-1">
+                          {item.dropdown.map((sub) => (
+                            <Link
+                              key={sub.name}
+                              href={sub.href}
+                              onClick={() => setIsOpen(false)}
+                              className="block rounded-lg px-4 py-2.5 text-sm font-semibold text-neutral-600 hover:bg-neutral-50 hover:text-primary transition-colors duration-150"
+                            >
+                              {sub.name}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className="block rounded-lg px-4 py-3 text-sm font-bold text-neutral-700 hover:bg-neutral-50"
                   >
                     {item.name}
-                    <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${activeDropdown === item.name ? 'rotate-180' : ''}`} />
-                  </button>
-                  {activeDropdown === item.name && (
-                    <div className="pl-6 space-y-1">
-                      {item.dropdown.map((sub) => (
-                        <Link
-                          key={sub.name}
-                          href={sub.href}
-                          onClick={() => setIsOpen(false)}
-                          className="block rounded-lg px-4 py-2.5 text-sm font-semibold text-neutral-600 hover:bg-neutral-50 hover:text-primary transition-colors duration-150"
-                        >
-                          {sub.name}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            }
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                onClick={() => setIsOpen(false)}
-                className="block rounded-lg px-4 py-3 text-sm font-bold text-neutral-700 hover:bg-neutral-50"
-              >
-                {item.name}
-              </Link>
-            );
-          })}
-          <Link
-            href="/chat"
-            onClick={() => setIsOpen(false)}
-            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-accent py-3 text-sm font-bold text-white"
-          >
-            <Bot className="h-4 w-4" />
-            AI Assistant
-          </Link>
-        </div>
-      </div>
-    )}
-  </>
-);
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+        )}
+    </>
+  );
 }

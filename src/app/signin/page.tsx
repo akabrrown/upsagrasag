@@ -1,124 +1,115 @@
 'use client';
 
-import Image from 'next/image';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Eye, EyeOff, Mail, Lock } from 'lucide-react';
-import { supabaseClient } from '@/lib/supabaseClient';
-
-const signInSchema = z.object({
-  email: z.string().email({ message: 'Invalid email address' }),
-  password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
-});
-
-type SignInForm = z.infer<typeof signInSchema>;
+import { supabase } from '@/lib/supabase';
+import { Mail, Lock, LogIn, ArrowRight } from 'lucide-react';
 
 export default function SignInPage() {
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<SignInForm>({ resolver: zodResolver(signInSchema as any) as any });
-
-  const onSubmit = async (data: SignInForm) => {
-    const { data: authData, error } = await supabaseClient.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    console.log('Attempting sign‑in', { email, password });
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
-    if (error) {
-      alert(error.message);
+    console.log('Supabase response', { data, authError });
+    if (authError) {
+      setError(authError.message);
     } else {
-      router.replace('/');
+      // Synchronize cookies with Next.js Server Components / Middleware
+      router.refresh();
+      router.replace('/admin/dashboard');
     }
+    setLoading(false);
   };
 
   return (
-    <section className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
-      <div className="w-full max-w-md rounded-2xl bg-white border border-neutral-200 p-8 shadow-xl">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Logo */}
-          <div className="flex justify-center mb-4">
-            <Image
-              src="/grasag-logo.jpeg"
-              alt="GRASAG‑UPSA"
-              width={80}
-              height={80}
-              className="object-contain"
-            />
-          </div>
-          <div className="text-center space-y-1">
-            <h1 className="text-3xl font-extrabold text-primary">Sign in to your account</h1>
-            <p className="text-sm text-neutral-500 font-medium">Access the GRASAG‑UPSA portal</p>
-          </div>
-
-          {/* Email field */}
-          <div className="space-y-1.5">
-            <label htmlFor="email" className="flex items-center gap-2 text-xs font-bold text-neutral-700">
-              <Mail className="h-4 w-4 text-accent" /> Email Address
-            </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="student@upsamail.edu.gh"
-              {...register('email')}
-              className="form-input"
-            />
-            {errors.email && (
-              <p className="mt-1 text-xs font-medium text-rose-600">{errors.email.message}</p>
-            )}
-          </div>
-
-          {/* Password field */}
-          <div className="space-y-1.5">
-            <label htmlFor="password" className="flex items-center gap-2 text-xs font-bold text-neutral-700">
-              <Lock className="h-4 w-4 text-accent" /> Password
-            </label>
-            <div className="relative">
-              <input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="••••••••"
-                {...register('password')}
-                className="form-input pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((v) => !v)}
-                className="absolute inset-y-0 right-3.5 flex items-center text-neutral-400 hover:text-accent"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
-            </div>
-            {errors.password && (
-              <p className="mt-1 text-xs font-medium text-rose-600">{errors.password.message}</p>
-            )}
-          </div>
-
-          {/* Submit button */}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="btn-primary w-full flex items-center justify-center gap-2 text-sm py-3.5"
-          >
-            {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-            Sign In
-          </button>
-
-          {/* Auxiliary links */}
-            <div className="flex flex-col items-center space-y-2 text-xs font-medium text-neutral-500 pt-2">
-              <a href="#" className="underline hover:text-accent transition-colors">
-                Forgot password?
-              </a>
-            </div>
-        </form>
+    <main className="min-h-screen flex items-center justify-center bg-[url('/IMG_5244.jpg')] bg-cover bg-center p-4 relative overflow-hidden text-blue-400">
+      {/* Decorative background elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-accent/20 blur-[120px] mix-blend-screen" />
+        <div className="absolute bottom-[10%] right-[5%] w-[40%] h-[60%] rounded-full bg-blue-500/10 blur-[150px] mix-blend-screen" />
       </div>
-    </section>
+
+      <div className="relative z-10 w-full max-w-md">
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 sm:p-10 shadow-2xl transition-all duration-500 hover:shadow-accent/10">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent/20 text-accent mb-4 ring-1 ring-accent/50 shadow-[0_0_15px_rgba(184,134,11,0.5)]">
+               <LogIn className="w-8 h-8" />
+            </div>
+            <h1 className="text-3xl font-extrabold text-blue-500 tracking-tight">Admin Portal</h1>
+                      <p className="text-blue-500 mt-2 text-sm font-medium">GRASAG UPSA Management Dashboard</p>
+          </div>
+
+          {error && (
+            <div className="mb-6 p-4 rounded-xl bg-error/20 border border-error/50 text-error-100 flex items-center animate-in fade-in slide-in-from-top-2">
+              <span className="text-sm font-semibold text-white">{error}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+                             <label className="text-xs font-bold text-blue-500 uppercase tracking-wider ml-1">Email Address</label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-blue-300 group-focus-within:text-accent transition-colors">
+                  <Mail className="h-5 w-5" />
+                </div>
+                <input
+                  type="email"
+                  placeholder="admin@grasag-upsa.edu.gh"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full bg-white/5 border border-white/10 text-white placeholder-blue-200/50 rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all duration-300"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between items-center ml-1">
+                                 <label className="text-xs font-bold text-blue-500 uppercase tracking-wider">Password</label>
+              </div>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-blue-300 group-focus-within:text-accent transition-colors">
+                  <Lock className="h-5 w-5" />
+                </div>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full bg-white/5 border border-white/10 text-white placeholder-blue-200/50 rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all duration-300"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="group relative w-full flex justify-center py-4 px-4 border border-transparent rounded-xl text-sm font-bold text-blue-500 bg-accent hover:bg-[#cba028] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-primary transition-all duration-300 shadow-[0_0_20px_rgba(184,134,11,0.3)] hover:shadow-[0_0_25px_rgba(184,134,11,0.6)] disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden"
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                {loading ? 'Authenticating...' : 'Sign In'}
+                {!loading && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
+              </span>
+            </button>
+          </form>
+
+          <div className="mt-8 pt-6 border-t border-white/10 text-center">
+             <p className="text-xs text-blue-500 font-medium tracking-wide">Secure Access • Authorized Personnel Only</p>
+          </div>
+        </div>
+      </div>
+    </main>
   );
 }

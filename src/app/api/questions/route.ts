@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseClient } from '@/lib/supabaseClient';
-import { uploadToCloudinary } from '@/lib/cloudinary';
+import { uploadImage } from '@/lib/cloudinary';
 
 export async function GET(req: NextRequest) {
   try {
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
 
     // Upload to Cloudinary
-    const uploadResult = await uploadToCloudinary(buffer);
+    const uploadResultUrl = await uploadImage(buffer) as string;
 
     // Save record to Supabase questions_bank table
     const { data, error } = await supabaseClient
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
         course_id: courseId,
         title,
         description,
-        file_url: uploadResult.secure_url,
+        file_url: uploadResultUrl,
         file_type: fileType,
       })
       .select()

@@ -175,7 +175,7 @@ export default function PastQuestionsPage() {
                   href={question.file_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white hover:bg-accent hover:text-white px-3 py-2 text-xs font-bold text-neutral-700 transition-all duration-200"
+                  className="inline-flex items-center gap-2 rounded-lg border border-neutral-200 bg-white hover:bg-accent hover:text-white px-3 py-2 text-xs font-bold text-neutral-700 transition-all duration-200"
                 >
                   <Download className="h-3.5 w-3.5" /> Download
                 </a>
