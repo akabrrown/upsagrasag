@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../../../../lib/auth';
-import { supabaseClient } from '../../../../lib/supabaseClient';
-import { hashPassword } from '../../../../lib/hash';
+import { authOptions } from '@/lib/auth';
+import { supabaseClient } from '@/lib/supabaseClient';
+import { hashPassword } from '@/lib/hash';
 
 // GET all admin users
 export async function GET() {

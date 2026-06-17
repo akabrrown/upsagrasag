@@ -1,3 +1,5 @@
+'use client';
+
 // app/admin/partners/edit/[id]/page.tsx
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -9,7 +11,7 @@ import { z } from "zod";
 
 export const dynamic = "force-dynamic";
 
-type FormData = z.infer<typeof partnerSchema>;
+type FormData = z.input<typeof partnerSchema>;
 
 export default function PartnerEditPage() {
   const router = useRouter();

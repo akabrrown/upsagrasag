@@ -1,79 +1,89 @@
-// app/admin/resources/create/page.tsx
-import React from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { resourceSchema } from "@/types/admin";
-import { resourceService } from "@/lib/supabase/admin";
-import { useRouter } from "next/navigation";
-import { z } from "zod";
+'use client';
 
-export const dynamic = "force-dynamic";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { resourceService } from '@/lib/supabase/admin';
+import type { Resource } from '@/types/admin';
 
-type FormData = z.infer<typeof resourceSchema>;
-
-export default function ResourceCreatePage() {
+export default function CreateResource() {
   const router = useRouter();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<FormData>({ resolver: zodResolver(resourceSchema) });
+  const [title, setTitle] = useState('');
+  const [fileType, setFileType] = useState('');
+  const [description, setDescription] = useState('');
+  const [displayOrder, setDisplayOrder] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const onSubmit = async (data: FormData) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
     try {
-      await resourceService.create(data);
-      router.push("/admin/resources");
-    } catch (e) {
-      console.error(e);
-      alert("Failed to create resource");
+      const payload: Partial<Resource> = {
+        title,
+        file_type: fileType,
+        description,
+        display_order: displayOrder,
+      };
+      await resourceService.create(payload);
+      router.push('/admin/resources');
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4">
+    <section className="bg-white min-h-screen p-6">
       <h1 className="text-2xl font-bold mb-4">Create Resource</h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {error && <p className="text-red-600 mb-2">Error: {error}</p>}
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block font-medium">Title</label>
-          <input {...register("title")} className="w-full border rounded p-2" />
-          {errors.title && (
-            <p className="text-sm text-red-600">{errors.title.message}</p>
-          )}
+          <label className="block mb-1 font-medium">Title</label>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            className="w-full border rounded p-2"
+          />
         </div>
         <div>
-          <label className="block font-medium">Description</label>
-          <textarea {...register("description")} className="w-full border rounded p-2" />
-          {errors.description && (
-            <p className="text-sm text-red-600">{errors.description.message}</p>
-          )}
+          <label className="block mb-1 font-medium">File Type</label>
+          <input
+            type="text"
+            value={fileType}
+            onChange={(e) => setFileType(e.target.value)}
+            required
+            className="w-full border rounded p-2"
+          />
         </div>
         <div>
-          <label className="block font-medium">File URL</label>
-          <input {...register("file_url")} className="w-full border rounded p-2" />
-          {errors.file_url && (
-            <p className="text-sm text-red-600">{errors.file_url.message}</p>
-          )}
+          <label className="block mb-1 font-medium">Description</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full border rounded p-2"
+          />
         </div>
         <div>
-          <label className="block font-medium">File Type</label>
-          <select {...register("file_type")} className="w-full border rounded p-2">
-            <option value="pdf">PDF</option>
-            <option value="docx">DOCX</option>
-            <option value="pptx">PPTX</option>
-            <option value="xlsx">XLSX</option>
-          </select>
-          {errors.file_type && (
-            <p className="text-sm text-red-600">{errors.file_type.message}</p>
-          )}
+          <label className="block mb-1 font-medium">Display Order</label>
+          <input
+            type="number"
+            value={displayOrder}
+            onChange={(e) => setDisplayOrder(parseInt(e.target.value, 10) || 0)}
+            className="w-full border rounded p-2"
+          />
         </div>
         <button
           type="submit"
-          disabled={isSubmitting}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          disabled={submitting}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
         >
-          {isSubmitting ? "Saving..." : "Create"}
+          {submitting ? 'Saving…' : 'Save'}
         </button>
       </form>
-    </div>
+    </section>
   );
 }

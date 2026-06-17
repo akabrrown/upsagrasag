@@ -5,7 +5,8 @@ import Navbar from "@/components/Navbar";
 
 export default function ConditionalNavbar() {
   const pathname = usePathname();
-  if (pathname === "/signin") {
+  // Hide navbar on admin routes and sign‑in page
+  if (pathname.startsWith("/admin") || pathname === "/signin") {
     return null;
   }
   return <Navbar />;

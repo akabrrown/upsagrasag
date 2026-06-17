@@ -1,12 +1,18 @@
 import React from 'react';
+import { opportunityService } from '@/lib/supabase/admin';
+import type { Opportunity } from '@/types/admin';
 
-export default function ResearchOpportunitiesPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function ResearchOpportunitiesPage() {
+  const opportunities: Opportunity[] = await opportunityService.list();
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8 space-y-12 bg-background text-foreground">
       {/* Header */}
       <div className="text-center space-y-3">
         <span className="inline-flex items-center gap-1 rounded-full bg-accent px-4 py-1.5 text-xs font-bold text-white uppercase tracking-wider shadow-sm">
-          Research &amp; Opportunities
+          Research & Opportunities
         </span>
         <h1 className="text-4xl font-extrabold text-primary sm:text-5xl">
           Scholarships, Grants, Calls, Publications, Career Opportunities
@@ -16,34 +22,17 @@ export default function ResearchOpportunitiesPage() {
         </p>
       </div>
 
-      {/* Content Sections */}
+      {/* Opportunities List */}
       <section className="space-y-8">
-        <h2 className="text-2xl font-semibold text-primary">Scholarships &amp; Grants</h2>
-        <p className="text-sm text-neutral-600">
-          Explore a curated list of funding opportunities, scholarship programs, and research grants available to graduate students at UPSA and beyond.
-        </p>
-        {/* Placeholder for dynamic list – can be populated via Supabase or CMS */}
-      </section>
-
-      <section className="space-y-8">
-        <h2 className="text-2xl font-semibold text-primary">Calls for Proposals &amp; Papers</h2>
-        <p className="text-sm text-neutral-600">
-          Stay updated on upcoming conference calls, journal special issues, and competition announcements.
-        </p>
-      </section>
-
-      <section className="space-y-8">
-        <h2 className="text-2xl font-semibold text-primary">Publications</h2>
-        <p className="text-sm text-neutral-600">
-          Access recent publications, theses, and research outputs from GRASAG members.
-        </p>
-      </section>
-
-      <section className="space-y-8">
-        <h2 className="text-2xl font-semibold text-primary">Career Opportunities</h2>
-        <p className="text-sm text-neutral-600">
-          Browse internship programs, job listings, and fellowship opportunities tailored for graduate students.
-        </p>
+        {opportunities.map((opp) => (
+          <article key={opp.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+            <h2 className="text-2xl font-bold text-primary mb-2">{opp.title}</h2>
+            <p className="text-sm text-neutral-500 mb-2">
+              {new Date(opp.start_date ?? '').toLocaleDateString()} - {new Date(opp.end_date ?? '').toLocaleDateString()}
+            </p>
+            <p className="text-neutral-700" dangerouslySetInnerHTML={{ __html: opp.description ?? '' }} />
+          </article>
+        ))}
       </section>
     </div>
   );

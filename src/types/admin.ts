@@ -73,7 +73,7 @@ export const chatbotLogSchema = z.object({
   session_id: z.string().uuid(),
   message_role: z.enum(["user", "assistant", "system"]),
   content: z.string().min(1),
-  token_usage: z.record(z.any()).optional(),
+  token_usage: z.record(z.string(), z.any()).optional(),
   created_at: z.string().optional(),
 });
 export type ChatbotLog = z.infer<typeof chatbotLogSchema>;
@@ -87,6 +87,29 @@ export const siteSettingSchema = z.object({
 });
 export type SiteSetting = z.infer<typeof siteSettingSchema>;
 
+export const newsSchema = z.object({
+  id: z.string().uuid().optional(),
+  title: z.string().min(1, "Title required"),
+  slug: z.string().min(1, "Slug required"),
+  content: z.any().optional(),
+  created_at: z.string().optional(),
+  updated_at: z.string().optional(),
+});
+export type News = z.infer<typeof newsSchema>;
+
+export const eventSchema = z.object({
+  id: z.string().uuid().optional(),
+  title: z.string().min(1, "Title required"),
+  description: z.string().optional(),
+  startDt: z.string(),
+  endDt: z.string(),
+  cover_image_url: z.string().optional(),
+  featured: z.boolean().default(false),
+  created_at: z.string().optional(),
+  updated_at: z.string().optional(),
+});
+export type Event = z.infer<typeof eventSchema>;
+
 export type AdminEntity =
   | Executive
   | Opportunity
@@ -94,4 +117,11 @@ export type AdminEntity =
   | Resource
   | Partner
   | ChatbotLog
-  | SiteSetting;
+  | SiteSetting
+  | News
+  | Event;
+
+export interface ColumnConfig<T> {
+  key: keyof T | string;
+  label: string;
+}

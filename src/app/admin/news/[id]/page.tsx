@@ -1,3 +1,5 @@
+'use client';
+
 // app/admin/news/[id]/page.tsx
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';

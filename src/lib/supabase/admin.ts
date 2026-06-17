@@ -8,9 +8,9 @@ import {
   PastQuestion,
   Resource,
   Partner,
-  NewsletterSubscriber,
+
   ChatbotLog,
-  SiteSettings,
+  SiteSetting,
 } from '@/types/admin';
 
 /** Generic CRUD helpers */
@@ -43,7 +43,7 @@ async function fetchById<T>(table: string, id: number): Promise<T | null> {
 }
 
 async function insert<T>(table: string, payload: Partial<T>) {
-  const { data, error } = await supabase.from(table).insert(payload).select();
+  const { data, error } = await supabase.from(table).insert(payload as any).select();
   if (error) throw error;
   return data[0] as T;
 }
@@ -51,7 +51,7 @@ async function insert<T>(table: string, payload: Partial<T>) {
 async function update<T>(table: string, id: number, payload: Partial<T>) {
   const { data, error } = await supabase
     .from(table)
-    .update(payload)
+    .update(payload as any)
     .eq('id', id)
     .select();
   if (error) throw error;
@@ -128,14 +128,7 @@ export const partnerService = {
 };
 
 /** Newsletter Subscriber */
-export const newsletterSubscriberService = {
-  list: () => fetchAll<NewsletterSubscriber>('newsletter_subscribers'),
-  get: (id: number) => fetchById<NewsletterSubscriber>('newsletter_subscribers', id),
-  create: (payload: Partial<NewsletterSubscriber>) => insert<NewsletterSubscriber>('newsletter_subscribers', payload),
-  update: (id: number, payload: Partial<NewsletterSubscriber>) =>
-    update<NewsletterSubscriber>('newsletter_subscribers', id, payload),
-  delete: (id: number) => remove('newsletter_subscribers', id),
-};
+
 
 /** Chatbot Log */
 export const chatbotLogService = {
@@ -148,7 +141,7 @@ export const chatbotLogService = {
 
 /** Site Settings (singleton) */
 export const siteSettingsService = {
-  get: () => fetchById<SiteSettings>('site_settings', 1),
-  update: (payload: Partial<SiteSettings>) => update<SiteSettings>('site_settings', 1, payload),
+  get: () => fetchById<SiteSetting>('site_settings', 1),
+  update: (payload: Partial<SiteSetting>) => update<SiteSetting>('site_settings', 1, payload),
 };
 

@@ -3,8 +3,8 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { NextResponse } from 'next/server';
 
-export async function GET(request: Request, { params }: { params: { slug: string } }) {
-  const { slug } = params;
+export async function GET(request: Request, { params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const filePath = path.join(process.cwd(), 'src', 'data', 'pages', `${slug}.json`);
   try {
     const data = await fs.readFile(filePath, 'utf-8');
@@ -14,8 +14,8 @@ export async function GET(request: Request, { params }: { params: { slug: string
   }
 }
 
-export async function PUT(request: Request, { params }: { params: { slug: string } }) {
-  const { slug } = params;
+export async function PUT(request: Request, { params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const filePath = path.join(process.cwd(), 'src', 'data', 'pages', `${slug}.json`);
   const body = await request.json();
   try {

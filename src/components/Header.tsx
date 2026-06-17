@@ -16,7 +16,7 @@ export default function Header() {
         <Link className="rounded-lg px-4 py-2.5 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-primary transition-all" href="/leadership">Leadership</Link>
         <Link className="rounded-lg px-4 py-2.5 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-primary transition-all" href="/opportunities">Opportunities</Link>
         <Link className="rounded-lg px-4 py-2.5 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-primary transition-all" href="/welfare">Welfare</Link>
-        <Link className="rounded-lg px-4 py-2.5 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-primary transition-all" href="/resources">Resources</Link>
+
         <Link className="rounded-lg px-4 py-2.5 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-primary transition-all" href="/academics/past-questions">Past Questions</Link>
         <Link className="rounded-lg px-4 py-2.5 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-primary transition-all" href="/academics/tutorials">Tutorials</Link>
         <Link className="rounded-lg px-4 py-2.5 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-primary transition-all" href="/events">Events</Link>

@@ -1,5 +1,5 @@
 // lib/api/helpers.ts
-import { supabase } from "../supabase";
+import { supabase } from "../supabase/client";
 
 /**
  * Verify that the current request is made by an admin user.

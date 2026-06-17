@@ -56,7 +56,7 @@ export const ChatbotLogSchema = z.object({
   sessionId: z.string().uuid(),
   messageRole: z.enum(['user', 'assistant', 'system']),
   content: z.string().min(1),
-  tokenUsage: z.record(z.number()).optional(),
+  tokenUsage: z.record(z.string(), z.number()).optional(),
 });
 
 // Site Settings

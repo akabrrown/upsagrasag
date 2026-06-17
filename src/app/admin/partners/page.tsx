@@ -1,6 +1,7 @@
 // app/admin/partners/page.tsx
 import React from "react";
-import CrudTable from "@/components/admin/CrudTable";
+import { AdminTable } from "@/components/admin/AdminTable";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { Partner } from "@/types/admin";
 
 const columns = [
@@ -12,14 +13,18 @@ const columns = [
   { key: "actions", label: "Actions" },
 ];
 
-export default function PartnersPage() {
+export default async function PartnersPage() {
+  const supabase = await createServerSupabaseClient();
+  const { data } = await supabase.from('partners').select('*').order('display_order');
+  const partners = data || [];
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Partners</h1>
-      <CrudTable<Partner>
+      <AdminTable<Partner & { id: string }>
         entity="partners"
         columns={columns}
-        pageSize={20}
+        data={partners as (Partner & { id: string })[]}
       />
     </div>
   );

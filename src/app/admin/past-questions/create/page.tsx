@@ -1,3 +1,5 @@
+'use client';
+
 // app/admin/past-questions/create/page.tsx
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -9,7 +11,7 @@ import { z } from "zod";
 
 export const dynamic = "force-dynamic";
 
-type FormData = z.infer<typeof pastQuestionSchema>;
+type FormData = z.input<typeof pastQuestionSchema>;
 
 export default function PastQuestionCreatePage() {
   const router = useRouter();

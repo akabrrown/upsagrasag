@@ -1,6 +1,6 @@
 // app/api/admin/[entity]/route.ts
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import supabaseAdmin from '@/lib/supabaseAdmin';
 import { getPagination } from '@/lib/pagination';
 import { z } from 'zod';
 
@@ -51,7 +51,7 @@ const schemas: Record<string, z.ZodObject<any>> = {
     session_id: z.string().uuid(),
     message_role: z.enum(["user", "assistant", "system"]),
     content: z.string().min(1),
-    token_usage: z.record(z.any()).optional(),
+    token_usage: z.record(z.string(), z.any()).optional(),
   }),
   site_settings: z.object({
     key: z.string().min(1),
@@ -60,8 +60,8 @@ const schemas: Record<string, z.ZodObject<any>> = {
   }),
 };
 
-export async function GET(request: Request, { params }: { params: { entity: string } }) {
-  const { entity } = params;
+export async function GET(request: Request, { params }: { params: Promise<{ entity: string }> }) {
+  const { entity } = await params;
   const url = new URL(request.url);
   const { page, limit } = getPagination(url.searchParams);
   const from = (page - 1) * limit;
@@ -73,8 +73,8 @@ export async function GET(request: Request, { params }: { params: { entity: stri
   return NextResponse.json({ data, total: count ?? 0, page, limit });
 }
 
-export async function POST(request: Request, { params }: { params: { entity: string } }) {
-  const { entity } = params;
+export async function POST(request: Request, { params }: { params: Promise<{ entity: string }> }) {
+  const { entity } = await params;
   const schema = schemas[entity];
   if (!schema) return NextResponse.json({ error: 'Unknown entity' }, { status: 400 });
   const body = await request.json();
@@ -85,8 +85,8 @@ export async function POST(request: Request, { params }: { params: { entity: str
   return NextResponse.json(data[0]);
 }
 
-export async function PATCH(request: Request, { params }: { params: { entity: string } }) {
-  const { entity } = params;
+export async function PATCH(request: Request, { params }: { params: Promise<{ entity: string }> }) {
+  const { entity } = await params;
   const schema = schemas[entity];
   if (!schema) return NextResponse.json({ error: 'Unknown entity' }, { status: 400 });
   const body = await request.json();
@@ -99,8 +99,8 @@ export async function PATCH(request: Request, { params }: { params: { entity: st
   return NextResponse.json(data[0]);
 }
 
-export async function DELETE(request: Request, { params }: { params: { entity: string } }) {
-  const { entity } = params;
+export async function DELETE(request: Request, { params }: { params: Promise<{ entity: string }> }) {
+  const { entity } = await params;
   const body = await request.json();
   // Accept either single id or array of ids for bulk delete
   const ids: number[] = Array.isArray(body.ids) ? body.ids : body.id ? [body.id] : [];

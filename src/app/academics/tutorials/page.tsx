@@ -1,11 +1,12 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { BookOpen, Video, Layers } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase';
 
 export default function TutorialsPage() {
   const [items, setItems] = useState<Array<any>>([]);
   const [loading, setLoading] = useState(true);
+  const supabase = createClient();
 
   useEffect(() => {
     async function fetchData() {

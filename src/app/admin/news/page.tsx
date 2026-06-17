@@ -1,13 +1,13 @@
 // app/admin/news/page.tsx
 import React from 'react';
 import { CrudTable } from '@/components/admin/CrudTable';
-import { getNews } from '@/lib/supabase/admin';
+import { newsService } from '@/lib/supabase/admin';
 import type { News, ColumnConfig } from '@/types/admin';
 
 export const dynamic = 'force-dynamic';
 
 export default async function NewsPage() {
-  const news = await getNews();
+  const news = await newsService.list();
 
   const columns: ColumnConfig<News>[] = [
     { key: 'id', label: 'ID' },
@@ -21,8 +21,12 @@ export default async function NewsPage() {
 
   return (
     <section className="p-4">
-      <h2 className="text-xl font-semibold mb-4">News</h2>
-      <CrudTable data={news} columns={columns} entity="news" />
+      <h1 className="text-2xl font-bold mb-4">News & Updates</h1>
+      <CrudTable<News & { id: string }> 
+        data={news as (News & { id: string })[]} 
+        columns={columns as any} 
+        entity="news" 
+      />
     </section>
   );
 }

@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { ArrowRight, Bot } from 'lucide-react';
 import { supabaseClient } from '@/lib/supabaseClient';
 
+import { partnerService } from '@/lib/supabase/admin';
+
 export default function HomePage() {
   // Countdown timer state
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -61,13 +63,25 @@ export default function HomePage() {
     fetchHero();
   }, []);
 
-  const partners = [
-    { name: 'KPMG', logo: '/KPMG-Symbol.png' },
-    { name: 'PwC', logo: '/images.png' },
-    { name: 'Deloitte', logo: '/download.png' },
-    { name: 'ICAG', logo: '/download%20(1).png' },
-    { name: 'ACCA', logo: '/download%20(2).png' },
-  ];
+  const [partners, setPartners] = useState([] as { name: string; logo: string }[]);
+
+useEffect(() => {
+  const fetchPartners = async () => {
+    try {
+      const { data, error } = await supabaseClient
+        .from('partners')
+        .select('name, logo_url')
+        .order('display_order');
+      if (error) throw error;
+      setPartners(data.map(p => ({ name: p.name, logo: p.logo_url ?? '' })));
+    } catch (err) {
+      console.error('Failed to fetch partners', err);
+      setPartners([]);
+    }
+  };
+  fetchPartners();
+}, []);
+
 
   // Slides will be defined after hero defaults
   // Updated hero defaults for fallback when slide has no custom data
@@ -86,14 +100,14 @@ export default function HomePage() {
       subtitle: heroSubtitle,
       ctaText: heroCtaText,
       ctaLink: heroCtaLink,
-      bgStyle: { backgroundImage: 'url(/IMG_5244.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' },
+      bgStyle: { backgroundImage: 'url(/IMG_5241.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' },
     },
     {
       title: 'Welcome to the Graduate Student Association of Ghana',
       subtitle: 'Join us in fostering graduate research, professional growth, and community impact across Ghana.',
       ctaText: 'Learn More',
       ctaLink: '/about',
-      bgStyle: { backgroundImage: 'url(/IMG_5244.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' },
+      bgStyle: { backgroundImage: 'url(/IMG_5241.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' },
     },
   ];
   const [slideIndex, setSlideIndex] = useState(0);

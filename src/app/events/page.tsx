@@ -1,23 +1,9 @@
 import React from 'react';
 import { Calendar, MapPin, Clock } from 'lucide-react';
+import { eventService } from '@/lib/supabase/admin';
 
-export default function EventsPage() {
-  const eventsList = [
-    {
-      title: '14th Annual GRASAG-UPSA General Congress',
-      date: 'Nov 15, 2026',
-      time: '9:00 AM - 5:00 PM',
-      location: 'UPSA Auditorium',
-      desc: 'Annual flagship assembly including research exhibitions, senate debates, professional development panels, and delegate networking sessions.'
-    },
-    {
-      title: 'CV Writing & LinkedIn Professional Audit',
-      date: 'Dec 03, 2026',
-      time: '2:00 PM - 4:00 PM',
-      location: 'Graduate School Block',
-      desc: 'Practical workshop with corporate HR recruiters vetting and reviewing postgrad resumes and profile optimization tips.'
-    }
-  ];
+export default async function EventsPage() {
+  const events = await eventService.list();
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8 space-y-12 bg-background text-foreground">
@@ -36,7 +22,7 @@ export default function EventsPage() {
 
       {/* Events loop */}
       <div className="space-y-6">
-        {eventsList.map((e) => (
+        {events.map((e) => (
           <div
             key={e.title}
             className="group grid grid-cols-1 md:grid-cols-12 gap-6 upsa-gold-card"

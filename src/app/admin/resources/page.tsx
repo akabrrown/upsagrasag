@@ -24,9 +24,9 @@ export default async function ResourcesPage() {
   return (
     <section className="p-4">
       <h1 className="text-2xl font-bold mb-4">Resources</h1>
-      <CrudTable<Resource>
+      <CrudTable<Resource & { id: string }>
         entity="resources"
-        data={resources}
+        data={resources as (Resource & { id: string })[]}
         columns={columns}
         pageSize={20}
       />

@@ -1,3 +1,5 @@
+'use client';
+
 // components/TipTapEditor.tsx
 import React, { useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';

@@ -24,7 +24,7 @@ export default async function AboutPage() {
             <Landmark className="h-6 w-6 text-accent" /> Overview & History
           </h2>
           <p className="text-sm text-neutral-600 leading-relaxed">
-            Established as the local chapter of the Graduate Students' Association of Ghana, GRASAG-UPSA represents all postgraduates pursuing MBA, MSc, MPhil, LLM, and PhD courses at UPSA.
+            Established as the local chapter of the Graduate Students&apos; Association of Ghana, GRASAG-UPSA represents all postgraduates pursuing MBA, MSc, MPhil, LLM, and PhD courses at UPSA.
           </p>
           <p className="text-sm text-neutral-600 leading-relaxed">
             Our mission coordinates directly with the School of Graduate Studies (SOGS) to align academic work, thesis formatting, and supervisor allocations with national standards, helping students build research and executive capacity.
@@ -52,7 +52,7 @@ export default async function AboutPage() {
           </div>
           <h3 className="text-lg font-bold text-accent">Our Mission</h3>
           <p className="text-sm text-neutral-600 leading-relaxed">
-            To champion the academic, professional, and welfare interests of all graduate students at UPSA through advocacy, representation, and service delivery, while contributing to Ghana's development.
+            To champion the academic, professional, and welfare interests of all graduate students at UPSA through advocacy, representation, and service delivery, while contributing to Ghana&apos;s development.
           </p>
         </div>
 

@@ -1,3 +1,5 @@
+'use client';
+
 // app/admin/events/create/page.tsx
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';

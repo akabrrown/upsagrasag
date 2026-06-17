@@ -43,7 +43,7 @@ export default function Navbar() {
     },
     { name: 'Events & Programmes', href: '/events', icon: Calendar },
     { name: 'Research & Opportunities', href: '/research-and-opportunities', icon: Bot },
-    { name: 'Resources', href: '/resources', icon: FileText },
+
     { name: 'News & Updates', href: '/news-updates', icon: Info },
     
   ];

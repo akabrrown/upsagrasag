@@ -24,10 +24,10 @@ export default async function PastQuestionsPage() {
   return (
     <section className="p-4">
       <h1 className="text-2xl font-bold mb-4">Past Questions</h1>
-      <CrudTable<PastQuestion>
+      <CrudTable<PastQuestion & { id: string }>
         entity="past_questions"
-        data={questions}
         columns={columns}
+        data={questions as (PastQuestion & { id: string })[]}
         pageSize={20}
       />
     </section>

@@ -1,3 +1,5 @@
+'use client';
+
 // components/admin/CrudTable.tsx
 import * as React from 'react';
 import { useState } from 'react';
@@ -10,6 +12,7 @@ interface CrudTableProps<T> {
   data: T[];
   columns: ColumnConfig<T>[];
   entity: string; // e.g., 'executives'
+  pageSize?: number;
 }
 
 export function CrudTable<T extends { id: number | string }>({ data, columns, entity }: CrudTableProps<T>) {
@@ -65,7 +68,7 @@ export function CrudTable<T extends { id: number | string }>({ data, columns, en
           <TableRow key={item.id}>
             {columns.map((col) => (
               <TableCell key={col.key as string}>
-                {String(item[col.key])}
+                {String(item[col.key as keyof T] ?? '')}
               </TableCell>
             ))}
             <TableCell>

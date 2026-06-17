@@ -1,3 +1,5 @@
+'use client';
+
 // app/admin/events/edit/[id]/page.tsx
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';

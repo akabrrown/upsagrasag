@@ -1,3 +1,5 @@
+'use client';
+
 // app/admin/opportunities/edit/[id]/page.tsx
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -9,7 +11,7 @@ import { z } from "zod";
 
 export const dynamic = "force-dynamic";
 
-type FormData = z.infer<typeof opportunitySchema>;
+type FormData = z.input<typeof opportunitySchema>;
 
 export default function OpportunityEditPage() {
   const router = useRouter();

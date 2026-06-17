@@ -1,3 +1,5 @@
+'use client';
+
 // app/admin/executives/edit/[id]/page.tsx
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -9,7 +11,7 @@ import { z } from "zod";
 
 export const dynamic = "force-dynamic";
 
-type FormData = z.infer<typeof executiveSchema>;
+type FormData = z.input<typeof executiveSchema>;
 
 export default function ExecutiveEditPage() {
   const router = useRouter();
@@ -33,11 +35,22 @@ export default function ExecutiveEditPage() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      await executiveService.update(id, data);
-      router.push("/admin/executives");
-    } catch (e) {
-      console.error(e);
-      alert("Failed to update executive");
+      let photoUrl = data.photo_url;
+      if (file) {
+        const filePath = `executives/${Date.now()}_${file.name}`;
+        const { error: uploadError } = await supabaseClient.storage
+          .from('executive-photos')
+          .upload(filePath, file);
+        if (uploadError) throw uploadError;
+        const { data: publicData } = supabaseClient.storage
+          .from('executive-photos')
+          .getPublicUrl(filePath);
+        photoUrl = publicData.publicUrl || '';
+      }
+      await executiveService.update(id, { ...data, photo_url: photoUrl });
+      router.push('/admin/executives');
+    } catch (e: any) {
+      alert(e.message);
     }
   };
 

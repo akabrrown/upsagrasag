@@ -22,7 +22,11 @@ export default async function OpportunitiesPage() {
   return (
     <section className="p-4">
       <h2 className="text-xl font-semibold mb-4">Opportunities</h2>
-      <CrudTable data={opportunities} columns={columns} entity="opportunities" />
+      <CrudTable<Opportunity & { id: string }> 
+        data={opportunities as (Opportunity & { id: string })[]} 
+        columns={columns as any} 
+        entity="opportunities" 
+      />
     </section>
   );
 }

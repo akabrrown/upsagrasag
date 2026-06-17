@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase';
 import { Mail, Lock, LogIn, ArrowRight } from 'lucide-react';
 
 export default function SignInPage() {
@@ -11,6 +11,7 @@ export default function SignInPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const supabase = createClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,13 +28,13 @@ export default function SignInPage() {
     } else {
       // Synchronize cookies with Next.js Server Components / Middleware
       router.refresh();
-      router.replace('/admin/dashboard');
+      router.push('/admin');
     }
     setLoading(false);
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[url('/IMG_5244.jpg')] bg-cover bg-center p-4 relative overflow-hidden text-blue-400">
+    <main className="min-h-screen flex items-center justify-center bg-[url('/IMG_5241.jpg')] bg-cover bg-center p-4 relative overflow-hidden text-blue-400">
       {/* Decorative background elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-accent/20 blur-[120px] mix-blend-screen" />
@@ -46,8 +47,8 @@ export default function SignInPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent/20 text-accent mb-4 ring-1 ring-accent/50 shadow-[0_0_15px_rgba(184,134,11,0.5)]">
                <LogIn className="w-8 h-8" />
             </div>
-            <h1 className="text-3xl font-extrabold text-blue-500 tracking-tight">Admin Portal</h1>
-                      <p className="text-blue-500 mt-2 text-sm font-medium">GRASAG UPSA Management Dashboard</p>
+            <h1 className="text-3xl font-extrabold text-primary tracking-tight">Admin Portal</h1>
+                      <p className="text-primary mt-2 text-sm font-medium">GRASAG UPSA Management Dashboard</p>
           </div>
 
           {error && (
@@ -58,7 +59,7 @@ export default function SignInPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-                             <label className="text-xs font-bold text-blue-500 uppercase tracking-wider ml-1">Email Address</label>
+                             <label className="text-xs font-bold text-primary uppercase tracking-wider ml-1">Email Address</label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-blue-300 group-focus-within:text-accent transition-colors">
                   <Mail className="h-5 w-5" />
@@ -76,7 +77,7 @@ export default function SignInPage() {
 
             <div className="space-y-2">
               <div className="flex justify-between items-center ml-1">
-                                 <label className="text-xs font-bold text-blue-500 uppercase tracking-wider">Password</label>
+                                 <label className="text-xs font-bold text-primary uppercase tracking-wider">Password</label>
               </div>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-blue-300 group-focus-within:text-accent transition-colors">
@@ -96,7 +97,7 @@ export default function SignInPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-4 px-4 border border-transparent rounded-xl text-sm font-bold text-blue-500 bg-accent hover:bg-[#cba028] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-primary transition-all duration-300 shadow-[0_0_20px_rgba(184,134,11,0.3)] hover:shadow-[0_0_25px_rgba(184,134,11,0.6)] disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden"
+              className="group relative w-full flex justify-center py-4 px-4 border border-transparent rounded-xl text-sm font-bold text-primary bg-accent hover:bg-[#cba028] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-primary transition-all duration-300 shadow-[0_0_20px_rgba(184,134,11,0.3)] hover:shadow-[0_0_25px_rgba(184,134,11,0.6)] disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden"
             >
               <span className="relative z-10 flex items-center gap-2">
                 {loading ? 'Authenticating...' : 'Sign In'}
@@ -106,7 +107,7 @@ export default function SignInPage() {
           </form>
 
           <div className="mt-8 pt-6 border-t border-white/10 text-center">
-             <p className="text-xs text-blue-500 font-medium tracking-wide">Secure Access • Authorized Personnel Only</p>
+             <p className="text-xs text-primary font-medium tracking-wide">Secure Access • Authorized Personnel Only</p>
           </div>
         </div>
       </div>

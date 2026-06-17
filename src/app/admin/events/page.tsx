@@ -23,7 +23,11 @@ export default async function EventsPage() {
   return (
     <section className="p-4">
       <h2 className="text-xl font-semibold mb-4">Events</h2>
-      <CrudTable data={events} columns={columns} entity="events" />
+      <CrudTable<Event & { id: string }> 
+        data={events as (Event & { id: string })[]} 
+        columns={columns as any} 
+        entity="events" 
+      />
     </section>
   );
 }
