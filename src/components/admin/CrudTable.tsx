@@ -1,95 +1,100 @@
 'use client';
 
-// components/admin/CrudTable.tsx
-import * as React from 'react';
-import { useState } from 'react';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
-import type { ColumnConfig } from '@/types/admin';
+import React from 'react';
+import { Edit, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button'; // Assuming shadcn/ui or similar exists, fallback to standard if not
+
+interface Column<T> {
+  header: string;
+  accessor: keyof T | ((row: T) => React.ReactNode);
+}
 
 interface CrudTableProps<T> {
   data: T[];
-  columns: ColumnConfig<T>[];
-  entity: string; // e.g., 'executives'
-  pageSize?: number;
+  columns: Column<T>[];
+  onEdit?: (row: T) => void;
+  onDelete?: (row: T) => void;
+  isLoading?: boolean;
 }
 
-export function CrudTable<T extends { id: number | string }>({ data, columns, entity }: CrudTableProps<T>) {
-  const router = useRouter();
+export default function CrudTable<T extends { id?: string }>({
+  data = [],
+  columns,
+  onEdit,
+  onDelete,
+  isLoading = false
+}: CrudTableProps<T>) {
+  if (isLoading) {
+    return (
+      <div className="w-full bg-white rounded-lg border shadow-sm p-8 flex justify-center items-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
-  const [selectedIds, setSelectedIds] = useState<Set<string | number>>(new Set());
-  const toggleSelect = (id: string | number) => {
-    setSelectedIds(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) newSet.delete(id);
-      else newSet.add(id);
-      return newSet;
-    });
-  };
-
-  const handleBulkDelete = async () => {
-    if (selectedIds.size === 0) return alert('No rows selected');
-    if (!confirm(`Delete ${selectedIds.size} selected records?`)) return;
-    const idsArray = Array.from(selectedIds);
-    const res = await fetch(`/api/admin/${entity}`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ids: idsArray }),
-    });
-    if (res.ok) {
-      router.refresh();
-      setSelectedIds(new Set());
-    } else alert('Bulk delete failed');
-  };
+  if (data.length === 0) {
+    return (
+      <div className="w-full bg-white rounded-lg border shadow-sm p-8 text-center text-slate-500">
+        No records found. Click "Add New" to create one.
+      </div>
+    );
+  }
 
   return (
-    <>
-    <Table>
-      <TableHeader>
-        <TableRow>
-          {columns.map((col) => (
-            <TableHead key={col.key as string}>{col.label}</TableHead>
-          ))}
-            <TableHead>
-              <input
-                type="checkbox"
-                checked={selectedIds.size === data.length && data.length > 0}
-                onChange={e => {
-                  if (e.target.checked) setSelectedIds(new Set(data.map(item => item.id)));
-                  else setSelectedIds(new Set());
-                }}
-              />
-            </TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {data.map((item) => (
-          <TableRow key={item.id}>
-            {columns.map((col) => (
-              <TableCell key={col.key as string}>
-                {String(item[col.key as keyof T] ?? '')}
-              </TableCell>
+    <div className="w-full bg-white rounded-lg border shadow-sm overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm text-left">
+          <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-b">
+            <tr>
+              {columns.map((col, idx) => (
+                <th key={idx} className="px-6 py-4 font-medium">{col.header}</th>
+              ))}
+              {(onEdit || onDelete) && (
+                <th className="px-6 py-4 font-medium text-right">Actions</th>
+              )}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {(Array.isArray(data) ? data : []).map((row, idx) => (
+              <tr key={row.id || idx} className="hover:bg-slate-50/50 transition-colors">
+                {columns.map((col, cIdx) => (
+                  <td key={cIdx} className="px-6 py-4">
+                    {typeof col.accessor === 'function' 
+                      ? col.accessor(row) 
+                      : (row[col.accessor] as React.ReactNode)}
+                  </td>
+                ))}
+                {(onEdit || onDelete) && (
+                  <td className="px-6 py-4 text-right space-x-2">
+                    {onEdit && (
+                      <button 
+                        onClick={() => onEdit(row)}
+                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors inline-flex"
+                        title="Edit"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                    )}
+                    {onDelete && (
+                      <button 
+                        onClick={() => {
+                          if(confirm('Are you sure you want to delete this record?')) {
+                            onDelete(row);
+                          }
+                        }}
+                        className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors inline-flex"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </td>
+                )}
+              </tr>
             ))}
-            <TableCell>
-              <input
-                type="checkbox"
-                checked={selectedIds.has(item.id)}
-                onChange={() => toggleSelect(item.id)}
-              />
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-    <div className="flex justify-between mb-4 mt-4">
-        <Button onClick={handleBulkDelete} variant="destructive" disabled={selectedIds.size === 0}>
-          Delete Selected ({selectedIds.size})
-        </Button>
-        <Button onClick={() => router.push(`/admin/${entity}/create`)}>
-          Create New
-        </Button>
+          </tbody>
+        </table>
       </div>
-    </>
+    </div>
   );
 }

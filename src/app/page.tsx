@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Bot } from 'lucide-react';
+import Image from 'next/image';
+import { Bot } from 'lucide-react';
 import { supabaseClient } from '@/lib/supabaseClient';
 
-import { partnerService } from '@/lib/supabase/admin';
 
 export default function HomePage() {
   // Countdown timer state
@@ -75,7 +75,7 @@ useEffect(() => {
       if (error) throw error;
       setPartners(data.map(p => ({ name: p.name, logo: p.logo_url ?? '' })));
     } catch (err) {
-      console.error('Failed to fetch partners', err);
+      console.warn('Failed to fetch partners (table might be missing)', err);
       setPartners([]);
     }
   };
@@ -89,9 +89,7 @@ useEffect(() => {
   const heroSubtitle = hero.subtitle || 'Join forces with GRASAG‑UPSA to shape graduate research, professional growth, and community impact across Ghana.';
   const heroCtaText = hero.ctaText || 'Partner with us';
   const heroCtaLink = hero.ctaLink || '/opportunities';
-  const heroBgStyle = hero.imageUrl
-    ? { backgroundImage: `url(${hero.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-    : {};
+
 
   // Define hero slides
   const slides = [
@@ -116,7 +114,7 @@ useEffect(() => {
       setSlideIndex((prev) => (prev + 1) % slides.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [slides.length]);
   const currentSlide = slides[slideIndex];
 
   const bgStyle = currentSlide?.bgStyle || {};
@@ -158,9 +156,11 @@ useEffect(() => {
             {/* President Photo – Left Side */}
             <div className="flex justify-center lg:justify-start lg:order-2">
               <div className="relative w-full max-w-lg overflow-hidden rounded-2xl">
-                <img
+                <Image
                   src="/WhatsApp Image 2026-06-04 at 6.23.20 PM.jpeg"
                   alt="President – Samuel Sasu Adonteng"
+                  width={500}
+                  height={300}
                   className="object-cover w-full h-auto rounded-2xl"
                 />
                 <div className="pt-4 border-t border-neutral-200">
@@ -173,7 +173,7 @@ useEffect(() => {
             {/* Welcome Text – Right Side */}
             <div className="space-y-6 lg:order-1">
               <h2 className="text-3xl sm:text-4xl font-extrabold text-primary leading-tight">
-                Welcome to the official website for the Graduate Students' Association of Ghana – UPSA.
+                Welcome to the official website for the Graduate Students&apos; Association of Ghana – UPSA.
               </h2>
 
               <div className="space-y-4 text-neutral-600 text-sm sm:text-base leading-relaxed">
@@ -241,11 +241,39 @@ useEffect(() => {
           <div className="flex flex-wrap justify-center items-center gap-10">
             {partners.map((partner) => (
               <div key={partner.name} className="h-10 w-24 relative opacity-50 hover:opacity-100 transition-opacity duration-300">
-                <img src={partner.logo} alt={partner.name} className="object-contain w-full h-full filter grayscale" />
+                <Image src={partner.logo} alt={partner.name} width={96} height={40} className="object-contain w-full h-full filter grayscale" />
               </div>
             ))}
           </div>
         </div>
+      {/* Strategic Priorities */}
+      <section className="py-6">
+        <div className="mx-auto max-w-4xl px-4">
+          <h2 className="text-xl font-semibold text-center text-primary mb-4">Strategic Priorities</h2>
+          <div className="grid grid-cols-2 gap-4">
+  <div className="flex flex-col items-center bg-white/80 backdrop-blur-md p-2 rounded text-center">
+    <Image src="/Academic advocacy and curriculum improvement.png" alt="Academic" width={40} height={40} className="w-10 h-10 mb-2 rounded" />
+    <span className="text-sm font-medium mb-1">Academic Advocacy & Curriculum Improvement</span>
+    <p className="text-xs text-neutral-600">We champion policies and initiatives that enhance academic excellence, ensuring graduate students have a voice in curriculum development, teaching quality, and the overall learning experience.</p>
+  </div>
+  <div className="flex flex-col items-center bg-white/80 backdrop-blur-md p-2 rounded text-center">
+    <Image src="/Professional development and career services.png" alt="Career" width={40} height={40} className="w-10 h-10 mb-2 rounded" />
+    <span className="text-sm font-medium mb-1">Professional Development & Career Services</span>
+    <p className="text-xs text-neutral-600">We equip graduate students with the skills, networks, and opportunities needed to excel in their careers through training programs, mentorship, industry engagement, and career support services.</p>
+  </div>
+  <div className="flex flex-col items-center bg-white/80 backdrop-blur-md p-2 rounded text-center">
+    <Image src="/Research funding and collaboration.png" alt="Research" width={40} height={40} className="w-10 h-10 mb-2 rounded" />
+    <span className="text-sm font-medium mb-1">Research Funding & Collaboration</span>
+    <p className="text-xs text-neutral-600">We promote a vibrant research culture by facilitating access to funding opportunities, fostering interdisciplinary partnerships, and encouraging collaborations with academia, industry, and development organizations.</p>
+  </div>
+  <div className="flex flex-col items-center bg-white/80 backdrop-blur-md p-2 rounded text-center">
+    <Image src="/Student welfare and mental health support.png" alt="Welfare" width={40} height={40} className="w-10 h-10 mb-2 rounded" />
+    <span className="text-sm font-medium mb-1">Student Welfare & Mental Health Support</span>
+    <p className="text-xs text-neutral-600">We are committed to the holistic well‑being of graduate students by advocating for welfare initiatives, providing support systems, and promoting mental health awareness and resilience.</p>
+  </div>
+</div>
+        </div>
+      </section>
       </section>
 
       {/* Floating Chatbot Indicator */}

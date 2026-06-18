@@ -1,65 +1,131 @@
-"use client";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area.tsx";
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { 
+  LayoutDashboard, 
+  Users, 
+  FileText, 
+  Settings, 
+  Calendar, 
+  Briefcase, 
+  BookOpen, 
+  Video, 
+  Award,
+  Globe,
+  Newspaper,
+  LogOut,
+  FolderOpen,
+  ChevronsLeft,
+  ChevronsRight,
+} from 'lucide-react';
+import { supabaseClient } from '@/lib/supabaseClient';
+import { useRouter } from 'next/navigation';
+
+const navItems = [
+  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+  { name: 'Homepage Content', href: '/admin/president', icon: Globe },
+  { name: 'Congress Events', href: '/admin/congress', icon: Calendar },
+  { name: 'Partners', href: '/admin/partners', icon: Users },
+  { name: 'Constitution Files', href: '/admin/constitution', icon: FileText },
+  { name: 'Leadership & Patrons', href: '/admin/leadership', icon: Award },
+  { name: 'Executive Council', href: '/admin/executives', icon: Users },
+  { name: 'Opportunities', href: '/admin/opportunities', icon: Briefcase },
+  { name: 'Resources', href: '/admin/resources', icon: FolderOpen },
+  { name: 'Past Questions', href: '/admin/past_questions', icon: BookOpen },
+  { name: 'Tutorials', href: '/admin/tutorials', icon: Video },
+  { name: 'Events & Programmes', href: '/admin/events_programmes', icon: Calendar },
+  { name: 'Research & Grants', href: '/admin/research_opportunities', icon: Award },
+  { name: 'News & Updates', href: '/admin/news_updates', icon: Newspaper },
+  { name: 'Admin Users', href: '/admin/users', icon: Users },
+  { name: 'Site Settings', href: '/admin/settings', icon: Settings },
+];
 
 export default function AdminSidebar() {
   const pathname = usePathname();
-  return (
-    <aside className="w-64 bg-gray-50 border-r p-4 h-screen flex flex-col">
-      <ScrollArea className="flex-1">
-        <nav className="flex-1 space-y-1">
-          {[
-            { href: "/admin/executives", label: "Executives" },
-            { href: "/admin/opportunities", label: "Opportunities" },
-            { href: "/admin/past-questions", label: "Past Questions" },
-            { href: "/admin/resources", label: "Resources" },
-            { href: "/admin/partners", label: "Partners" },
-            { href: "/admin/chatbot-logs", label: "Chatbot Logs" },
-            { href: "/admin/site-settings", label: "Site Settings" },
-            { href: "/admin/news", label: "News" },
-            { href: "/admin/events", label: "Events" },
-          ].map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={
-                  "block py-2 px-3 rounded transition-colors " +
-                  (isActive ? "bg-indigo-200 text-indigo-900" : "text-gray-700 hover:bg-indigo-100")
-                }
-              >
-                {item.label}
-              </Link>
-            );
-          })}
+  const router = useRouter();
+  // Add admin-page class for global styling (hide footer)
+  useEffect(() => {
+    document.body.classList.add('admin-page');
+    return () => {
+      document.body.classList.remove('admin-page');
+    };
+  }, []);
 
-        {/* Create Links */}
-          {[
-            { href: "/admin/partners/create", label: "Create Partner" },
-            { href: "/admin/news/create", label: "Create News" },
-            { href: "/admin/events/create", label: "Create Event" },
-            { href: "/admin/opportunities/create", label: "Create Opportunity" },
-            { href: "/admin/resources/create", label: "Create Resource" },
-            { href: "/admin/past-questions/create", label: "Create Past Question" },
-          ].map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="block py-2 px-3 rounded text-gray-700 hover:bg-indigo-100"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-      </ScrollArea>
-      <div className="mt-4">
-        <Button asChild className="w-full bg-indigo-600 hover:bg-indigo-700 text-white">
-          <Link href="/">Switch to Public Site</Link>
-        </Button>
+  // Collapse state for sidebar
+  const [collapsed, setCollapsed] = useState(false);
+
+
+  const handleLogout = async () => {
+    await supabaseClient.auth.signOut();
+    router.push('/signin');
+  };
+
+  const toggleCollapse = () => {
+    setCollapsed(!collapsed);
+    if (typeof window !== 'undefined') {
+      if (!collapsed) {
+        document.body.classList.add('sidebar-collapsed');
+      } else {
+        document.body.classList.remove('sidebar-collapsed');
+      }
+    }
+  };
+
+
+  return (
+    <div className={`${collapsed ? 'w-16' : 'w-64'} h-screen bg-slate-900 text-white flex flex-col fixed left-0 top-0 overflow-y-auto custom-scrollbar transition-all duration-300 z-10`}> 
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .sidebar-collapsed + div { margin-left: 4rem; }
+        .admin-page:has(.sidebar-collapsed) > div:last-child { margin-left: 4rem; }
+      `}</style>
+      <div className="p-6 flex items-center justify-between">
+        {!collapsed && (
+          <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+            <span className="text-blue-500">GRASAG</span> Admin
+          </h2>
+        )}
+        <button onClick={toggleCollapse} className="text-gray-300 hover:text-white focus:outline-none">
+          {collapsed ? <ChevronsRight size={20} /> : <ChevronsLeft size={20} />}
+        </button>
       </div>
-    </aside>
+
+      <nav className="flex-1 px-4 space-y-1 pb-8">
+        {navItems.map((item) => {
+          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.name}
+              href={item.href}
+              title={collapsed ? item.name : ''}
+              className={`flex items-center ${collapsed ? 'justify-center gap-0' : 'gap-3'} px-3 py-2.5 rounded-lg transition-colors text-sm font-medium ${
+                isActive 
+                  ? 'bg-blue-600 text-white' 
+                  : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+              }`}
+            >
+              <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-white' : 'text-slate-200'}`} />
+              {!collapsed && item.name}
+            </Link>
+          );
+        })}
+      </nav>
+
+      <div className="p-4 border-t border-slate-800">
+        <button 
+          onClick={handleLogout}
+          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg transition-colors text-sm font-medium text-slate-300 hover:bg-red-500 hover:text-white"
+        >
+          <LogOut className="w-4 h-4 text-slate-400" />
+          {!collapsed && 'Logout'}
+        </button>
+      </div>
+    </div>
   );
 }

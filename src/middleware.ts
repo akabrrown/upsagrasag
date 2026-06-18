@@ -1,40 +1,43 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { createServerClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient } from '@supabase/ssr';
+import { NextResponse, type NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
-  let res = NextResponse.next({ request });
-  
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  
-  const supabase = createServerClient(supabaseUrl, supabaseKey, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) => {
-          request.cookies.set(name, value);
-          res.cookies.set({ name, value, ...options });
-        });
-      },
-    },
+  const response = NextResponse.next({
+    request,
   });
 
-  const { data: { user }, error } = await supabase.auth.getUser();
-  
-  if (error || !user) {
-    if (request.nextUrl.pathname.startsWith('/api/')) {
-      return new NextResponse('Unauthorized', { status: 401 });
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set(name, value, options);
+          });
+        },
+      },
     }
-    const signInUrl = new URL('/signin', request.url);
-    return NextResponse.redirect(signInUrl);
+  );
+
+  const { data: { session } } = await supabase.auth.getSession();
+  const { pathname } = request.nextUrl;
+
+  // Protect admin routes except sign‑in
+  if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/signin')) {
+    if (!session) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/signin';
+      return NextResponse.redirect(url);
+    }
   }
-  
-  return res;
+
+  return response;
 }
 
 export const config = {
-  matcher: ['/admin', '/admin/:path*', '/api/admin/:path*']
+  matcher: ['/admin/:path*'],
 };

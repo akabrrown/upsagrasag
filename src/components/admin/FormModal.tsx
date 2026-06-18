@@ -1,32 +1,47 @@
-// src/components/admin/FormModal.tsx
-"use client";
+'use client';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ReactNode } from "react";
+import React, { useEffect } from 'react';
+import { X } from 'lucide-react';
 
 interface FormModalProps {
-  /** Button label that opens the modal */
-  triggerLabel: string;
-  /** Modal title */
+  isOpen: boolean;
+  onClose: () => void;
   title: string;
-  /** Form content – usually a component with its own state */
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
-export default function FormModal({ triggerLabel, title, children }: FormModalProps) {
+export default function FormModal({ isOpen, onClose, title, children }: FormModalProps) {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <button className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
-          {triggerLabel}
-        </button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-        </DialogHeader>
-        {children}
-      </DialogContent>
-    </Dialog>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm overflow-y-auto">
+      <div 
+        className="bg-white rounded-xl shadow-xl w-full max-w-2xl flex flex-col my-auto max-h-[90vh]"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+          <h3 className="text-lg font-bold text-slate-800">{title}</h3>
+          <button 
+            onClick={onClose}
+            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        
+        <div className="p-6 overflow-y-auto">
+          {children}
+        </div>
+      </div>
+    </div>
   );
 }

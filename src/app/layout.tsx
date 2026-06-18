@@ -1,10 +1,7 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import ConditionalNavbar from "@/components/ConditionalNavbar";
-import Link from "next/link";
-import { Bot } from "lucide-react";
+import type { Metadata } from 'next';
+import './globals.css';
+import ConditionalNavbar from '@/components/ConditionalNavbar';
+import ConditionalFooter from '@/components/ConditionalFooter';
 
 export const metadata: Metadata = {
   title: "GRASAG-UPSA Portal | Graduate Students' Association of Ghana, UPSA",
@@ -14,20 +11,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className="h-full antialiased font-sans" suppressHydrationWarning>
-      <body
-        suppressHydrationWarning
-        className="min-h-full flex flex-col bg-background text-foreground"
-      >
+      <body suppressHydrationWarning className="min-h-full flex flex-col bg-background text-foreground">
         <ConditionalNavbar />
         <main className="flex-1">{children}</main>
-        <Footer />
-
+        <ConditionalFooter />
       </body>
     </html>
   );

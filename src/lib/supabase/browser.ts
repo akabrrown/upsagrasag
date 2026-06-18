@@ -8,7 +8,7 @@ if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
   throw new Error('NEXT_PUBLIC_SUPABASE_ANON_KEY is not defined');
 }
 
-export const supabaseBrowser = createClient(
+export const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   {

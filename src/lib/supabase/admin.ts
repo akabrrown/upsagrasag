@@ -145,3 +145,5 @@ export const siteSettingsService = {
   update: (payload: Partial<SiteSetting>) => update<SiteSetting>('site_settings', 1, payload),
 };
 
+import { serviceMap, schemaMap } from './admin/index';
+export { serviceMap, schemaMap };
