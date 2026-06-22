@@ -38,7 +38,7 @@ export default function AdminUsersPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<AdminUserForm>({
-    resolver: zodResolver(adminUserSchema)
+    resolver: zodResolver(adminUserSchema) as any
   });
 
   const openCreate = () => {

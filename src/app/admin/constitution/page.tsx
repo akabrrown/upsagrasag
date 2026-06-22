@@ -129,6 +129,7 @@ export default function AdminConstitutionPage() {
               accept="application/pdf"
               onUpload={(url) => setValue('file_url', url, { shouldValidate: true })}
             />
+            <input type="hidden" {...register('file_url')} />
             {fileUrl && (
               <div className="mt-2 text-sm text-green-600 flex items-center gap-2">
                 ✓ File selected/uploaded
@@ -147,7 +148,7 @@ export default function AdminConstitutionPage() {
             </button>
             <button 
               type="submit" 
-              disabled={isSubmitting}
+              disabled={!fileUrl || isSubmitting}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
             >
               {isSubmitting ? 'Saving...' : 'Save'}

@@ -25,12 +25,37 @@ export default async function ResearchOpportunitiesPage() {
       {/* Opportunities List */}
       <section className="space-y-8">
         {opportunities.map((opp) => (
-          <article key={opp.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-            <h2 className="text-2xl font-bold text-primary mb-2">{opp.title}</h2>
-            <p className="text-sm text-neutral-500 mb-2">
-              {new Date(opp.start_date ?? '').toLocaleDateString()} - {new Date(opp.end_date ?? '').toLocaleDateString()}
-            </p>
-            <p className="text-neutral-700" dangerouslySetInnerHTML={{ __html: opp.description ?? '' }} />
+          <article key={opp.id} className="border rounded-lg p-6 hover:shadow-md transition-shadow bg-white site-card-light">
+            <div className="flex justify-between items-start gap-4 mb-2">
+              <span className="badge-accent py-0.5 px-2 text-[10px]">
+                {opp.category}
+              </span>
+              {(opp as any).deadline && (
+                <span className="text-xs text-neutral-400">
+                  Deadline: {(() => {
+                    const parsed = Date.parse((opp as any).deadline);
+                    return isNaN(parsed) ? (opp as any).deadline : new Date(parsed).toLocaleDateString();
+                  })()}
+                </span>
+              )}
+            </div>
+            <h2 className="text-2xl font-bold text-primary mb-1">{opp.title}</h2>
+            <p className="text-sm font-semibold text-neutral-500 mb-4">{opp.company} • {opp.type}</p>
+            {(opp as any).description && (
+              <p className="text-neutral-700 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: (opp as any).description }} />
+            )}
+            {opp.apply_url && (
+              <div className="mt-4 pt-4 border-t border-neutral-100 flex justify-end">
+                <a
+                  href={opp.apply_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs font-bold text-accent hover:underline"
+                >
+                  Apply Now →
+                </a>
+              </div>
+            )}
           </article>
         ))}
       </section>

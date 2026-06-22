@@ -19,7 +19,7 @@ export default function AdminDashboard() {
     { name: 'Events & Programmes', href: '/admin/events_programmes', icon: Calendar, color: 'text-purple-500', bg: 'bg-purple-50' },
     { name: 'Opportunities', href: '/admin/opportunities', icon: Briefcase, color: 'text-amber-500', bg: 'bg-amber-50' },
     { name: 'Past Questions', href: '/admin/past_questions', icon: BookOpen, color: 'text-rose-500', bg: 'bg-rose-50' },
-    { name: 'Executive Council', href: '/admin/executives', icon: Users, color: 'text-indigo-500', bg: 'bg-indigo-50' },
+
   ];
 
   return (

@@ -4,12 +4,18 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Bot } from 'lucide-react';
+import ChatModal from '@/components/ChatModal';
+import PartnerCarousel from '@/components/PartnerCarousel';
 import { supabaseClient } from '@/lib/supabaseClient';
 
 
 export default function HomePage() {
+    const [isChatOpen, setIsChatOpen] = useState(false);
   // Countdown timer state
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  // Congress event state (fetched from DB)
+  const [congress, setCongress] = useState<{ title: string; description: string; event_date: string; image_url: string } | null>(null);
 
   // Hero section state
   const [hero, setHero] = useState({
@@ -20,9 +26,27 @@ export default function HomePage() {
     imageUrl: '',
   });
 
-  // Countdown effect
+  // Fetch the latest upcoming congress event
   useEffect(() => {
-    const targetDate = new Date('Nov 15, 2026 09:00:00').getTime();
+    const fetchCongress = async () => {
+      const { data, error } = await supabaseClient
+        .from('congress_events')
+        .select('title, description, event_date, image_url')
+        .gte('event_date', new Date().toISOString())
+        .order('event_date', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (!error && data) {
+        setCongress(data);
+      }
+    };
+    fetchCongress();
+  }, []);
+
+  // Countdown effect – uses congress event_date from the DB
+  useEffect(() => {
+    if (!congress?.event_date) return;
+    const targetDate = new Date(congress.event_date).getTime();
     const interval = setInterval(() => {
       const now = Date.now();
       const difference = targetDate - now;
@@ -40,7 +64,7 @@ export default function HomePage() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [congress?.event_date]);
 
   // Fetch hero content
   useEffect(() => {
@@ -49,7 +73,8 @@ export default function HomePage() {
         .from('page_contents')
         .select('title, body, image_url, cta_text, cta_link')
         .eq('slug', 'home-hero')
-        .single();
+        .limit(1)
+        .maybeSingle();
       if (!error && data) {
         setHero({
           title: data.title ?? '',
@@ -73,7 +98,8 @@ useEffect(() => {
         .select('name, logo_url')
         .order('display_order');
       if (error) throw error;
-      setPartners(data.map(p => ({ name: p.name, logo: p.logo_url ?? '' })));
+        const fetched = data.map(p => ({ name: p.name, logo: p.logo_url ?? '' }));
+    setPartners(fetched);
     } catch (err) {
       console.warn('Failed to fetch partners (table might be missing)', err);
       setPartners([]);
@@ -118,7 +144,7 @@ useEffect(() => {
   const currentSlide = slides[slideIndex];
 
   const bgStyle = currentSlide?.bgStyle || {};
-  const sectionClass = `relative overflow-hidden px-4 py-8 lg:px-8 border-b border-neutral-100 flex items-center justify-center min-h-[25vh] ${!bgStyle.backgroundImage ? 'bg-gradient-to-br from-slate-50 via-slate-100/50 to-white' : ''}`;
+  const sectionClass = `relative overflow-hidden px-4 py-8 lg:px-8 border-b border-neutral-100 flex items-center justify-center min-h-[700px] ${!bgStyle.backgroundImage ? 'bg-gradient-to-br from-slate-50 via-slate-100/50 to-white' : ''}`;
 
   return (
     <div className="relative min-h-screen bg-background">
@@ -157,7 +183,7 @@ useEffect(() => {
             <div className="flex justify-center lg:justify-start lg:order-2">
               <div className="relative w-full max-w-lg overflow-hidden rounded-2xl">
                 <Image
-                  src="/WhatsApp Image 2026-06-04 at 6.23.20 PM.jpeg"
+                  src="/Sasu.jpeg"
                   alt="President – Samuel Sasu Adonteng"
                   width={500}
                   height={300}
@@ -200,52 +226,45 @@ useEffect(() => {
       </section>
 
       {/* Countdown & Events banner */}
-      <section className="mx-auto max-w-7xl px-4 pb-20 lg:px-8">
-        <div className="relative rounded-3xl overflow-hidden gradient-bg text-white px-6 py-12 md:px-12 md:py-16 shadow-xl">
-          <div className="absolute inset-0 bg-cover bg-center opacity-10 bg-[url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200')]"></div>
-          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
-            <div className="max-w-xl space-y-4">
-              <span className="inline-block rounded-full bg-accent/20 px-3 py-1 text-xs font-bold text-accent tracking-wide uppercase border border-accent/30">
-                Upcoming Congress
-              </span>
-              <h2 className="text-3xl md:text-4xl font-extrabold leading-tight">
-                14th Annual GRASAG-UPSA General Congress
-              </h2>
-              <p className="text-sm text-neutral-200">
-                Join our research symposium, professional development panels, and networks. Ensure you register and reserve your delegates slot.
-              </p>
-            </div>
-
-            {/* Timer values */}
-            <div className="flex flex-wrap gap-4 text-center">
-              {[
-                { label: 'Days', value: timeLeft.days },
-                { label: 'Hours', value: timeLeft.hours },
-                { label: 'Min', value: timeLeft.minutes },
-                { label: 'Sec', value: timeLeft.seconds },
-              ].map((item) => (
-                <div key={item.label} className="w-20 rounded-2xl bg-white/10 px-3 py-4 backdrop-blur-md border border-white/10">
-                  <div className="text-2xl font-black text-white">{item.value}</div>
-                  <div className="text-[10px] font-bold text-neutral-300 uppercase tracking-wide">{item.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Partner Logos */}
-      <section className="bg-slate-50 border-y border-neutral-100 py-10">
-        <div className="mx-auto max-w-7xl px-4 text-center space-y-6">
-          <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Our Corporate & Academic Partners</p>
-          <div className="flex flex-wrap justify-center items-center gap-10">
-            {partners.map((partner) => (
-              <div key={partner.name} className="h-10 w-24 relative opacity-50 hover:opacity-100 transition-opacity duration-300">
-                <Image src={partner.logo} alt={partner.name} width={96} height={40} className="object-contain w-full h-full filter grayscale" />
+      {(congress || Object.values(timeLeft).some(v => v > 0)) && (
+        <section className="mx-auto max-w-7xl px-4 pb-20 lg:px-8">
+          <div className="relative rounded-3xl overflow-hidden gradient-bg text-white px-6 py-12 md:px-12 md:py-16 shadow-xl">
+            <div 
+              className="absolute inset-0 bg-cover bg-center opacity-10"
+              style={{ backgroundImage: `url('${congress?.image_url || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200'}')` }}
+            ></div>
+            <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
+              <div className="max-w-xl space-y-4">
+                <span className="inline-block rounded-full bg-accent/20 px-3 py-1 text-xs font-bold text-accent tracking-wide uppercase border border-accent/30">
+                  Upcoming Events
+                </span>
+                <h2 className="text-3xl md:text-4xl font-extrabold leading-tight">
+                  {congress?.title || 'Upcoming GRASAG-UPSA Events'}
+                </h2>
+                <p className="text-sm text-neutral-200">
+                  {congress?.description || 'Join our research symposium, professional development panels, and networks. Ensure you register and reserve your delegates slot.'}
+                </p>
               </div>
-            ))}
+
+              {/* Timer values */}
+              <div className="flex flex-wrap gap-4 text-center">
+                {[
+                  { label: 'Days', value: timeLeft.days },
+                  { label: 'Hours', value: timeLeft.hours },
+                  { label: 'Min', value: timeLeft.minutes },
+                  { label: 'Sec', value: timeLeft.seconds },
+                ].map((item) => (
+                  <div key={item.label} className="w-20 rounded-2xl bg-white/10 px-3 py-4 backdrop-blur-md border border-white/10">
+                    <div className="text-2xl font-black text-white">{item.value}</div>
+                    <div className="text-[10px] font-bold text-neutral-300 uppercase tracking-wide">{item.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
+      )}
+
       {/* Strategic Priorities */}
       <section className="py-6">
         <div className="mx-auto max-w-4xl px-4">
@@ -274,17 +293,28 @@ useEffect(() => {
 </div>
         </div>
       </section>
-      </section>
+      {/* Partner Logos */}
+<section className="bg-slate-50 border-y border-neutral-100 py-10">
+  <div className="mx-auto max-w-7xl px-4 text-center space-y-6">
+    <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Our Corporate & Academic Partners</p>
+    <div className="flex flex-wrap justify-center items-center gap-10">
+      <PartnerCarousel logos={partners.map(p => p.logo)} />
+    </div>
+  </div>
+</section>
+
 
       {/* Floating Chatbot Indicator */}
       <div className="fixed bottom-6 right-6 z-40">
-        <Link
-          href="/chat"
+        <button
+          onClick={() => setIsChatOpen(true)}
           className="flex h-14 w-14 items-center justify-center rounded-full bg-accent text-white shadow-2xl hover:scale-105 hover:bg-accent/90 transition-all duration-200"
         >
           <Bot className="h-6 w-6" />
-        </Link>
+        </button>
       </div>
+      {/* Chat Modal */}
+      <ChatModal open={isChatOpen} onClose={() => setIsChatOpen(false)} />
     </div>
   );
 }

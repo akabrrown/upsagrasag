@@ -48,7 +48,7 @@ export async function PATCH(
     return NextResponse.json(updated);
   } catch (error: unknown) {
     if (error instanceof ZodError) {
-      return NextResponse.json({ error: 'Validation Error', details: error.issues }, { status: 400 });
+      return NextResponse.json({ error: 'Validation Error', details: (error as any).errors }, { status: 400 });
     }
     // Fallback for other errors
     const message = error instanceof Error ? error.message : String(error);

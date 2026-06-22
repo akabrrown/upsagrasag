@@ -1,18 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-  throw new Error('NEXT_PUBLIC_SUPABASE_URL is not defined');
-}
-if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-  throw new Error('SUPABASE_SERVICE_ROLE_KEY is not defined');
+if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY && !process.env.SUPABASE_ANON_KEY) {
+  throw new Error('Supabase anon key is not defined (NEXT_PUBLIC_SUPABASE_ANON_KEY or SUPABASE_ANON_KEY)');
 }
 
 export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY,
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '',
   {
     auth: {
-      // Server side only, no persistence
+      // Browser client – no session persistence needed for public data
       persistSession: false,
       autoRefreshToken: false,
       detectSessionInUrl: false,

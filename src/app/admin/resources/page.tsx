@@ -65,14 +65,12 @@ export default function AdminResourcesPage() {
 
   const columns = [
     { header: 'Title', accessor: 'title' as keyof Resource },
-    { 
-      header: 'Has File', 
-      accessor: (row: Resource) => row.file_url ? 'Yes' : 'No' 
-    },
-    { 
-      header: 'Has Link', 
-      accessor: (row: Resource) => row.link_url ? 'Yes' : 'No' 
-    }
+    { header: 'File', accessor: (row: Resource) => row.file_url ? (
+        <a href={row.file_url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+          Download
+        </a>
+      ) : '—' },
+    { header: 'Has Link', accessor: (row: Resource) => row.link_url ? 'Yes' : 'No' }
   ];
 
   return (
@@ -132,16 +130,25 @@ export default function AdminResourcesPage() {
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">File URL (Optional)</label>
             <div className="flex gap-2 mb-2">
-              <input 
-                {...register('file_url')} 
-                placeholder="Direct file URL or upload via Cloudinary below"
-                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-              />
+                <input
+                  type="file"
+                  id="fileInput"
+                  accept="application/pdf"
+                  multiple={false}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      // For demo purposes, use a temporary URL. Replace with actual upload logic.
+                      const tempUrl = URL.createObjectURL(file);
+                      setValue('file_url', tempUrl);
+                    }
+                  }}
+                />
             </div>
-            <CloudinaryUpload 
-              onUpload={(url) => setValue('file_url', url, { shouldValidate: true })}
-            />
-            {errors.file_url && <p className="text-sm text-red-600 mt-1">{errors.file_url.message as string}</p>}
+            {errors.file_url && (
+              <p className="text-sm text-red-600 mt-1">{errors.file_url.message as string}</p>
+            )}
           </div>
           
           <div className="pt-4 flex justify-end gap-3">

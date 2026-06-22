@@ -20,13 +20,13 @@ export default function AdminLeadershipPage() {
 
   const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<any>({
     resolver: zodResolver(leadershipSchema) as any,
-    defaultValues: { name: '', role: '', type: 'patron', bio: '', image_url: '', display_order: 0 }
+    defaultValues: { name: '', role: '', type: 'executive', bio: '', image_url: '', display_order: 0 }
   });
 
   const imageUrl = useWatch({ control, name: 'image_url' });
 
   const openCreate = () => {
-    reset({ name: '', role: '', type: 'patron', bio: '', image_url: '', display_order: 0 });
+    reset({ name: '', role: '', type: 'executive', bio: '', image_url: '', display_order: 0 });
     setEditingId(null);
     setIsModalOpen(true);
   };
@@ -83,8 +83,8 @@ export default function AdminLeadershipPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Leadership & Patrons</h1>
-          <p className="text-slate-500">Manage Patrons and Authorities.</p>
+          <h1 className="text-2xl font-bold text-slate-900">Leadership & Executives</h1>
+          <p className="text-slate-500">Manage Executives and Authorities.</p>
         </div>
         <button 
           onClick={openCreate}
@@ -134,7 +134,7 @@ export default function AdminLeadershipPage() {
                 {...register('type')} 
                 className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               >
-                <option value="patron">Patron</option>
+                <option value="executive">Executive</option>
                 <option value="authority">Authority</option>
               </select>
               {errors.type && <p className="text-sm text-red-600 mt-1">{errors.type.message as string}</p>}
@@ -143,7 +143,7 @@ export default function AdminLeadershipPage() {
               <label className="block text-sm font-medium text-slate-700 mb-1">Display Order</label>
               <input 
                 type="number"
-                {...register('display_order')} 
+                {...register('display_order', { valueAsNumber: true })} 
                 className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>

@@ -33,13 +33,13 @@ export default function AdminExecutivesPage() {
 
   const openEdit = (item: Executive) => {
     reset(item);
-    setEditingId(item.id!);
+    setEditingId(String(item.id));
     setIsModalOpen(true);
   };
 
   const handleDelete = async (item: Executive) => {
     try {
-      const res = await fetch(`/api/admin/executives/${item.id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin/executives/${String(item.id)}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete');
       mutate();
     } catch (e: any) {
@@ -70,7 +70,7 @@ export default function AdminExecutivesPage() {
     { 
       header: 'Photo', 
       accessor: (row: Executive) => (
-        <img src={row.photo_url} alt={row.name} className="w-10 h-10 object-cover rounded-full border" />
+                  <img src={row.photo_url || '/placeholder.png'} alt={row.name} className="w-10 h-10 object-cover rounded-full border" />
       )
     },
     { header: 'Name', accessor: 'name' as keyof Executive },
@@ -130,7 +130,7 @@ export default function AdminExecutivesPage() {
             <label className="block text-sm font-medium text-slate-700 mb-1">Display Order</label>
             <input 
               type="number"
-              {...register('display_order')} 
+              {...register('display_order', { valueAsNumber: true })} 
               className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -145,7 +145,12 @@ export default function AdminExecutivesPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Photo</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Photo URL</label>
+            <input 
+              {...register('photo_url')} 
+              placeholder="Paste photo URL or upload below"
+              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2 text-sm"
+            />
             <CloudinaryUpload 
               onUpload={(url) => setValue('photo_url', url, { shouldValidate: true })}
             />

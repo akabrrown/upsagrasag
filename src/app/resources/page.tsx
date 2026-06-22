@@ -8,8 +8,8 @@ export const dynamic = 'force-dynamic'; // ensure fresh data
 export default async function ResourcesPage() {
   const resources: Resource[] = await resourceService.list();
 
-  const downloads = resources.filter(r => r.file_type === 'download');
-  const links = resources.filter(r => r.file_type === 'link');
+  const downloads = resources.filter(r => !!r.file_url);
+  const links = resources.filter(r => !!r.link_url);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8 space-y-12 bg-background text-foreground">
@@ -29,17 +29,25 @@ export default async function ResourcesPage() {
             <FileText className="h-5 w-5 text-accent" /> Available Downloads
           </h2>
           <div className="divide-y divide-neutral-200 rounded-2xl border border-neutral-200 bg-white overflow-hidden shadow-sm">
-            {downloads.map((d) => (
-              <div key={d.id} className="flex items-center justify-between p-4 hover:bg-neutral-50 transition-colors duration-150">
-                <div>
-                  <h3 className="text-sm font-bold text-neutral-800 leading-tight">{d.title}</h3>
-                  <p className="text-[10px] text-neutral-400 mt-1 font-medium">{d.file_type.toUpperCase()} • {d.display_order}KB</p>
+            {downloads.map((d) => {
+              const ext = d.file_url?.split('.').pop()?.split('?')[0]?.toUpperCase() || 'PDF';
+              return (
+                <div key={d.id} className="flex items-center justify-between p-4 hover:bg-neutral-50 transition-colors duration-150">
+                  <div>
+                    <h3 className="text-sm font-bold text-neutral-800 leading-tight">{d.title}</h3>
+
+                  </div>
+                  <a 
+                    href={d.file_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 bg-white hover:bg-accent hover:text-white text-neutral-600 transition-all duration-150 cursor-pointer"
+                  >
+                    <Download className="h-4 w-4" />
+                  </a>
                 </div>
-                <button className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 bg-white hover:bg-accent hover:text-white text-neutral-600 transition-all duration-150 cursor-pointer">
-                  <Download className="h-4 w-4" />
-                </button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -50,7 +58,7 @@ export default async function ResourcesPage() {
           </h2>
           <div className="divide-y divide-neutral-200 rounded-2xl border border-neutral-200 bg-white overflow-hidden shadow-sm">
             {links.map((l) => (
-              <a key={l.id} href={l.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 hover:bg-neutral-50 transition-colors duration-150 group">
+              <a key={l.id} href={l.link_url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 hover:bg-neutral-50 transition-colors duration-150 group">
                 <span className="text-sm font-bold text-neutral-800 group-hover:text-accent transition-colors duration-150">{l.title}</span>
                 <ArrowUpRight className="h-4 w-4 text-neutral-400 group-hover:text-accent transition-colors duration-150" />
               </a>

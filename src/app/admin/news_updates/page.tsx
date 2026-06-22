@@ -1,29 +1,37 @@
-'use client';
-
+"use client";
 import React, { useState } from 'react';
 import useSWR from 'swr';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm, useWatch, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { newsUpdateSchema, NewsUpdate } from '@/types/admin';
 import CrudTable from '@/components/admin/CrudTable';
 import FormModal from '@/components/admin/FormModal';
 import { Plus } from 'lucide-react';
 import CloudinaryUpload from '@/components/CloudinaryUpload';
+import dynamic from 'next/dynamic';
+const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
+import 'react-quill-new/dist/quill.snow.css';
+import ReactDOM from 'react-dom';
+if (!(ReactDOM as any).findDOMNode) {
+  (ReactDOM as any).findDOMNode = (el: any) => el;
+}
+
+import ReactMarkdown from 'react-markdown';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 export default function AdminNewsPage() {
   const { data: records, error, isLoading, mutate } = useSWR<NewsUpdate[]>('/api/admin/news_updates', fetcher);
-  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<NewsUpdate>({
     resolver: zodResolver(newsUpdateSchema),
-    defaultValues: { category: 'notices' }
+    defaultValues: { category: 'news' }
   });
 
   const imageUrl = useWatch({ control, name: 'image_url' });
+  const contentValue = useWatch({ control, name: 'content' });
 
   const openCreate = () => {
     reset({ title: '', content: '', category: 'notices', image_url: '', published_at: new Date().toISOString() });
@@ -56,12 +64,10 @@ export default function AdminNewsPage() {
     try {
       const url = editingId ? `/api/admin/news_updates/${editingId}` : '/api/admin/news_updates';
       const method = editingId ? 'PATCH' : 'POST';
-      
       const payload = { ...data };
       if (data.published_at) {
         payload.published_at = new Date(data.published_at).toISOString();
       }
-
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -76,16 +82,16 @@ export default function AdminNewsPage() {
   };
 
   const columns = [
-    { 
-      header: 'Cover', 
+    {
+      header: 'Cover',
       accessor: (row: NewsUpdate) => row.image_url ? (
         <img src={row.image_url} alt={row.title} className="w-16 h-10 object-cover rounded-md border" />
       ) : <span className="text-xs text-slate-400">None</span>
     },
     { header: 'Title', accessor: 'title' as keyof NewsUpdate },
     { header: 'Category', accessor: (row: NewsUpdate) => <span className="capitalize">{row.category}</span> },
-    { 
-      header: 'Published', 
+    {
+      header: 'Published',
       accessor: (row: NewsUpdate) => row.published_at ? (
         <span suppressHydrationWarning>{new Date(row.published_at).toLocaleDateString()}</span>
       ) : <span className="text-slate-400">Draft</span>
@@ -99,7 +105,7 @@ export default function AdminNewsPage() {
           <h1 className="text-2xl font-bold text-slate-900">News & Updates</h1>
           <p className="text-slate-500">Manage notices, press releases, reports, accountability info, and galleries.</p>
         </div>
-        <button 
+        <button
           onClick={openCreate}
           className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
         >
@@ -107,67 +113,58 @@ export default function AdminNewsPage() {
         </button>
       </div>
 
-      <CrudTable 
-        data={records || []} 
-        columns={columns} 
+      <CrudTable
+        data={records || []}
+        columns={columns}
         isLoading={isLoading}
         onEdit={openEdit}
         onDelete={handleDelete}
       />
 
-      <FormModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+      <FormModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
         title={editingId ? 'Edit Post' : 'Create Post'}
       >
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* Title */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Title</label>
-            <input 
-              {...register('title')} 
+            <input
+              {...register('title')}
               className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {errors.title && <p className="text-sm text-red-600 mt-1">{errors.title.message as string}</p>}
           </div>
 
+          {/* Category & Publish Date */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
-              <select 
-                {...register('category')} 
+              <select
+                {...register('category')}
                 className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               >
-                <option value="notices">Notice</option>
-                <option value="press">Press Release</option>
-                <option value="reports">Report</option>
-                <option value="accountability">Accountability</option>
-                <option value="gallery">Gallery</option>
+                <option value="news">News</option>
+                <option value="articles">Articles</option>
+                <option value="announcements">Announcements</option>
               </select>
               {errors.category && <p className="text-sm text-red-600 mt-1">{errors.category.message as string}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Publish Date</label>
-              <input 
+              <input
                 type="datetime-local"
-                {...register('published_at')} 
+                {...register('published_at')}
                 className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
 
+          {/* Cover Image (Mandatory) */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Content (Supports HTML/Markdown or plain text)</label>
-            <textarea 
-              {...register('content')} 
-              rows={6}
-              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-            />
-            {errors.content && <p className="text-sm text-red-600 mt-1">{errors.content.message as string}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Cover Image (Optional)</label>
-            <CloudinaryUpload 
+            <label className="block text-sm font-medium text-slate-700 mb-1">Cover Image (Required)</label>
+            <CloudinaryUpload
               onUpload={(url) => setValue('image_url', url, { shouldValidate: true })}
             />
             {imageUrl && (
@@ -177,17 +174,45 @@ export default function AdminNewsPage() {
             )}
             {errors.image_url && <p className="text-sm text-red-600 mt-1">{errors.image_url.message as string}</p>}
           </div>
-          
+
+          {/* Content Editor with Live Preview */}
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Content (Rich Text)</label>
+              <Controller
+                name="content"
+                control={control}
+                render={({ field }) => (
+                  <ReactQuill
+                      theme="snow"
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                      modules={{ toolbar: [['bold', 'italic', 'underline'], [{ 'list': 'ordered' }, { 'list': 'bullet' }], ['link', 'image']] }}
+                      className="bg-white rounded-md"
+                    />
+                )}
+              />
+              {errors.content && <p className="text-sm text-red-600 mt-1">{errors.content.message as string}</p>}
+            </div>
+            <div className="border p-2 rounded bg-gray-50 overflow-y-auto max-h-96 prose prose-sm max-w-none">
+              <label>Preview</label>
+              <ReactMarkdown>
+                {contentValue || '*Start typing to see preview...*'}
+              </ReactMarkdown>
+            </div>
+          </div>
+
+          {/* Form Actions */}
           <div className="pt-4 flex justify-end gap-3">
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => setIsModalOpen(false)}
               className="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-md transition-colors"
             >
               Cancel
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={isSubmitting}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
             >

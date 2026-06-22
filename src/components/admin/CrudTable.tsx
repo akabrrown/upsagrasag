@@ -17,7 +17,7 @@ interface CrudTableProps<T> {
   isLoading?: boolean;
 }
 
-export default function CrudTable<T extends { id?: string }>({
+export default function CrudTable<T extends { id?: string | number }>({
   data = [],
   columns,
   onEdit,

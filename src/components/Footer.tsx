@@ -8,14 +8,7 @@ import Tooltip from './Tooltip';
 export default function Footer() {
   return (
     <footer className="admin-footer w-full border-t border-neutral-800 bg-neutral-950 text-white transition-all duration-300">
-      {/* Contact Us Button */}
-      <div className="border-b border-neutral-800">
-        <div className="mx-auto max-w-7xl px-4 py-2 sm:px-6 lg:px-8 flex justify-center">
-          <Link href="/contact" className="rounded-xl bg-accent px-6 py-2 text-lg font-bold text-white shadow-md hover:bg-accent/90 transition-all duration-200">
-            Contact Us
-          </Link>
-        </div>
-      </div>
+
 
       {/* Main Footer Links */}
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
@@ -24,7 +17,7 @@ export default function Footer() {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="flex h-20 w-68 overflow-hidden bg-white rounded-md relative">
-                <Image src="/grasag-logo.jpeg" alt="GRASAG UPSA Logo" className="object-contain w-full h-full" width={272} height={80} />
+                <Image src="/GRASAG-LOGO-text.png" alt="GRASAG UPSA Logo" className="object-contain w-full h-full rounded-full" width={272} height={80} />
               </div>
             </div>
             <p className="text-sm text-neutral-400 leading-relaxed">

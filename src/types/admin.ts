@@ -33,7 +33,7 @@ export type CongressEvent = z.infer<typeof congressSchema>;
 export const partnerSchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(1, "Name is required"),
-  logo_url: z.string().min(1, "Logo is required").url("Must be a valid URL"),
+  logo_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   display_order: z.number().int().nonnegative().default(0),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
@@ -54,7 +54,7 @@ export const leadershipSchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(1, "Name is required"),
   role: z.string().min(1, "Role is required"),
-  type: z.enum(["patron", "authority"]),
+  type: z.enum(["executive", "authority"]),
   bio: z.string().optional(),
   image_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   display_order: z.number().int().nonnegative().default(0),
@@ -64,7 +64,7 @@ export const leadershipSchema = z.object({
 export type Leadership = z.infer<typeof leadershipSchema>;
 
 export const executiveSchema = z.object({
-  id: z.string().uuid().optional(),
+  id: z.union([z.string(), z.number()]).optional(),
   name: z.string().min(1, "Name is required"),
   title: z.string().min(1, "Title is required"),
   bio: z.string().optional(),
@@ -99,12 +99,23 @@ export const resourceSchema = z.object({
 });
 export type Resource = z.infer<typeof resourceSchema>;
 
-export const pastQuestionSchema = z.object({
+export const programSchema = z.object({
   id: z.string().uuid().optional(),
+  name: z.string().min(1, "Program name is required"),
+  slug: z.string().min(1, "Slug is required"),
+  created_at: z.string().optional(),
+  updated_at: z.string().optional(),
+});
+export type Program = z.infer<typeof programSchema>;
+
+export const pastQuestionSchema = z.object({
+  id: z.union([z.string(), z.number()]).optional(),
+  programSlug: z.string().min(1, "Program is required"),
   course_code: z.string().min(1, "Course code is required"),
   course_title: z.string().min(1, "Course title is required"),
   year: z.string().min(1, "Year is required"),
-  file_url: z.string().min(1, "File is required").url("Must be a valid URL"),
+  title: z.string().min(1, "Title is required").optional(),
+  file_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
 });
@@ -148,8 +159,9 @@ export const newsUpdateSchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
-  category: z.enum(["notices", "press", "reports", "accountability", "gallery"]),
-  image_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  category: z.string().min(1, "Category is required"),
+  slug: z.string().min(1, "Slug is required").optional(),
+  image_url: z.string().url("Must be a valid URL"),
   published_at: z.string().optional(),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),

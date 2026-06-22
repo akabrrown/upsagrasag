@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase/browser';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 import type { Partner } from '@/types/admin';
 
 export const partnerService = {

@@ -17,31 +17,23 @@ export default async function AboutPage() {
         </p>
       </div>
 
-      {/* Overview & History / Constitution */}
-      <section className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-        <div className="md:col-span-7 space-y-4">
-          <h2 className="text-2xl font-bold text-accent flex items-center gap-2">
-            <Landmark className="h-6 w-6 text-accent" /> Overview & History
-          </h2>
-          <p className="text-sm text-neutral-600 leading-relaxed">
-            Established as the local chapter of the Graduate Students&apos; Association of Ghana, GRASAG-UPSA represents all postgraduates pursuing MBA, MSc, MPhil, LLM, and PhD courses at UPSA.
-          </p>
-          <p className="text-sm text-neutral-600 leading-relaxed">
-            Our mission coordinates directly with the School of Graduate Studies (SOGS) to align academic work, thesis formatting, and supervisor allocations with national standards, helping students build research and executive capacity.
-          </p>
-        </div>
-
-        <div className="md:col-span-5 rounded-2xl bg-[#003366] p-6 border border-[#003366] text-white shadow-lg space-y-4">
-          <h3 className="font-bold text-sm text-accent flex items-center gap-2">
-            <FileText className="h-5 w-5 text-accent" /> Association Constitution
-          </h3>
-          <p className="text-xs text-white leading-relaxed">
-            Download the official GRASAG-UPSA Constitution containing the electoral regulations, senate guidelines, and welfare directives.
-          </p>
-          <a href="#" className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent hover:bg-accent/90 text-white px-4 py-2.5 text-xs font-bold transition-all duration-200 cursor-pointer w-full text-center">
-            <Download className="h-4 w-4" /> Download PDF (2.4 MB)
-          </a>
-        </div>
+      {/* Overview & History */}
+      <section className="space-y-4">
+        <h2 className="text-2xl font-bold text-accent flex items-center gap-2">
+          <Landmark className="h-6 w-6 text-accent" /> Overview & History
+        </h2>
+        <p className="text-sm text-neutral-600 leading-relaxed">
+          The Graduate Students’ Association of Ghana – University of Professional Studies, Accra Chapter (GRASAG-UPSA) is the official representative body and voice of all postgraduate students of the University of Professional Studies, Accra (UPSA). As a recognized chapter of the Graduate Students’ Association of Ghana (GRASAG), the association serves students enrolled in postgraduate programmes, including MBA, MSc, MA, MPhil, LLM, and PhD studies.
+        </p>
+        <p className="text-sm text-neutral-600 leading-relaxed">
+          GRASAG-UPSA is committed to promoting academic excellence, professional growth, research development, and student welfare. The Association works closely with the School of Graduate Studies (SOGS), university management, and other stakeholders to ensure that the interests and concerns of graduate students are effectively represented and addressed. Through advocacy, engagement, and collaboration, GRASAG-UPSA contributes to creating a supportive environment that enables students to excel academically and professionally.
+        </p>
+        <p className="text-sm text-neutral-600 leading-relaxed">
+          Beyond representation, the Association organizes seminars, workshops, research conferences, networking events, leadership development programmes, and community engagement initiatives that enrich the postgraduate experience. Over the years, GRASAG-UPSA has demonstrated its commitment to student welfare through various projects and contributions aimed at enhancing teaching, learning, and student support services within the University.
+        </p>
+        <p className="text-sm text-neutral-600 leading-relaxed">
+          As the collective voice of graduate students, GRASAG-UPSA remains dedicated to fostering a vibrant community of scholars, researchers, professionals, and future leaders who contribute meaningfully to national development and global progress. Guided by the values of excellence, integrity, service, and innovation, the Association continues to champion the interests of postgraduate students while supporting the vision and mission of UPSA.
+        </p>
       </section>
 
       {/* Mission & Vision */}

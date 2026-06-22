@@ -5,7 +5,7 @@
 module.exports = {
   // Existing config can be extended here if needed
   images: {
-
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
@@ -15,6 +15,11 @@ module.exports = {
       {
         protocol: "https",
         hostname: "cdn.simpleicons.org",
+        pathname: "/**"
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
         pathname: "/**"
       }
     ]

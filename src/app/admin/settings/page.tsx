@@ -21,7 +21,7 @@ export default function AdminSettingsPage() {
   const [pwdError, setPwdError] = useState('');
 
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<PlatformSettings>({
-    resolver: zodResolver(platformSettingsSchema)
+    resolver: zodResolver(platformSettingsSchema) as any
   });
 
   useEffect(() => {

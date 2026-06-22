@@ -32,7 +32,8 @@ export default function AdminPartnersPage() {
   };
 
   const openEdit = (item: Partner) => {
-    reset(item);
+    const unified = { ...item, logo_url: item.logo_url || (item as any).image_url || (item as any).photo_url || '' };
+    reset(unified);
     setEditingId(item.id!);
     setIsModalOpen(true);
   };
@@ -48,6 +49,10 @@ export default function AdminPartnersPage() {
   };
 
   const onSubmit = async (data: Partner) => {
+    // Ensure logo_url has a fallback image if none provided
+    if (!data.logo_url) {
+      data.logo_url = '';
+    }
     try {
       const url = editingId ? `/api/admin/partners/${editingId}` : '/api/admin/partners';
       const method = editingId ? 'PATCH' : 'POST';
@@ -56,7 +61,11 @@ export default function AdminPartnersPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
-      if (!res.ok) throw new Error('Failed to save');
+      if (!res.ok) {
+        const errMsg = await res.text();
+        alert(`Failed to save: ${res.status} ${errMsg}`);
+        return;
+      }
       setIsModalOpen(false);
       mutate();
     } catch (e: any) {
@@ -82,13 +91,15 @@ export default function AdminPartnersPage() {
     },
   ];
 
-  const sortedRecords = Array.isArray(records) ? [...records].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0)) : mockPartners.sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
+  const sortedRecords = (Array.isArray(records) ? [...records] : mockPartners)
+    .map((r) => ({ ...r, logo_url: r.logo_url || (r as any).image_url || (r as any).photo_url || '' }))
+    .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
 
   const columns = [
-    { 
-      header: 'Logo', 
+    {
+      header: 'Logo',
       accessor: (row: Partner) => (
-        <img src={row.logo_url} alt={row.name} className="h-10 object-contain border p-1 rounded bg-white" />
+        <img src={row.logo_url || '/placeholder.png'} alt={row.name} className="h-10 object-contain border p-1 rounded bg-white" />
       )
     },
     { header: 'Name', accessor: 'name' as keyof Partner },
@@ -125,33 +136,43 @@ export default function AdminPartnersPage() {
       >
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Company / Organization Name</label>
-            <input 
-              {...register('name')} 
-              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name.message as string}</p>}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
+              <input 
+                {...register('name')} 
+                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name.message as string}</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Logo URL</label>
+              <input 
+                {...register('logo_url')} 
+                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {errors.logo_url && <p className="text-sm text-red-600 mt-1">{errors.logo_url.message as string}</p>}
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Display Order (Lower numbers appear first)</label>
             <input 
               type="number"
-              {...register('display_order')} 
+              {...register('display_order', { valueAsNumber: true })} 
               className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {errors.display_order && <p className="text-sm text-red-600 mt-1">{errors.display_order.message as string}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Logo</label>
-            <CloudinaryUpload 
-              onUpload={(url) => setValue('logo_url', url, { shouldValidate: true })}
-            />
-            {logoUrl && (
-              <div className="mt-2 p-2 bg-slate-50 border rounded-md inline-block">
-                <img src={logoUrl} alt="Preview" className="h-16 object-contain" />
-              </div>
-            )}
-            {errors.logo_url && <p className="text-sm text-red-600 mt-1">{errors.logo_url.message as string}</p>}
+              <CloudinaryUpload 
+                onUpload={(url) => setValue('logo_url', url, { shouldValidate: true })}
+              />
+              {logoUrl && (
+                <div className="mt-2 p-2 bg-slate-50 border rounded-md inline-block">
+                  <img src={logoUrl} alt="Preview" className="h-16 object-contain" />
+                </div>
+              )}
+              {errors.logo_url && <p className="text-sm text-red-600 mt-1">{errors.logo_url.message as string}</p>}
           </div>
           
           <div className="pt-4 flex justify-end gap-3">

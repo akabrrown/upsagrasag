@@ -8,9 +8,10 @@ interface ProfileProps {
   role: string;
   image: string;
   email: string;
+  bio?: string;
 }
 
-export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email }) => {
+export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email, bio }) => {
   const [showInfo, setShowInfo] = useState(false);
 
   return (
@@ -49,7 +50,7 @@ export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email }
             <div className="w-full md:w-2/3 p-6 overflow-y-auto">
               <h4 className="text-md font-semibold mb-3">About {name}</h4>
               <p className="text-neutral-600">
-                Add a detailed biography, achievements, or any additional information about {name} here.
+                {bio || `Add a detailed biography, achievements, or any additional information about ${name} here.`}
               </p>
             </div>
           </div>

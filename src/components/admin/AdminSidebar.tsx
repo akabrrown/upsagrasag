@@ -27,10 +27,10 @@ const navItems = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Homepage Content', href: '/admin/president', icon: Globe },
   { name: 'Congress Events', href: '/admin/congress', icon: Calendar },
+  { name: 'Academic Calendar', href: '/admin/academic-calendar', icon: Calendar },
   { name: 'Partners', href: '/admin/partners', icon: Users },
-  { name: 'Constitution Files', href: '/admin/constitution', icon: FileText },
   { name: 'Leadership & Patrons', href: '/admin/leadership', icon: Award },
-  { name: 'Executive Council', href: '/admin/executives', icon: Users },
+
   { name: 'Opportunities', href: '/admin/opportunities', icon: Briefcase },
   { name: 'Resources', href: '/admin/resources', icon: FolderOpen },
   { name: 'Past Questions', href: '/admin/past_questions', icon: BookOpen },

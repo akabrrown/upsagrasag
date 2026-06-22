@@ -1,27 +1,16 @@
-// lib/supabase/admin.ts
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { supabaseClient as supabase } from '@/lib/supabaseClient';
 import {
   Executive,
-  News,
-  Event,
+  NewsUpdate,
+  EventProgramme,
   Opportunity,
   PastQuestion,
   Resource,
   Partner,
-
-  ChatbotLog,
-  SiteSetting,
+  Leadership,
+  PlatformSettings,
 } from '@/types/admin';
-
-/** Generic CRUD helpers */
-export async function getNewsById(id: number): Promise<News | null> {
-  const { data, error } = await supabase.from('news').select('*').eq('id', id).single();
-  if (error) {
-    if (error.code === 'PGRST116') return null; // not found
-    throw new Error(error.message);
-  }
-  return data as News;
-}
 
 async function fetchAll<T>(table: string): Promise<T[]> {
   const { data, error } = await supabase.from(table).select('*');
@@ -75,19 +64,19 @@ export const executiveService = {
 
 /** News */
 export const newsService = {
-  list: () => fetchAll<News>('news'),
-  get: (id: number) => fetchById<News>('news', id),
-  create: (payload: Partial<News>) => insert<News>('news', payload),
-  update: (id: number, payload: Partial<News>) => update<News>('news', id, payload),
-  delete: (id: number) => remove('news', id),
+  list: () => fetchAll<NewsUpdate>('news_updates'),
+
+  create: (payload: Partial<NewsUpdate>) => insert<NewsUpdate>('news_updates', payload),
+  update: (id: number, payload: Partial<NewsUpdate>) => update<NewsUpdate>('news_updates', id, payload),
+  delete: (id: number) => remove('news_updates', id),
 };
 
 /** Event */
 export const eventService = {
-  list: () => fetchAll<Event>('events'),
-  get: (id: number) => fetchById<Event>('events', id),
-  create: (payload: Partial<Event>) => insert<Event>('events', payload),
-  update: (id: number, payload: Partial<Event>) => update<Event>('events', id, payload),
+  list: () => fetchAll<EventProgramme>('events'),
+  get: (id: number) => fetchById<EventProgramme>('events', id),
+  create: (payload: Partial<EventProgramme>) => insert<EventProgramme>('events', payload),
+  update: (id: number, payload: Partial<EventProgramme>) => update<EventProgramme>('events', id, payload),
   delete: (id: number) => remove('events', id),
 };
 
@@ -109,6 +98,13 @@ export const pastQuestionService = {
   delete: (id: number) => remove('past_questions', id),
 };
 
+export const leadershipService = {
+  list: () => fetchAll<Leadership>('leadership'),
+  get: (id: number) => fetchById<Leadership>('leadership', id),
+  create: (payload: Partial<Leadership>) => insert<Leadership>('leadership', payload),
+  update: (id: number, payload: Partial<Leadership>) => update<Leadership>('leadership', id, payload),
+  delete: (id: number) => remove('leadership', id),
+};
 /** Resource */
 export const resourceService = {
   list: () => fetchAll<Resource>('resources'),
@@ -132,17 +128,17 @@ export const partnerService = {
 
 /** Chatbot Log */
 export const chatbotLogService = {
-  list: () => fetchAll<ChatbotLog>('chatbot_logs'),
-  get: (id: number) => fetchById<ChatbotLog>('chatbot_logs', id),
-  create: (payload: Partial<ChatbotLog>) => insert<ChatbotLog>('chatbot_logs', payload),
-  update: (id: number, payload: Partial<ChatbotLog>) => update<ChatbotLog>('chatbot_logs', id, payload),
+  list: () => fetchAll<any>('chatbot_logs'),
+  get: (id: number) => fetchById<any>('chatbot_logs', id),
+  create: (payload: Partial<any>) => insert<any>('chatbot_logs', payload),
+  update: (id: number, payload: Partial<any>) => update<any>('chatbot_logs', id, payload),
   delete: (id: number) => remove('chatbot_logs', id),
 };
 
 /** Site Settings (singleton) */
 export const siteSettingsService = {
-  get: () => fetchById<SiteSetting>('site_settings', 1),
-  update: (payload: Partial<SiteSetting>) => update<SiteSetting>('site_settings', 1, payload),
+  get: () => fetchById<PlatformSettings>('site_settings', 1),
+  update: (payload: Partial<PlatformSettings>) => update<PlatformSettings>('site_settings', 1, payload),
 };
 
 import { serviceMap, schemaMap } from './admin/index';

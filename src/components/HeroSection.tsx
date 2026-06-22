@@ -12,7 +12,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ title, subtitle, backgroundIm
     : {};
   return (
     <section
-      className="relative overflow-hidden px-4 py-8 lg:px-8 border-b border-neutral-100 flex items-center justify-center min-h-[25vh]"
+      className="relative overflow-hidden px-4 py-8 lg:px-8 border-b border-neutral-100 flex items-center justify-center min-h-[700px]"
       style={{ ...bgStyle, backgroundSize: 'cover', backgroundPosition: 'center' }}
     >
       <div className="absolute inset-0 bg-black/40" />

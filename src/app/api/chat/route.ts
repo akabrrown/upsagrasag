@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const runtime = 'edge';
 
@@ -10,27 +12,77 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Messages array is required' }, { status: 400 });
     }
 
-    const ollamaUrl = process.env.OLLAMA_SERVICE_URL || 'http://localhost:11434';
-    const model = process.env.OLLAMA_MODEL || 'llama3';
+    const groqApiKey = process.env.GROQ_API_KEY;
+    const model = process.env.GROQ_MODEL || 'mixtral-8x7b-32768';
 
-    const response = await fetch(`${ollamaUrl}/api/chat`, {
+    // Get the latest user message for similarity search
+    const userMessages = messages.filter((m: any) => m.role === 'user');
+    const latestUserMessage = userMessages[userMessages.length - 1]?.content || '';
+
+    let contextText = '';
+
+    // Only perform RAG if we have a user message and GEMINI_API_KEY is present
+    if (latestUserMessage && process.env.GEMINI_API_KEY && process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      try {
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const embedModel = genAI.getGenerativeModel({ model: 'embedding-001' });
+        const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || '', process.env.SUPABASE_SERVICE_ROLE_KEY || '');
+
+        // 1. Generate embedding for user query
+        const result = await embedModel.embedContent(latestUserMessage);
+        const query_embedding = result.embedding.values;
+
+        // 2. Search Supabase for matching content
+        const { data: matchedChunks, error } = await supabase.rpc('match_site_content', {
+          query_embedding,
+          match_threshold: 0.75, // 0 to 1 scale, 0.75 is a reasonable default
+          match_count: 5 // Get top 5 chunks
+        });
+
+        if (error) {
+          console.error('Supabase RPC Error:', error);
+        } else if (matchedChunks && matchedChunks.length > 0) {
+          contextText = matchedChunks.map((chunk: any) => chunk.chunk).join('\n\n');
+        }
+      } catch (ragError) {
+        console.error('RAG Error (continuing without context):', ragError);
+      }
+    }
+
+    // Ensure alternating or valid roles for Groq
+    const cleanMessages = messages.map((m: any) => ({
+      role: m.role,
+      content: m.content || ' '
+    }));
+
+    // Build the system prompt
+    let systemContent = 'You are the UPSA GRASAG Virtual Assistant, a helpful virtual assistant for the University of Professional Studies, Accra (UPSA).';
+    systemContent += '\nYou must only answer questions using the provided Context below. If the answer is not contained in the Context, politely decline to answer and direct the user to https://upsa.edu.gh.';
+    
+    if (contextText) {
+      systemContent += `\n\n--- CONTEXT FROM UPSA WEBSITE ---\n${contextText}\n----------------------------------`;
+    }
+
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${groqApiKey}`,
       },
       body: JSON.stringify({
         model,
-        messages: messages.map((m: any) => ({
-          role: m.role,
-          content: m.content,
-        })),
+        messages: [
+          { role: 'system', content: systemContent },
+          ...cleanMessages.filter((m: any) => m.content !== "Hello! I am your GRASAG-UPSA AI Assistant. Ask me anything about postgraduate programmes, welfare packages, past questions, registration, or campus events." && m.content.indexOf("Smart UPSA") === -1)
+        ],
         stream: true,
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      return NextResponse.json({ error: `Ollama service error: ${errorText}` }, { status: response.status });
+      console.error('Groq API Error:', response.status, errorText);
+      return NextResponse.json({ error: `Groq service error: ${errorText}` }, { status: response.status });
     }
 
     // Set up a ReadableStream to stream the response back to the client
@@ -39,23 +91,31 @@ export async function POST(req: NextRequest) {
     const reader = response.body?.getReader();
 
     if (!reader) {
-      return NextResponse.json({ error: 'Failed to read response stream from Ollama' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to read response stream from Groq' }, { status: 500 });
     }
 
     const customStream = new ReadableStream({
       async start(controller) {
+        let buffer = '';
         try {
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
 
-            const chunk = decoder.decode(value, { stream: true });
-            const lines = chunk.split('\n').filter(Boolean);
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
 
             for (const line of lines) {
+              const trimmed = line.trim();
+              if (!trimmed || !trimmed.startsWith('data: ')) continue;
+              
+              const dataLine = trimmed.slice(6);
+              if (dataLine === '[DONE]') continue;
+
               try {
-                const parsed = JSON.parse(line);
-                const content = parsed.message?.content || '';
+                const parsed = JSON.parse(dataLine);
+                const content = parsed.choices?.[0]?.delta?.content || '';
                 if (content) {
                   controller.enqueue(encoder.encode(content));
                 }
