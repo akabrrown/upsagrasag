@@ -7,6 +7,7 @@ const supabaseAdminClient = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+export { supabaseAdminClient };
 
 export class AdminCrudService<T extends { id?: string | number }> {
   private static columnsCache: Record<string, string[]> = {};
@@ -271,15 +272,14 @@ export class PastQuestionCrudService extends AdminCrudService<PastQuestion> {
       throw new Error(error.message);
     }
     return (data || []).map((item: any) => {
-      const parts = (item.programme || '').split(' - ');
-      const course_code = parts[0] || '';
-      const course_title = parts.slice(1).join(' - ') || '';
       return {
         id: String(item.id),
-        course_code,
-        course_title,
+        programSlug: item.program_slug,
+        course_code: item.course_code,
+        course_title: item.course_title,
         year: String(item.year ?? ''),
-        file_url: item.pdf_url || '',
+        title: item.title,
+        file_url: item.file_path || '',
         created_at: item.created_at,
         updated_at: item.updated_at
       };
@@ -299,15 +299,14 @@ export class PastQuestionCrudService extends AdminCrudService<PastQuestion> {
       console.error(`[PastQuestionCrudService get] error:`, error);
       throw new Error(error.message);
     }
-    const parts = (data.programme || '').split(' - ');
-    const course_code = parts[0] || '';
-    const course_title = parts.slice(1).join(' - ') || '';
     return {
       id: String(data.id),
-      course_code,
-      course_title,
+      programSlug: data.program_slug,
+      course_code: data.course_code,
+      course_title: data.course_title,
       year: String(data.year ?? ''),
-      file_url: data.pdf_url || '',
+      title: data.title,
+      file_url: data.file_path || '',
       created_at: data.created_at,
       updated_at: data.updated_at
     } as PastQuestion;
@@ -315,12 +314,13 @@ export class PastQuestionCrudService extends AdminCrudService<PastQuestion> {
 
   async create(item: Partial<PastQuestion>): Promise<PastQuestion> {
     const supabase = supabaseAdminClient;
-    const programme = `${item.course_code || ''} - ${item.course_title || ''}`;
-    const yearInt = parseInt(item.year || '0', 10);
-    const dbPayload = {
-      programme,
-      year: isNaN(yearInt) ? 0 : yearInt,
-      pdf_url: item.file_url || ''
+    const dbPayload: any = {
+      program_slug: (item as any).programSlug,
+      title: item.title,
+      course_code: item.course_code,
+      course_title: item.course_title,
+      year: item.year ? parseInt(item.year, 10) : null,
+      file_path: item.file_url
     };
     const filtered = await this.filterPayload(dbPayload);
     const { data, error } = await supabase
@@ -329,15 +329,17 @@ export class PastQuestionCrudService extends AdminCrudService<PastQuestion> {
       .select()
       .single();
     if (error) {
-      console.error(`[PastQuestionCrudService create] error:`, error);
+      console.error(`[PastQuestionCrudService create ${this.tableName}] error:`, error);
       throw new Error(error.message);
     }
     return {
       id: String(data.id),
-      course_code: item.course_code || '',
-      course_title: item.course_title || '',
+      programSlug: data.program_slug,
+      course_code: data.course_code,
+      course_title: data.course_title,
       year: String(data.year ?? ''),
-      file_url: data.pdf_url || '',
+      title: data.title,
+      file_url: data.file_path,
       created_at: data.created_at,
       updated_at: data.updated_at
     } as PastQuestion;
@@ -350,19 +352,14 @@ export class PastQuestionCrudService extends AdminCrudService<PastQuestion> {
     const existing = await this.get(id);
     if (!existing) throw new Error("Item not found");
     
-    const newCourseCode = item.course_code !== undefined ? item.course_code : existing.course_code;
-    const newCourseTitle = item.course_title !== undefined ? item.course_title : existing.course_title;
-    const programme = `${newCourseCode} - ${newCourseTitle}`;
+    const dbPayload: any = {};
+    if (item.programSlug !== undefined) dbPayload.program_slug = item.programSlug;
+    if (item.title !== undefined) dbPayload.title = item.title;
+    if (item.course_code !== undefined) dbPayload.course_code = item.course_code;
+    if (item.course_title !== undefined) dbPayload.course_title = item.course_title;
+    if (item.year !== undefined) dbPayload.year = parseInt(item.year, 10);
+    if (item.file_url !== undefined) dbPayload.file_path = item.file_url;
     
-    const dbPayload: any = { programme };
-    if (item.year !== undefined) {
-      const yearInt = parseInt(item.year, 10);
-      dbPayload.year = isNaN(yearInt) ? 0 : yearInt;
-    }
-    if (item.file_url !== undefined) {
-      dbPayload.pdf_url = item.file_url;
-    }
-
     const filtered = await this.filterPayload(dbPayload);
     const { data, error } = await supabase
       .from('past_questions')
@@ -376,10 +373,12 @@ export class PastQuestionCrudService extends AdminCrudService<PastQuestion> {
     }
     return {
       id: String(data.id),
-      course_code: newCourseCode,
-      course_title: newCourseTitle,
+      programSlug: data.program_slug,
+      course_code: data.course_code,
+      course_title: data.course_title,
       year: String(data.year ?? ''),
-      file_url: data.pdf_url || '',
+      title: data.title,
+      file_url: data.file_path,
       created_at: data.created_at,
       updated_at: data.updated_at
     } as PastQuestion;

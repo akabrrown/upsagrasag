@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/utils/supabaseClient';
+import { supabaseAdminClient } from '@/lib/supabase/admin';
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -8,7 +8,7 @@ export async function DELETE(req: Request) {
   if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
 
   // Get record to know file path
-  const { data: record, error: fetchErr } = await supabase
+  const { data: record, error: fetchErr } = await supabaseAdminClient
     .from('past_questions')
     .select('file_path')
     .eq('id', id)
@@ -16,7 +16,7 @@ export async function DELETE(req: Request) {
   if (fetchErr) return NextResponse.json({ error: fetchErr.message }, { status: 400 });
 
   // Delete DB row
-  const { error: delErr } = await supabase.from('past_questions').delete().eq('id', id);
+  const { error: delErr } = await supabaseAdminClient.from('past_questions').delete().eq('id', id);
   if (delErr) return NextResponse.json({ error: delErr.message }, { status: 400 });
 
   // Delete file from disk

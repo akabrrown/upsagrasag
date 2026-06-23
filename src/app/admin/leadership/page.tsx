@@ -64,7 +64,8 @@ export default function AdminLeadershipPage() {
     }
   };
 
-  const sortedRecords = Array.isArray(records) ? [...records].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0)) : [];
+  const executors = Array.isArray(records) ? records.filter(r => r.type === 'executive') : [];
+  const sortedRecords = executors.sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
 
   const columns = [
     { 
@@ -84,7 +85,7 @@ export default function AdminLeadershipPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Leadership & Executives</h1>
-          <p className="text-slate-500">Manage Executives and Authorities.</p>
+          <p className="text-slate-500">Manage Executives.</p>
         </div>
         <button 
           onClick={openCreate}
@@ -135,7 +136,6 @@ export default function AdminLeadershipPage() {
                 className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               >
                 <option value="executive">Executive</option>
-                <option value="authority">Authority</option>
               </select>
               {errors.type && <p className="text-sm text-red-600 mt-1">{errors.type.message as string}</p>}
             </div>

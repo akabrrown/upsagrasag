@@ -88,11 +88,11 @@ export default function Navbar() {
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-1.5">
             <Phone className="h-3.5 w-3.5 text-[#B8860B]" />
-            <span>+233 (0) 50 123 4567</span>
+            <span>+233 (0) 55 860 1545</span>
           </div>
           <div className="flex items-center gap-1.5">
             <Mail className="h-3.5 w-3.5 text-[#B8860B]" />
-            <span>Grasagupsa2026@gmail.com</span>
+            <span>grasagpresident@upsamail.edu.gh</span>
           </div>
           <div className="flex items-center gap-3 border-l border-white/10 pl-6 py-1">
             <a href="#" className="hover:text-[#B8860B] transition-colors" aria-label="LinkedIn">

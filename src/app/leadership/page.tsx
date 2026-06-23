@@ -19,24 +19,7 @@ export default async function LeadershipPage() {
         </p>
       </div>
 
-      {/* Authorities Section */}
-      {authorities.length > 0 && (
-        <section className="space-y-8">
-          <h2 className="text-2xl font-bold text-center text-primary border-b pb-2">Authorities</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {authorities.map((leader) => (
-              <ProfileCard
-                key={leader.id}
-                name={leader.name}
-                role={leader.role}
-                image={leader.image_url ?? '/default-avatar.png'}
-                email={(leader as any).email ?? ''}
-                bio={leader.bio ?? ''}
-              />
-            ))}
-          </div>
-        </section>
-      )}
+
 
       {/* Executives Section */}
       {executives.length > 0 && (

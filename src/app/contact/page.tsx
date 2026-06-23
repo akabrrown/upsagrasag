@@ -51,28 +51,20 @@ export default function ContactPage() {
   };
 
   const contactInfo = [
-    {
-      title: 'Our Secretariat',
-      details: 'Graduate School Building, Room 204, UPSA Campus, Madina, Accra',
-      icon: MapPin,
-    },
+
     {
       title: 'Email Address',
-      details: 'Grasagupsa2026@gmail.com',
+      details: 'grasagpresident@upsamail.edu.gh',
       icon: Mail,
-      href: 'mailto:Grasagupsa2026@gmail.com',
+      href: 'mailto:grasagpresident@upsamail.edu.gh',
     },
     {
       title: 'Phone Contact',
-      details: '+233 (0) 50 123 4567',
+      details: '+233 (0) 55 860 1545',
       icon: Phone,
-      href: 'tel:+233501234567',
+      href: 'tel:+233558601545',
     },
-    {
-      title: 'Office Hours',
-      details: 'Monday - Friday (10:00 AM - 5:00 PM)',
-      icon: Clock,
-    },
+
   ];
 
   return (

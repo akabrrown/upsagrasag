@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { supabase } from '@/utils/supabaseClient';
+import { supabaseAdminClient } from '@/lib/supabase/admin';
 import { PastQuestion } from '@/types/admin';
 type PastQuestionRecord = {
   id: number;
@@ -15,6 +15,7 @@ type PastQuestionRecord = {
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const programSlug = url.searchParams.get('programSlug');
+  const supabase = supabaseAdminClient;
   let query = supabase
     .from('past_questions')
     .select('id, program_slug, course_code, course_title, year, title, file_path, created_at');

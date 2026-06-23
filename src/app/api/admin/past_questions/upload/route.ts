@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/utils/supabaseClient';
+import { supabaseAdminClient } from '@/lib/supabase/admin';
 import slugify from '@/utils/slugify';
 import { promises as fs } from 'fs';
 import path from 'path';
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
   }
 
   // Verify programme exists
-  const { data: program, error: progErr } = await supabase
+  const { data: program, error: progErr } = await supabaseAdminClient
     .from('programs')
     .select('id')
     .eq('slug', programSlug)
@@ -45,14 +45,13 @@ export async function POST(req: Request) {
     const buffer = Buffer.from(await file.arrayBuffer());
     await fs.writeFile(filePath, buffer);
 
-    const { data: inserted } = await supabase.from('past_questions').insert({
-      program_id: program.id,
-      program_slug: programSlug,
-      title: file.name,
-      course_code: course_code || null,
-      course_title: course_title || null,
-      year: year || null,
-      file_path: `programs/${programSlug}/${safeName}`,
+    const { data: inserted } = await supabaseAdminClient.from('past_questions').insert({
+        program_slug: programSlug,
+        title: file.name,
+        course_code: course_code || null,
+        course_title: course_title || null,
+        year: year || null,
+        file_path: `programs/${programSlug}/${safeName}`,
     }).select();
     if (inserted && inserted.length) {
       const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || '';

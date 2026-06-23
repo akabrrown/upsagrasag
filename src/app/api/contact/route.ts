@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
 
     const emailResponse = await resend.emails.send({
       from: 'GRASAG Portal <onboarding@resend.dev>',
-      to: 'Grasagupsa2026@gmail.com',
+      to: 'grasagpresident@upsamail.edu.gh',
       subject: `[GRASAG Portal Contact] - ${subject}`,
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">

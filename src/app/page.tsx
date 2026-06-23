@@ -223,47 +223,50 @@ useEffect(() => {
 
           </div>
         </div>
+           {/* Upcoming Events Banner */}
+       <section className="mx-auto max-w-7xl px-4 py-12">
+         { (congress || Object.values(timeLeft).some(v => v > 0)) && (
+           <div className="relative mx-auto max-w-5xl rounded-2xl overflow-hidden border border-primary/20 bg-white/30 backdrop-blur-xl shadow-2xl">
+             {/* Background image with dark overlay */}
+             {congress?.image_url && (
+               <div className="absolute inset-0 z-0">
+                 <img
+                   src={congress.image_url}
+                   alt="Event background"
+                   className="absolute inset-0 w-full h-full object-cover opacity-30"
+                 />
+                 <div className="absolute inset-0 bg-gradient-to-br from-primary/70 via-primary/50 to-secondary/70 mix-blend-multiply" />
+               </div>
+             )}
+             <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 p-8 lg:p-12 text-center lg:text-left">
+               <div className="max-w-xl space-y-4">
+                 <span className="inline-block rounded-full bg-[#d4af37]/20 px-4 py-1 text-sm font-semibold text-[#d4af37] uppercase tracking-wider border border-[#d4af37]/30">
+                   Upcoming Event
+                 </span>
+                 <h2 className="text-3xl md:text-4xl font-extrabold text-white">
+                   {congress?.title || 'Upcoming GRASAG‑UPSA Event'}
+                 </h2>
+                 <p className="text-base text-white max-w-prose font-medium">
+                   {congress?.description || ''}
+                 </p>
+               </div>
+               <div className="flex flex-wrap gap-6 justify-center lg:justify-end">
+                 {[{ label: 'Days', value: timeLeft.days },
+                   { label: 'Hours', value: timeLeft.hours },
+                   { label: 'Min', value: timeLeft.minutes },
+                   { label: 'Sec', value: timeLeft.seconds }].map(item => (
+                   <div key={item.label} className="min-w-[70px] rounded-xl bg-white/10 px-4 py-3 border border-white/30 text-center">
+                     <div className="text-2xl font-bold text-white">{item.value}</div>
+                     <div className="text-xs font-medium uppercase text-white/80">{item.label}</div>
+                   </div>
+                 ))}
+               </div>
+             </div>
+           </div>
+         )}
+       </section>
+        
       </section>
-
-      {/* Countdown & Events banner */}
-      {(congress || Object.values(timeLeft).some(v => v > 0)) && (
-        <section className="mx-auto max-w-7xl px-4 pb-20 lg:px-8">
-          <div className="relative rounded-3xl overflow-hidden gradient-bg text-white px-6 py-12 md:px-12 md:py-16 shadow-xl">
-            <div 
-              className="absolute inset-0 bg-cover bg-center opacity-10"
-              style={{ backgroundImage: `url('${congress?.image_url || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200'}')` }}
-            ></div>
-            <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
-              <div className="max-w-xl space-y-4">
-                <span className="inline-block rounded-full bg-accent/20 px-3 py-1 text-xs font-bold text-accent tracking-wide uppercase border border-accent/30">
-                  Upcoming Events
-                </span>
-                <h2 className="text-3xl md:text-4xl font-extrabold leading-tight">
-                  {congress?.title || 'Upcoming GRASAG-UPSA Events'}
-                </h2>
-                <p className="text-sm text-neutral-200">
-                  {congress?.description || 'Join our research symposium, professional development panels, and networks. Ensure you register and reserve your delegates slot.'}
-                </p>
-              </div>
-
-              {/* Timer values */}
-              <div className="flex flex-wrap gap-4 text-center">
-                {[
-                  { label: 'Days', value: timeLeft.days },
-                  { label: 'Hours', value: timeLeft.hours },
-                  { label: 'Min', value: timeLeft.minutes },
-                  { label: 'Sec', value: timeLeft.seconds },
-                ].map((item) => (
-                  <div key={item.label} className="w-20 rounded-2xl bg-white/10 px-3 py-4 backdrop-blur-md border border-white/10">
-                    <div className="text-2xl font-black text-white">{item.value}</div>
-                    <div className="text-[10px] font-bold text-neutral-300 uppercase tracking-wide">{item.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Strategic Priorities */}
       <section className="py-6">

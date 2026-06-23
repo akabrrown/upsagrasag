@@ -1,5 +1,5 @@
 import React from 'react';
-import { Landmark, FileText, Download, Target, Info } from 'lucide-react';
+import { Landmark, FileText, Download, Target, Info, CheckCircle } from 'lucide-react';
 
 export const dynamic = 'force-dynamic'; // ensure fresh data
 
@@ -50,12 +50,28 @@ export default async function AboutPage() {
 
         <div className="site-card-light bg-white p-6 space-y-4">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 text-accent">
-            <Info className="h-5 w-5 text-accent" />
+            <Target className="h-5 w-5 text-accent" />
           </div>
           <h3 className="text-lg font-bold text-accent">Our Vision</h3>
           <p className="text-sm text-neutral-600 leading-relaxed">
             To be the leading graduate students' association in Ghana, recognized for academic and research excellence, professional development, and transformative student leadership.
           </p>
+        </div>
+      </section>
+
+      {/* Strategic Priorities */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
+        <div className="site-card-light bg-white p-6 space-y-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 text-accent">
+            <CheckCircle className="h-5 w-5" />
+          </div>
+          <h3 className="text-lg font-bold text-accent">Strategic Priorities</h3>
+          <ul className="list-disc list-inside text-sm text-neutral-600 space-y-1">
+            <li>Academic advocacy and curriculum improvement</li>
+            <li>Professional development and career services</li>
+            <li>Research funding and collaboration</li>
+            <li>Student welfare and mental health support</li>
+          </ul>
         </div>
       </section>
 

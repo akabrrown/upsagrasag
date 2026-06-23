@@ -71,7 +71,7 @@ export default function NewsGrid({ news }: { news: NewsUpdate[] }) {
                   </time>
                 </div>
 
-                <h2 className="text-2xl font-bold text-gray-900 mb-3 leading-tight line-clamp-2">
+                <h2 className="text-2xl font-bold text-gray-900 mb-3 leading-tight line-clamp-2 uppercase">
                   {item.title}
                 </h2>
 
@@ -82,8 +82,8 @@ export default function NewsGrid({ news }: { news: NewsUpdate[] }) {
 
                 <div className="mt-auto pt-4 border-t border-gray-100">
                   <Link
-                    href={`/news-updates/${item.slug}`}
-                    className="text-[#0c2340] font-bold text-sm hover:text-[#d4af37] transition-colors flex items-center gap-1"
+                    href={`/news-updates/${item.slug || item.id}`}
+                    className="text-[#0c2340] font-bold text-sm hover:text-[#d4af37] transition-colors flex items-center gap-1 p-2 -ml-2"
                   >
                     Read more
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

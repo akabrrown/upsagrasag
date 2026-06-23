@@ -1,14 +1,23 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { newsService } from '@/lib/supabase/admin';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 import type { NewsUpdate } from '@/types/admin';
 
 export const dynamic = 'force-dynamic';
 
 import NewsGrid from './NewsGrid';
 export default async function NewsUpdatesPage() {
-  const news: NewsUpdate[] = await newsService.list();
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase
+    .from('news_updates')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Failed to fetch news:', error);
+  }
+  const news: NewsUpdate[] = data || [];
 
   return (
     <main className="flex-1 bg-gray-50 min-h-screen">
