@@ -77,7 +77,7 @@ export default function AdminCongressPage() {
     }
   };
 
-  const columns = [
+    const columns = [
     { 
       header: 'Image', 
       accessor: (row: CongressEvent) => row.image_url ? (
@@ -88,8 +88,16 @@ export default function AdminCongressPage() {
     { 
       header: 'Event Date', 
       accessor: (row: CongressEvent) => <span suppressHydrationWarning>{new Date(row.event_date).toLocaleString()}</span>
+    },
+    { 
+      header: 'Location', 
+      accessor: (row: CongressEvent) => row.location ?? ''
     }
   ];
+
+  // Inside form after event date input
+  // Added new location input field
+  
 
   return (
     <div className="space-y-6">
@@ -145,7 +153,15 @@ export default function AdminCongressPage() {
             />
             {errors.event_date && <p className="text-sm text-red-600 mt-1">{errors.event_date.message as string}</p>}
           </div>
-          <div>
+
+          <div className="pt-4">
+            <label className="block text-sm font-medium text-slate-700 mb-1">Location (Optional)</label>
+            <input
+              {...register('location')}
+              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div className="pt-4">
             <label className="block text-sm font-medium text-slate-700 mb-1">Image Banner (Optional)</label>
             <CloudinaryUpload 
               onUpload={(url) => setValue('image_url', url, { shouldValidate: true })}

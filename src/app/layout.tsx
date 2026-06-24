@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import ConditionalNavbar from '@/components/ConditionalNavbar';
 import ConditionalFooter from '@/components/ConditionalFooter';
+import AuthProvider from '@/components/AuthProvider';
 
 export const metadata: Metadata = {
   title: "GRASAG-UPSA Portal | Graduate Students' Association of Ghana, UPSA",
@@ -16,7 +17,9 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased font-sans" suppressHydrationWarning>
       <body suppressHydrationWarning className="min-h-full flex flex-col bg-background text-foreground">
         <ConditionalNavbar />
-        <main className="flex-1">{children}</main>
+        <AuthProvider>
+          <main className="flex-1">{children}</main>
+        </AuthProvider>
         <ConditionalFooter />
       </body>
     </html>

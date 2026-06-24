@@ -24,6 +24,7 @@ export const congressSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   event_date: z.string().min(1, "Date is required"),
+  location: z.string().optional(),
   image_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),

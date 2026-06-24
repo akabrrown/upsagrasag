@@ -17,6 +17,7 @@ export default async function NewsUpdatesPage() {
   if (error) {
     console.error('Failed to fetch news:', error);
   }
+  const fetchError = !!error;
   const news: NewsUpdate[] = data || [];
 
   return (
@@ -29,6 +30,9 @@ export default async function NewsUpdatesPage() {
           </p>
         </div>
         {/* Filtering UI and grid */}
+        {fetchError && (
+          <p className="text-red-600 text-center my-4">Unable to load news updates. Please try again later.</p>
+        )}
         <NewsGrid news={news} />
       </section>
     </main>

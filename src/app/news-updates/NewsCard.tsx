@@ -39,9 +39,27 @@ export default function NewsCard({ item }: { item: NewsUpdate }) {
         </h2>
 
         <div
-          className={`prose prose-sm prose-blue max-w-none text-gray-600 ${expanded ? "" : "line-clamp-4"}`}
-          dangerouslySetInnerHTML={{ __html: item.content }}
-        />
+          className={`prose prose-sm prose-blue max-w-none text-gray-600 break-words whitespace-pre-wrap ${expanded ? "" : "line-clamp-4"}`}
+        >
+          {(() => {
+            const cleanContent = item.content
+              .replace(/\u00a0/g, " ")
+              .replace(/&nbsp;/g, " ");
+            
+            return cleanContent.trim().startsWith('<') ? (
+              <div dangerouslySetInnerHTML={{ __html: cleanContent }} />
+            ) : (
+              cleanContent
+                .split('\n')
+                .filter(Boolean)
+                .map((para, idx) => (
+                  <p key={idx} className="mb-2">
+                    {para}
+                  </p>
+                ))
+            );
+          })()}
+        </div>
 
         <div className="mt-auto pt-4 border-t border-gray-100">
           <button

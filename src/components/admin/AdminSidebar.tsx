@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { 
   LayoutDashboard, 
   Users, 
@@ -11,6 +12,7 @@ import {
   Calendar, 
   Briefcase, 
   BookOpen, 
+  Image,
   Video, 
   Award,
   Globe,
@@ -39,11 +41,14 @@ const navItems = [
   { name: 'Research & Grants', href: '/admin/research_opportunities', icon: Award },
   { name: 'News & Updates', href: '/admin/news_updates', icon: Newspaper },
   { name: 'Admin Users', href: '/admin/users', icon: Users },
+  { name: 'Gallery', href: '/admin/gallery', icon: Image },
   { name: 'Site Settings', href: '/admin/settings', icon: Settings },
 ];
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === 'admin';
   const router = useRouter();
   // Add admin-page class for global styling (hide footer)
   useEffect(() => {

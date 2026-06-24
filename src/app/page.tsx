@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import type { CongressEvent } from '@/types/admin';
 import { Bot } from 'lucide-react';
 import ChatModal from '@/components/ChatModal';
 import PartnerCarousel from '@/components/PartnerCarousel';
 import { supabaseClient } from '@/lib/supabaseClient';
+import Image from 'next/image';
 
 
 export default function HomePage() {
@@ -14,39 +15,40 @@ export default function HomePage() {
   // Countdown timer state
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
-  // Congress event state (fetched from DB)
-  const [congress, setCongress] = useState<{ title: string; description: string; event_date: string; image_url: string } | null>(null);
+  // Congress events state (fetched from DB)
+  const [events, setEvents] = useState<CongressEvent[]>([]);
+  const [currentEventIndex, setCurrentEventIndex] = useState(0);
+  const currentEvent = events[currentEventIndex] || null;
 
-  // Hero section state
-  const [hero, setHero] = useState({
-    title: '',
-    subtitle: '',
-    ctaText: '',
-    ctaLink: '',
-    imageUrl: '',
-  });
-
-  // Fetch the latest upcoming congress event
+  // Fetch upcoming congress events (multiple)
   useEffect(() => {
     const fetchCongress = async () => {
       const { data, error } = await supabaseClient
         .from('congress_events')
-        .select('title, description, event_date, image_url')
+        .select('title, description, event_date, image_url, location')
         .gte('event_date', new Date().toISOString())
         .order('event_date', { ascending: true })
-        .limit(1)
-        .maybeSingle();
+        .limit(5);
       if (!error && data) {
-        setCongress(data);
+        setEvents(data);
       }
     };
     fetchCongress();
   }, []);
 
-  // Countdown effect – uses congress event_date from the DB
+  // Slide show effect for events if more than one
   useEffect(() => {
-    if (!congress?.event_date) return;
-    const targetDate = new Date(congress.event_date).getTime();
+    if (events.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentEventIndex((prev) => (prev + 1) % events.length);
+    }, 8000);
+    return () => clearInterval(interval);
+  }, [events]);
+
+  // Countdown effect – uses currentEvent event_date from the DB
+  useEffect(() => {
+    if (!currentEvent?.event_date) return;
+    const targetDate = new Date(currentEvent.event_date).getTime();
     const interval = setInterval(() => {
       const now = Date.now();
       const difference = targetDate - now;
@@ -62,9 +64,17 @@ export default function HomePage() {
         setTimeLeft({ days: d, hours: h, minutes: m, seconds: s });
       }
     }, 1000);
-
     return () => clearInterval(interval);
-  }, [congress?.event_date]);
+  }, [currentEvent?.event_date]);
+
+    // Hero section state
+  const [hero, setHero] = useState({
+    title: '',
+    subtitle: '',
+    ctaText: '',
+    ctaLink: '',
+    imageUrl: '',
+  });
 
   // Fetch hero content
   useEffect(() => {
@@ -108,6 +118,39 @@ useEffect(() => {
   fetchPartners();
 }, []);
 
+  // Fetch executives (leadership) data
+  const [executives, setExecutives] = useState([] as { id: number; name: string; title: string; photo_url: string }[]);
+  useEffect(() => {
+    const fetchExec = async () => {
+      try {
+        const response = await fetch('/api/leadership');
+        if (!response.ok) throw new Error('Failed to fetch leadership');
+        const data = await response.json();
+        // The API may return an array directly or an object containing the array under a key (e.g., {executives: [...]})
+        const execArray = Array.isArray(data) ? data : data.executives;
+        if (Array.isArray(execArray) && execArray.length > 0) {
+          setExecutives(execArray);
+        } else {
+          console.warn('Leadership endpoint returned unexpected format, using sample data');
+          setExecutives([
+            { id: 1, name: 'Sample Exec 1', title: 'President', photo_url: '' },
+            { id: 2, name: 'Sample Exec 2', title: 'Vice President', photo_url: '' },
+            { id: 3, name: 'Sample Exec 3', title: 'Treasurer', photo_url: '' },
+          ]);
+        }
+      } catch (err) {
+        console.warn('Failed to fetch leadership', err);
+        // Fallback sample data on error
+        setExecutives([
+          { id: 1, name: 'Sample Exec 1', title: 'President', photo_url: '' },
+          { id: 2, name: 'Sample Exec 2', title: 'Vice President', photo_url: '' },
+          { id: 3, name: 'Sample Exec 3', title: 'Treasurer', photo_url: '' },
+        ]);
+      }
+    };
+    fetchExec();
+  }, []);
+
 
   // Slides will be defined after hero defaults
   // Updated hero defaults for fallback when slide has no custom data
@@ -127,7 +170,7 @@ useEffect(() => {
       bgStyle: { backgroundImage: 'url(/IMG_5241.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' },
     },
     {
-      title: 'Welcome to the Graduate Student Association of Ghana',
+      title: 'Welcome to the Graduate Student Association of Ghana - UPSA',
       subtitle: 'Join us in fostering graduate research, professional growth, and community impact across Ghana.',
       ctaText: 'Learn More',
       ctaLink: '/about',
@@ -185,8 +228,8 @@ useEffect(() => {
                 <Image
                   src="/Sasu.jpeg"
                   alt="President – Samuel Sasu Adonteng"
-                  width={500}
-                  height={300}
+                  width={300}
+                  height={150}
                   className="object-cover w-full h-auto rounded-2xl"
                 />
                 <div className="pt-4 border-t border-neutral-200">
@@ -199,7 +242,7 @@ useEffect(() => {
             {/* Welcome Text – Right Side */}
             <div className="space-y-6 lg:order-1">
               <h2 className="text-3xl sm:text-4xl font-extrabold text-primary leading-tight">
-                Welcome to the official website for the Graduate Students&apos; Association of Ghana – UPSA.
+                Welcome to the Graduate Student Association of Ghana - UPSA.
               </h2>
 
               <div className="space-y-4 text-neutral-600 text-sm sm:text-base leading-relaxed">
@@ -223,48 +266,56 @@ useEffect(() => {
 
           </div>
         </div>
-           {/* Upcoming Events Banner */}
-       <section className="mx-auto max-w-7xl px-4 py-12">
-         { (congress || Object.values(timeLeft).some(v => v > 0)) && (
-           <div className="relative mx-auto max-w-5xl rounded-2xl overflow-hidden border border-primary/20 bg-white/30 backdrop-blur-xl shadow-2xl">
-             {/* Background image with dark overlay */}
-             {congress?.image_url && (
-               <div className="absolute inset-0 z-0">
-                 <img
-                   src={congress.image_url}
-                   alt="Event background"
-                   className="absolute inset-0 w-full h-full object-cover opacity-30"
-                 />
-                 <div className="absolute inset-0 bg-gradient-to-br from-primary/70 via-primary/50 to-secondary/70 mix-blend-multiply" />
-               </div>
-             )}
-             <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 p-8 lg:p-12 text-center lg:text-left">
-               <div className="max-w-xl space-y-4">
-                 <span className="inline-block rounded-full bg-[#d4af37]/20 px-4 py-1 text-sm font-semibold text-[#d4af37] uppercase tracking-wider border border-[#d4af37]/30">
-                   Upcoming Event
-                 </span>
-                 <h2 className="text-3xl md:text-4xl font-extrabold text-white">
-                   {congress?.title || 'Upcoming GRASAG‑UPSA Event'}
-                 </h2>
-                 <p className="text-base text-white max-w-prose font-medium">
-                   {congress?.description || ''}
-                 </p>
-               </div>
-               <div className="flex flex-wrap gap-6 justify-center lg:justify-end">
-                 {[{ label: 'Days', value: timeLeft.days },
-                   { label: 'Hours', value: timeLeft.hours },
-                   { label: 'Min', value: timeLeft.minutes },
-                   { label: 'Sec', value: timeLeft.seconds }].map(item => (
-                   <div key={item.label} className="min-w-[70px] rounded-xl bg-white/10 px-4 py-3 border border-white/30 text-center">
-                     <div className="text-2xl font-bold text-white">{item.value}</div>
-                     <div className="text-xs font-medium uppercase text-white/80">{item.label}</div>
-                   </div>
-                 ))}
-               </div>
-             </div>
-           </div>
-         )}
-       </section>
+
+{/* Upcoming Events Banner */}
+{events.length > 0 && (
+  <section className="mx-auto max-w-7xl px-4 py-12">
+    <div className="relative mx-auto max-w-5xl rounded-2xl overflow-hidden border border-primary/20 bg-white/30 backdrop-blur-xl shadow-2xl min-h-[150px] sm:min-h-[250px]">
+      {/* Background image */}
+      {currentEvent?.image_url && (
+        <Image
+          src={currentEvent.image_url}
+          alt="Event background"
+          width={400}
+          height={200}
+          className="object-contain opacity-30"
+          sizes="(max-width: 768px) 100vw, 50vw"
+        />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/70 via-primary/50 to-secondary/70 mix-blend-multiply" />
+      <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 p-8 lg:p-12 text-center lg:text-left">
+        <div className="max-w-xl space-y-4">
+          <span className="inline-block rounded-full bg-[#d4af37]/20 px-4 py-1 text-sm font-semibold text-[#d4af37] uppercase tracking-wider border border-[#d4af37]/30">
+            Upcoming Event
+          </span>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-white">
+            {currentEvent?.title}
+          </h2>
+          {currentEvent?.location && (
+            <p className="text-base text-white font-medium mt-1">
+              Location: {currentEvent.location}
+            </p>
+          )}
+          <p className="text-base text-white max-w-prose font-medium">
+            {currentEvent?.description}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-6 justify-center lg:justify-end">
+          {[{ label: 'Days', value: timeLeft.days },
+            { label: 'Hours', value: timeLeft.hours },
+            { label: 'Min', value: timeLeft.minutes },
+            { label: 'Sec', value: timeLeft.seconds }].map(item => (
+            <div key={item.label} className="min-w-[70px] rounded-xl bg-primary/10 px-4 py-3 border border-primary/30 text-center">
+              <div className="text-2xl font-bold text-primary">{item.value}</div>
+              <div className="text-xs font-medium uppercase text-primary/80">{item.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+)}
+
         
       </section>
 
@@ -296,15 +347,8 @@ useEffect(() => {
 </div>
         </div>
       </section>
-      {/* Partner Logos */}
-<section className="bg-slate-50 border-y border-neutral-100 py-10">
-  <div className="mx-auto max-w-7xl px-4 text-center space-y-6">
-    <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Our Corporate & Academic Partners</p>
-    <div className="flex flex-wrap justify-center items-center gap-10">
-      <PartnerCarousel logos={partners.map(p => p.logo)} />
-    </div>
-  </div>
-</section>
+      
+
 
 
       {/* Floating Chatbot Indicator */}

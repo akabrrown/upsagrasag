@@ -19,7 +19,8 @@ import {
   Clock,
   Phone,
   Mail,
-  ShoppingBag
+  ShoppingBag,
+  Image as LucideImage
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -59,6 +60,7 @@ export default function Navbar() {
         { name: 'Overview & Mission', href: '/about', icon: Info },
         { name: 'Our Agenda', href: '/agenda', icon: Info },
         { name: 'Leadership & Executives', href: '/leadership', icon: Users },
+        { name: 'Gallery', href: '/about/gallery', icon: LucideImage },
       ],
     },
     { name: 'Student Support', href: '#', dropdown: [
