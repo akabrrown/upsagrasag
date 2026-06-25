@@ -21,6 +21,7 @@ import {
   FolderOpen,
   ChevronsLeft,
   ChevronsRight,
+  Link as LinkIcon,
 } from 'lucide-react';
 import { supabaseClient } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
@@ -28,6 +29,7 @@ import { useRouter } from 'next/navigation';
 const navItems = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Homepage Content', href: '/admin/president', icon: Globe },
+  { name: 'Quick Links', href: '/admin/quick-links', icon: LinkIcon },
   { name: 'Congress Events', href: '/admin/congress', icon: Calendar },
   { name: 'Academic Calendar', href: '/admin/academic-calendar', icon: Calendar },
   { name: 'Partners', href: '/admin/partners', icon: Users },

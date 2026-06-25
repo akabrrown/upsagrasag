@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Ensure alternating or valid roles for Groq
+    // Ensure alternating or valid roles for Groq/Gemini
     const cleanMessages = messages.map((m: any) => ({
       role: m.role,
       content: m.content || ' '
@@ -61,6 +61,60 @@ export async function POST(req: NextRequest) {
     
     if (contextText) {
       systemContent += `\n\n--- CONTEXT FROM UPSA WEBSITE ---\n${contextText}\n----------------------------------`;
+    }
+
+    const useGemini = !groqApiKey || groqApiKey === 'REDACTED';
+
+    if (useGemini) {
+      if (!process.env.GEMINI_API_KEY) {
+        return NextResponse.json({ error: 'Gemini API key is not configured' }, { status: 500 });
+      }
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+      const geminiModel = genAI.getGenerativeModel({
+        model: 'gemini-1.5-flash',
+        systemInstruction: systemContent
+      });
+
+      const filteredMessages = cleanMessages.filter((m: any) => 
+        m.content !== "Hello! I am your GRASAG-UPSA AI Assistant. Ask me anything about postgraduate programmes, welfare packages, past questions, registration, or campus events." && 
+        m.content.indexOf("Smart UPSA") === -1
+      );
+
+      const contents = filteredMessages.map((m: any) => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }]
+      }));
+
+      const result = await geminiModel.generateContentStream({
+        contents
+      });
+
+      const encoder = new TextEncoder();
+      const customStream = new ReadableStream({
+        async start(controller) {
+          try {
+            for await (const chunk of result.stream) {
+              const text = chunk.text();
+              if (text) {
+                controller.enqueue(encoder.encode(text));
+              }
+            }
+          } catch (err) {
+            console.error('Gemini Stream Error:', err);
+            controller.error(err);
+          } finally {
+            controller.close();
+          }
+        }
+      });
+
+      return new Response(customStream, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'no-cache, no-transform',
+          'Connection': 'keep-alive',
+        },
+      });
     }
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {

@@ -57,10 +57,9 @@ export default function Navbar() {
       name: 'About',
       href: '#',
       dropdown: [
-        { name: 'Overview & Mission', href: '/about', icon: Info },
-        { name: 'Our Agenda', href: '/agenda', icon: Info },
+        { name: 'Who We Are', href: '/about', icon: Info },
+        { name: 'Our Community', href: '/about/community', icon: Users },
         { name: 'Leadership & Executives', href: '/leadership', icon: Users },
-        { name: 'Gallery', href: '/about/gallery', icon: LucideImage },
       ],
     },
     { name: 'Student Support', href: '#', dropdown: [

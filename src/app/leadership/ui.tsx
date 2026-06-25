@@ -8,7 +8,7 @@ export const Card: React.FC<{ children: ReactNode; className?: string }> = ({
 }) => {
   return (
     <div
-      className={`group rounded-xl bg-white p-6 shadow-lg transition-shadow hover:shadow-2xl ${className}`}
+      className={`group rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 backdrop-blur-lg border border-white/20 p-6 shadow-lg transition-transform transform hover:scale-105 ${className}`}
     >
       {children}
     </div>
@@ -24,12 +24,11 @@ export const ModalOverlay: React.FC<{
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-transparent"
-      style={{ backdropFilter: "blur(12px)" }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-md"
       onClick={onClose}
     >
       <div
-        className="relative max-w-5xl w-full bg-white rounded-xl shadow-2xl p-12"
+        className="relative w-full h-full bg-white backdrop-blur-lg border border-white/20 rounded-xl shadow-2xl p-12 overflow-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -49,7 +48,7 @@ export const Button: React.FC<{ onClick?: () => void; children: React.ReactNode;
   return (
     <button
       onClick={onClick}
-      className={`px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ${className}`}
+      className={`px-4 py-2 bg-gradient-to-r from-primary to-accent text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ${className}`}
     >
       {children}
     </button>

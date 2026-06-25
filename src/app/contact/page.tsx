@@ -64,7 +64,12 @@ export default function ContactPage() {
       icon: Phone,
       href: 'tel:+233558601545',
     },
-
+    {
+      title: 'Location',
+      details: 'University of Professional Studies Accra, First floor on the student centre',
+      icon: MapPin,
+      href: '#',
+    },
   ];
 
   return (
@@ -94,7 +99,7 @@ export default function ContactPage() {
                   className="upsa-blue-card flex gap-4"
                 >
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <Icon className="h-6 w-6" />
+                    <Icon className="h-6 w-6 text-accent" />
                   </div>
                   <div>
                     <h3 className="font-bold text-accent text-base">

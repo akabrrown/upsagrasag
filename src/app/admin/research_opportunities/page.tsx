@@ -17,7 +17,7 @@ export default function AdminResearchOpportunitiesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<ResearchOpportunity>({
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(researchOpportunitySchema),
     defaultValues: { sub_type: 'scholarships' }
   });

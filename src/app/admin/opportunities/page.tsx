@@ -27,7 +27,7 @@ export default function AdminOpportunitiesPage() {
     setValue,
     control,
     formState: { errors, isSubmitting },
-  } = useForm<Opportunity>({
+  } = useForm({
     resolver: zodResolver(opportunitySchema),
     defaultValues: { title: '', company: '', type: 'Full-time', category: '', image_url: '' },
   });

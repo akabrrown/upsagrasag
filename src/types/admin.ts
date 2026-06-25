@@ -1,177 +1,155 @@
 import { z } from "zod";
 
-export const adminUserSchema = z.object({
-  id: z.string().uuid().optional(),
+export const adminContactSchema = z.object({
+  name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
-  role: z.string().default("admin"),
-  created_at: z.string().optional(),
-  updated_at: z.string().optional(),
+  phone: z.string().optional(),
+  role: z.string().min(1, "Role is required"),
 });
-export type AdminUser = z.infer<typeof adminUserSchema>;
 
 export const presidentSchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(1, "Name is required"),
-  speech: z.string().min(1, "Speech is required"),
-  image_url: z.string().min(1, "Image is required").url("Must be a valid URL"),
-  created_at: z.string().optional(),
-  updated_at: z.string().optional(),
+  speech: z.string().optional(),
+  image_url: z.string().url().optional()
 });
-export type President = z.infer<typeof presidentSchema>;
-
-export const congressSchema = z.object({
-  id: z.string().uuid().optional(),
-  title: z.string().min(1, "Title is required"),
-  description: z.string().optional(),
-  event_date: z.string().min(1, "Date is required"),
-  location: z.string().optional(),
-  image_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  created_at: z.string().optional(),
-  updated_at: z.string().optional(),
-});
-export type CongressEvent = z.infer<typeof congressSchema>;
-
+// Congress schema is defined later in the file
 export const partnerSchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(1, "Name is required"),
-  logo_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  display_order: z.number().int().nonnegative().default(0),
-  created_at: z.string().optional(),
-  updated_at: z.string().optional(),
+  logo_url: z.string().url().optional(),
+  display_order: z.number().int().optional()
 });
-export type Partner = z.infer<typeof partnerSchema>;
-
 export const constitutionSchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string().min(1, "Title is required"),
-  file_url: z.string().min(1, "File is required").url("Must be a valid URL"),
   version: z.string().optional(),
+  file_url: z.string().url().optional(),
   created_at: z.string().optional(),
-  updated_at: z.string().optional(),
 });
-export type ConstitutionFile = z.infer<typeof constitutionSchema>;
-
 export const leadershipSchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(1, "Name is required"),
   role: z.string().min(1, "Role is required"),
-  type: z.enum(["executive", "authority"]),
+  email: z.string().email("Invalid email address").optional(),
+  phone: z.string().optional(),
+  type: z.enum(["executive", "advisor"]).default("executive"),
   bio: z.string().optional(),
-  image_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  display_order: z.number().int().nonnegative().default(0),
-  created_at: z.string().optional(),
-  updated_at: z.string().optional(),
+  image_url: z.string().url().optional(),
+  display_order: z.number().int().min(0).optional(),
+  contactInfo: z.any().optional()
 });
-export type Leadership = z.infer<typeof leadershipSchema>;
-
 export const executiveSchema = z.object({
-  id: z.union([z.string(), z.number()]).optional(),
+  id: z.string().uuid().optional(),
   name: z.string().min(1, "Name is required"),
   title: z.string().min(1, "Title is required"),
   bio: z.string().optional(),
-  photo_url: z.string().min(1, "Photo is required").url("Must be a valid URL"),
-  display_order: z.number().int().nonnegative().default(0),
-  created_at: z.string().optional(),
-  updated_at: z.string().optional(),
+  photo_url: z.string().url().optional(),
+  display_order: z.number().int().default(0)
 });
-export type Executive = z.infer<typeof executiveSchema>;
-
 export const opportunitySchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string().min(1, "Title is required"),
   company: z.string().min(1, "Company is required"),
-  type: z.string().min(1, "Type is required"),
-  category: z.string().min(1, "Category is required"),
-  apply_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  image_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  created_at: z.string().optional(),
-  updated_at: z.string().optional(),
+  type: z.enum(["Full-time","Part-time","Internship","Contract"]).optional().default("Full-time"),
+  category: z.string().optional(),
+  image_url: z.string().url().optional()
 });
-export type Opportunity = z.infer<typeof opportunitySchema>;
-
 export const resourceSchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  file_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  link_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  created_at: z.string().optional(),
-  updated_at: z.string().optional(),
+  file_url: z.string().url().optional(),
+  link_url: z.string().url().optional()
 });
-export type Resource = z.infer<typeof resourceSchema>;
-
 export const programSchema = z.object({
   id: z.string().uuid().optional(),
-  name: z.string().min(1, "Program name is required"),
-  slug: z.string().min(1, "Slug is required"),
-  created_at: z.string().optional(),
-  updated_at: z.string().optional(),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().min(1, "Slug is required")
 });
-export type Program = z.infer<typeof programSchema>;
 
 export const pastQuestionSchema = z.object({
-  id: z.union([z.string(), z.number()]).optional(),
+  id: z.string().uuid().optional(),
   programSlug: z.string().min(1, "Program is required"),
   course_code: z.string().min(1, "Course code is required"),
   course_title: z.string().min(1, "Course title is required"),
   year: z.string().min(1, "Year is required"),
-  title: z.string().min(1, "Title is required").optional(),
-  file_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  created_at: z.string().optional(),
-  updated_at: z.string().optional(),
+  title: z.string().optional(),
+  file_url: z.string().url().optional(),
+  created_at: z.string().optional()
 });
-export type PastQuestion = z.infer<typeof pastQuestionSchema>;
-
 export const tutorialSchema = z.object({
-  id: z.string().uuid().optional(),
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  video_url: z.string().min(1, "Video URL is required").url("Must be a valid URL"),
-  created_at: z.string().optional(),
-  updated_at: z.string().optional(),
+  video_url: z.string().url().optional()
 });
-export type Tutorial = z.infer<typeof tutorialSchema>;
-
 export const eventProgrammeSchema = z.object({
-  id: z.string().uuid().optional(),
-  title: z.string().min(1, "Title is required"),
+  title: z.string().optional(),
   description: z.string().optional(),
-  event_date: z.string().min(1, "Date is required"),
+  event_date: z.string().min(1, "Event date is required"),
   location: z.string().optional(),
-  image_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  created_at: z.string().optional(),
-  updated_at: z.string().optional(),
+  image_url: z.string().url().optional()
 });
-export type EventProgramme = z.infer<typeof eventProgrammeSchema>;
 
+export type EventProgramme = z.infer<typeof eventProgrammeSchema>;
 export const researchOpportunitySchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  sub_type: z.enum(["scholarships", "calls", "publications", "careers"]),
-  link_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  deadline: z.string().optional(),
-  created_at: z.string().optional(),
-  updated_at: z.string().optional(),
+  sub_type: z.enum(["scholarships", "calls", "publications", "careers"]).default("scholarships"),
+  link_url: z.string().url().optional(),
+  deadline: z.string().optional()
 });
-export type ResearchOpportunity = z.infer<typeof researchOpportunitySchema>;
-
 export const newsUpdateSchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string().min(1, "Title is required"),
-  content: z.string().min(1, "Content is required"),
-  category: z.string().min(1, "Category is required"),
-  slug: z.string().min(1, "Slug is required").optional(),
-  image_url: z.string().url("Must be a valid URL"),
-  published_at: z.string().optional(),
-  created_at: z.string().optional(),
-  updated_at: z.string().optional(),
+  content: z.string().optional(),
+  category: z.enum(["news","articles","announcements","press"]).default("news"),
+  image_url: z.string().url().optional(),
+  published_at: z.string().optional()
 });
+
+export type President = z.infer<typeof presidentSchema>;
+export type Program = z.infer<typeof programSchema>;
+export type PastQuestion = z.infer<typeof pastQuestionSchema>;
+export type Partner = z.infer<typeof partnerSchema>;
+export type Constitution = z.infer<typeof constitutionSchema>;
+export type Leadership = z.infer<typeof leadershipSchema>;
+export type Executive = z.infer<typeof executiveSchema>;
+export type Opportunity = z.infer<typeof opportunitySchema>;
+export type Congress = z.infer<typeof congressSchema>;
+export type Resource = z.infer<typeof resourceSchema>;
+// duplicate export removed
+export type Tutorial = z.infer<typeof tutorialSchema>;
+export type EventProgrammeRecord = EventProgramme & { id: string };
+export type ResearchOpportunity = z.infer<typeof researchOpportunitySchema>;
 export type NewsUpdate = z.infer<typeof newsUpdateSchema>;
+
+export const adminUserSchema = z.object({
+  id: z.string().uuid().optional(),
+  email: z.string().email("Invalid email address"),
+  role: z.string().min(1, "Role is required"),
+  created_at: z.string().optional(),
+});
+export type AdminUser = z.infer<typeof adminUserSchema>;
+export type ConstitutionFile = z.infer<typeof constitutionSchema>;
+
+export const congressSchema = z.object({
+  id: z.string().uuid().optional(),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  event_date: z.string().min(1, "Event date is required"),
+  location: z.string().optional(),
+  image_url: z.string().url().optional(),
+  created_at: z.string().optional(),
+});
+export type CongressEvent = z.infer<typeof congressSchema>;
 
 export const platformSettingsSchema = z.object({
   id: z.string().uuid().optional(),
   maintenance_mode: z.boolean().default(false),
-  updated_at: z.string().optional(),
+  created_at: z.string().optional(),
 });
 export type PlatformSettings = z.infer<typeof platformSettingsSchema>;
+
+

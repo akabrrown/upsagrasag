@@ -4,7 +4,9 @@ import React, { useState } from 'react';
 import useSWR from 'swr';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { eventProgrammeSchema, EventProgramme } from '@/types/admin';
+import { eventProgrammeSchema, EventProgramme, EventProgrammeRecord } from '@/types/admin';
+
+
 
 type EventProgrammeForm = Pick<EventProgramme, 'title' | 'description' | 'event_date' | 'location' | 'image_url'>;
 import CrudTable from '@/components/admin/CrudTable';
@@ -15,7 +17,7 @@ import CloudinaryUpload from '@/components/CloudinaryUpload';
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 export default function AdminEventsPage() {
-  const { data: records, isLoading, mutate } = useSWR<EventProgramme[]>('/api/admin/events_programmes', fetcher);
+  const { data: records, isLoading, mutate } = useSWR<EventProgrammeRecord[]>('/api/admin/events_programmes', fetcher);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -32,18 +34,19 @@ export default function AdminEventsPage() {
     setIsModalOpen(true);
   };
 
-  const openEdit = (item: EventProgramme) => {
-    const formattedItem = { ...item };
+  const openEdit = (item: EventProgrammeRecord) => {
+    const { id, ...rest } = item;
+    const formattedItem = { ...rest };
     if (formattedItem.event_date) {
       const d = new Date(formattedItem.event_date);
       formattedItem.event_date = d.toISOString().slice(0, 16);
     }
-    reset(formattedItem);
-    setEditingId(item.id!);
+    reset(formattedItem as any);
+    setEditingId(id!);
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (item: EventProgramme) => {
+  const handleDelete = async (item: EventProgrammeRecord) => {
     try {
       const res = await fetch(`/api/admin/events_programmes/${item.id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete');
@@ -79,19 +82,20 @@ export default function AdminEventsPage() {
   const columns = [
     { 
       header: 'Cover', 
-      accessor: (row: EventProgramme) => row.image_url ? (
+      accessor: (row: EventProgrammeRecord) => row.image_url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={row.image_url} alt={row.title} className="w-16 h-10 object-cover rounded-md border" />
-      ) : <span className="text-xs text-slate-400">None</span>
+      ) : (
+        <span className="text-xs text-slate-400">None</span>
+      ),
     },
-    { header: 'Title', accessor: 'title' as keyof EventProgramme },
-    { header: 'Location', accessor: 'location' as keyof EventProgramme },
+    { header: 'Title', accessor: 'title' as keyof EventProgrammeRecord },
+    { header: 'Location', accessor: 'location' as keyof EventProgrammeRecord },
     { 
       header: 'Event Date', 
-      accessor: (row: EventProgramme) => <span suppressHydrationWarning>{new Date(row.event_date).toLocaleString()}</span>
+      accessor: (row: EventProgrammeRecord) => <span suppressHydrationWarning>{new Date(row.event_date).toLocaleString()}</span>
     }
-  ];
-
+];
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">

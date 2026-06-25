@@ -22,7 +22,7 @@ export default function AdminResourcesPage() {
     resolver: zodResolver(resourceSchema)
   });
 
-  const fileUrl = useWatch({ control, name: 'file_url' });
+  // const fileUrl = useWatch({ control, name: 'file_url' });
 
   const openCreate = () => {
     reset({ title: '', description: '', file_url: '', link_url: '' });

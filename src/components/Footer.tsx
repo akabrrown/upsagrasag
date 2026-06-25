@@ -52,10 +52,6 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-bold text-accent uppercase tracking-wider">Contact Info</h3>
             <ul className="mt-4 space-y-3.5">
-              <li className="flex items-start gap-3">
-                <MapPin className="h-5 w-5 shrink-0 text-accent" />
-                <span className="text-sm text-neutral-400 leading-relaxed">Graduate School Building, Room 204, UPSA Campus, Madina, Accra</span>
-              </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-5 w-5 shrink-0 text-accent" />
                 <span className="text-sm text-neutral-400">+233 (0) 55 860 1545</span>
@@ -63,6 +59,10 @@ export default function Footer() {
               <li className="flex items-center gap-3">
                 <Mail className="h-5 w-5 shrink-0 text-accent" />
                 <span className="text-sm text-neutral-400">grasagpresident@upsamail.edu.gh</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <MapPin className="h-5 w-5 shrink-0 text-accent" />
+                <span className="text-sm text-neutral-400">University of Professional Studies Accra, First floor on the student centre</span>
               </li>
             </ul>
           </div>

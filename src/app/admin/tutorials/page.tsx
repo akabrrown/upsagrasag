@@ -22,7 +22,7 @@ export default function AdminTutorialsPage() {
     resolver: zodResolver(tutorialSchema)
   });
 
-  const videoUrl = useWatch({ control, name: 'video_url' });
+  const videoUrl = useWatch<Tutorial>({ control, name: 'video_url' });
 
   const openCreate = () => {
     reset({ title: '', description: '', video_url: '' });

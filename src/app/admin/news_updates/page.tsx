@@ -25,16 +25,16 @@ export default function AdminNewsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<NewsUpdate>({
+  const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(newsUpdateSchema),
-    defaultValues: { category: 'news' }
+    defaultValues: { title: '', content: '', category: 'news', image_url: '', published_at: '' }
   });
 
   const imageUrl = useWatch({ control, name: 'image_url' });
   const contentValue = useWatch({ control, name: 'content' });
 
   const openCreate = () => {
-    reset({ title: '', content: '', category: 'notices', image_url: '', published_at: new Date().toISOString() });
+    reset({ title: '', content: '', category: 'news', image_url: '', published_at: new Date().toISOString() });
     setEditingId(null);
     setIsModalOpen(true);
   };

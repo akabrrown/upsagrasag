@@ -63,10 +63,11 @@ export class AdminCrudService<T extends { id?: string | number }> {
       .from(this.tableName)
       .select('*')
       .order(orderCol, { ascending });
-    if (error) {
-      console.error(`[AdminCrudService list ${this.tableName}] error:`, error);
-      throw new Error(error.message);
-    }
+      if (error) {
+        console.error(`[AdminCrudService list ${this.tableName}] error:`, error);
+        const errMsg = (error as any).message || 'Supabase list error';
+        throw new Error(errMsg);
+      }
     return data as T[];
   }
 
@@ -623,8 +624,8 @@ export const normalizeRecord = (record: any) => ({
   imageUrl: record.photo_url || record.logo_url || record.image_url || ''
 });
 
+import { adminUserSchema } from '@/types/page';
 import {
-  adminUserSchema,
   presidentSchema,
   congressSchema,
   partnerSchema,

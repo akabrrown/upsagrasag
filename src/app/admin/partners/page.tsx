@@ -18,8 +18,8 @@ export default function AdminPartnersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<Partner>({
-    resolver: zodResolver(partnerSchema) as any,
+  const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm({
+    resolver: zodResolver(partnerSchema),
     defaultValues: { name: '', logo_url: '', display_order: 0 }
   });
 
@@ -80,14 +80,12 @@ export default function AdminPartnersPage() {
       name: 'Acme Corp',
       logo_url: '',
       display_order: 1,
-      created_at: new Date().toISOString(),
     },
     {
       id: 'mock-2',
       name: 'Globex Inc',
       logo_url: '',
       display_order: 2,
-      created_at: new Date().toISOString(),
     },
   ];
 

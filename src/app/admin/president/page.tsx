@@ -22,7 +22,7 @@ export default function AdminPresidentPage() {
     resolver: zodResolver(presidentSchema)
   });
 
-  const imageUrl = useWatch({ control, name: 'image_url' });
+  const imageUrl = useWatch<President>({ control, name: 'image_url' });
 
   const openCreate = () => {
     reset({ name: '', speech: '', image_url: '' });

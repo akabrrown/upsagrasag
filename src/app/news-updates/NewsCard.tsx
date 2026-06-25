@@ -1,12 +1,12 @@
 /* src/app/news-updates/NewsCard.tsx */
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import type { NewsUpdate } from "@/types/admin";
 
 export default function NewsCard({ item }: { item: NewsUpdate }) {
-  const [expanded, setExpanded] = useState(false);
+  const contentClass = "prose prose-sm prose-blue max-w-none text-gray-600 break-words whitespace-pre-wrap line-clamp-4";
 
   return (
     <article className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col h-full">
@@ -38,9 +38,7 @@ export default function NewsCard({ item }: { item: NewsUpdate }) {
           {item.title}
         </h2>
 
-        <div
-          className={`prose prose-sm prose-blue max-w-none text-gray-600 break-words whitespace-pre-wrap ${expanded ? "" : "line-clamp-4"}`}
-        >
+        <div className={contentClass}>
           {(() => {
             const cleanContent = item.content
               .replace(/\u00a0/g, " ")
@@ -62,15 +60,17 @@ export default function NewsCard({ item }: { item: NewsUpdate }) {
         </div>
 
         <div className="mt-auto pt-4 border-t border-gray-100">
-          <button
-            onClick={() => setExpanded(!expanded)}
+          <Link
+            href={`/news-updates/${item.id ?? item.slug}`}
             className="text-[#0c2340] font-bold text-sm hover:text-[#d4af37] transition-colors flex items-center gap-1"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            {expanded ? "Show less" : "Read more"}
+            Read more
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
-          </button>
+          </Link>
         </div>
       </div>
     </article>

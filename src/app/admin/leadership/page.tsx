@@ -20,7 +20,7 @@ export default function AdminLeadershipPage() {
 
   const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<any>({
     resolver: zodResolver(leadershipSchema) as any,
-    defaultValues: { name: '', role: '', type: 'executive', bio: '', image_url: '', display_order: 0 }
+    defaultValues: { name: '', role: '', type: 'executive', bio: '', image_url: '', display_order: 0, contactInfo: '' }
   });
 
   const imageUrl = useWatch({ control, name: 'image_url' });
@@ -32,7 +32,10 @@ export default function AdminLeadershipPage() {
   };
 
   const openEdit = (item: Leadership) => {
-    reset(item);
+    reset({
+      ...item,
+      contactInfo: item.contactInfo ? JSON.stringify(item.contactInfo, null, 2) : ''
+    });
     setEditingId(item.id!);
     setIsModalOpen(true);
   };
@@ -48,13 +51,23 @@ export default function AdminLeadershipPage() {
   };
 
   const onSubmit = async (data: Leadership) => {
+    // Parse contactInfo JSON if provided
+    let parsed = data as any;
+    if (parsed.contactInfo && typeof parsed.contactInfo === 'string' && parsed.contactInfo.trim()) {
+      try {
+        parsed.contactInfo = JSON.parse(parsed.contactInfo);
+      } catch (e) {
+        alert('Contact Info must be valid JSON');
+        return;
+      }
+    }
     try {
       const url = editingId ? `/api/admin/leadership/${editingId}` : '/api/admin/leadership';
       const method = editingId ? 'PATCH' : 'POST';
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify(parsed)
       });
       if (!res.ok) throw new Error('Failed to save');
       setIsModalOpen(false);
@@ -125,6 +138,26 @@ export default function AdminLeadershipPage() {
                 className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.role && <p className="text-sm text-red-600 mt-1">{errors.role.message as string}</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Email (Optional)</label>
+              <input
+                {...register('email')}
+                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {errors.email && (
+                <p className="text-sm text-red-600 mt-1">{errors.email.message as string}</p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Phone (Optional)</label>
+              <input
+                {...register('phone')}
+                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {errors.phone && (
+                <p className="text-sm text-red-600 mt-1">{errors.phone.message as string}</p>
+              )}
             </div>
           </div>
           

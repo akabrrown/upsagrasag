@@ -18,7 +18,7 @@ export const dynamic = 'force-dynamic';
 function formatContent(content: string) {
   const hasHtml = /<[a-z][\s\S]*>/i.test(content);
   if (hasHtml) {
-    return <div dangerouslySetInnerHTML={{ __html: content }} />;
+    return <div className="break-words whitespace-normal" dangerouslySetInnerHTML={{ __html: content }} />;
   }
   // Split on single line breaks – preserve empty lines as <br/>
   return (
@@ -86,7 +86,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<Param
               {newsItem.title}
             </h1>
             <div className="flex-shrink-0 self-start">
-              <ShareButton title={newsItem.title} text={newsItem.content.replace(/<[^>]*>?/gm, '').substring(0, 100) + '...'} />
+               <ShareButton title={newsItem.title} text={newsItem.content.replace(/<[^>]*>/gm, '').substring(0, 100) + '...'} imageUrl={newsItem.image_url} />
             </div>
           </div>
           
