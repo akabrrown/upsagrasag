@@ -40,7 +40,7 @@ export default function NewsCard({ item }: { item: NewsUpdate }) {
 
         <div className={contentClass}>
           {(() => {
-            const cleanContent = item.content
+            const cleanContent = (item.content || "")
               .replace(/\u00a0/g, " ")
               .replace(/&nbsp;/g, " ");
             

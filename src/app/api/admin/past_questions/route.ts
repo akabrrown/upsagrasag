@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
   // Transform to public URLs
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || `http://localhost:${process.env.PORT || 3000}`;
   const items: PastQuestion[] = (data as PastQuestionRecord[]).map((item) => ({
-    id: item.id,
+    id: item.id.toString(),
     programSlug: item.program_slug,
     course_code: item.course_code,
     course_title: item.course_title,

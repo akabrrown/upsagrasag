@@ -23,12 +23,12 @@ export default function NewsForm({ initialData, isEdit = false }: NewsFormProps)
     setValue,
     control,
     formState: { errors, isSubmitting },
-  } = useForm<NewsUpdate>({
+  } = useForm({
     resolver: zodResolver(newsUpdateSchema),
     defaultValues: {
       title: initialData?.title || '',
       content: initialData?.content || '',
-      category: initialData?.category || 'notices',
+      category: initialData?.category || 'news',
       image_url: coverUrl,
       published_at: initialData?.published_at?.slice(0, 16) || '',
     },

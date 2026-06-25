@@ -515,7 +515,7 @@ useEffect(() => {
                     <div key={i} className="relative rounded-2xl overflow-hidden group h-[400px] shadow-sm hover:shadow-lg transition-shadow">
                       <div className="absolute inset-0 bg-neutral-800">
                         {ev.image_url ? (
-                          <Image src={ev.image_url} alt={ev.title} fill className="object-cover opacity-60 group-hover:opacity-50 transition-opacity duration-500 group-hover:scale-105 transform" />
+                          <Image src={ev.image_url} alt={ev.title || "Event Image"} fill className="object-cover transition-transform duration-700 group-hover:scale-105 opacity-60 group-hover:opacity-50 transition-opacity duration-500 transform" />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-t from-black/80 to-transparent flex items-center justify-center text-white/50" />
                         )}

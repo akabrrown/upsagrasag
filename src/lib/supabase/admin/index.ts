@@ -143,6 +143,7 @@ import type {
   PastQuestion, 
   Tutorial, 
   EventProgramme, 
+  EventProgrammeRecord,
   ResearchOpportunity, 
   NewsUpdate, 
   PlatformSettings 
@@ -573,7 +574,7 @@ export const opportunityService = new AdminCrudService<Opportunity>('opportuniti
 export const resourceService = new AdminCrudService<Resource>('resources');
 export const pastQuestionService = new PastQuestionCrudService();
 export const tutorialService = new AdminCrudService<Tutorial>('tutorials');
-export const eventProgrammeService = new AdminCrudService<EventProgramme>('events_programmes');
+export const eventProgrammeService = new AdminCrudService<EventProgrammeRecord>('events_programmes');
 export const researchOpportunityService = new AdminCrudService<ResearchOpportunity>('research_opportunities');
 export const newsUpdateService = new AdminCrudService<NewsUpdate>('news_updates');
 

@@ -33,7 +33,7 @@ export const leadershipSchema = z.object({
   role: z.string().min(1, "Role is required"),
   email: z.string().email("Invalid email address").optional(),
   phone: z.string().optional(),
-  type: z.enum(["executive", "advisor"]).default("executive"),
+  type: z.enum(["executive", "advisor", "authority"]).default("executive"),
   bio: z.string().optional(),
   image_url: z.string().url().optional(),
   display_order: z.number().int().min(0).optional(),
@@ -53,6 +53,8 @@ export const opportunitySchema = z.object({
   company: z.string().min(1, "Company is required"),
   type: z.enum(["Full-time","Part-time","Internship","Contract"]).optional().default("Full-time"),
   category: z.string().optional(),
+  description: z.string().optional(),
+  apply_url: z.string().url().optional(),
   image_url: z.string().url().optional()
 });
 export const resourceSchema = z.object({
@@ -79,6 +81,7 @@ export const pastQuestionSchema = z.object({
   created_at: z.string().optional()
 });
 export const tutorialSchema = z.object({
+  id: z.string().uuid().optional(),
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   video_url: z.string().url().optional()
@@ -105,8 +108,10 @@ export const newsUpdateSchema = z.object({
   title: z.string().min(1, "Title is required"),
   content: z.string().optional(),
   category: z.enum(["news","articles","announcements","press"]).default("news"),
+  slug: z.string().optional(),
   image_url: z.string().url().optional(),
-  published_at: z.string().optional()
+  published_at: z.string().optional(),
+  created_at: z.string().optional()
 });
 
 export type President = z.infer<typeof presidentSchema>;
