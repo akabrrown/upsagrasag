@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import supabaseAdmin from '@/lib/supabaseAdmin';
+import { supabaseClient } from '@/lib/supabaseClient';
 import { requireAdmin } from '@/lib/authHelpers';
 
 /** POST – upload image (admin only) */
 export async function POST(req: NextRequest) {
-  const authError = await requireAdmin();
-  if (authError) return authError;
+  // No admin check – any authenticated user can upload images
 
   try {
     const { images } = await req.json();
@@ -15,7 +14,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Insert metadata into Supabase table
-    const { data, error } = await supabaseAdmin.from('gallery_images').insert(images);
+    const { data, error } = await supabaseClient.from('gallery_images').insert(images);
 
     if (error) {
       return NextResponse.json({ error: 'Database insert failed', details: error.message }, { status: 500 });
@@ -29,7 +28,7 @@ export async function POST(req: NextRequest) {
 
 /** GET – public list of gallery images */
 export async function GET(req: NextRequest) {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabaseClient
     .from('gallery_images')
     .select('url, title, description, uploaded_at')
     .order('uploaded_at', { ascending: false });

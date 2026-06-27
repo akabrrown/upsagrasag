@@ -270,20 +270,20 @@ useEffect(() => {
   // Define hero slides (reordered: Welcome first, Congratulations second, Inspiring third)
   const slides = [
     {
-      title: 'Welcome to the Graduate Student Association of Ghana - UPSA',
-      subtitle: 'Join us in fostering graduate research, professional growth, and community impact across Ghana.',
-      ctaText: 'Learn More',
-      ctaLink: '/about',
-      imagePath: '/group-image.png',
-      bgStyle: { backgroundImage: 'url(/group-image.png)', backgroundSize: 'cover', backgroundPosition: 'center' },
-    },
-    {
       title: 'Congratulations to the newly elected GRASAG executives for the 2026/2027 academic year',
       subtitle: 'We welcome our new student leaders and look forward to a successful academic term of representation, excellence, and impact.',
       ctaText: 'Meet the Team',
       ctaLink: '/leadership',
-      imagePath: '/grasssag.png',
-      bgStyle: { backgroundImage: 'url(/grasssag.png)', backgroundSize: 'cover', backgroundPosition: 'center' },
+      imagePath: '/group-image.png',
+      bgStyle: { backgroundImage: 'url(/group-image.png)', backgroundSize: 'cover', backgroundPosition: 'center' },
+    },
+    {
+      title: 'Welcome to the Graduate Student Association of Ghana - UPSA',
+      subtitle: 'Join us in fostering graduate research, professional growth, and community impact across Ghana.',
+      ctaText: 'Learn More',
+      ctaLink: '/about',
+      imagePath: '/IMG_1619-scaled-2.jpg',
+      bgStyle: { backgroundImage: 'url(/IMG_1619-scaled-2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' },
     },
     {
       title: heroTitle,

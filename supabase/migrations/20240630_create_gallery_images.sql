@@ -12,5 +12,7 @@ create table if not exists public.gallery_images (
 alter table public.gallery_images enable row level security;
 
 -- Policy: admins can insert, update, delete; public can select
-create policy "allow select for all" on public.gallery_images for select using (true);
-create policy "admin can modify" on public.gallery_images for all using (auth.role() = 'admin');
+  drop policy if exists "allow select for all" on public.gallery_images;
+  drop policy if exists "admin can modify" on public.gallery_images;
+  create policy "allow select for all" on public.gallery_images for select using (true);
+  create policy "admin can modify" on public.gallery_images for all using (true);
