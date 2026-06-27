@@ -87,11 +87,12 @@ export const tutorialSchema = z.object({
   video_url: z.string().url().optional()
 });
 export const eventProgrammeSchema = z.object({
-  title: z.string().optional(),
+  title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   event_date: z.string().min(1, "Event date is required"),
   location: z.string().optional(),
-  image_url: z.string().url().optional()
+  image_url: z.string().url().optional(),
+  is_featured: z.boolean().default(false)
 });
 
 export type EventProgramme = z.infer<typeof eventProgrammeSchema>;
@@ -146,6 +147,7 @@ export const congressSchema = z.object({
   event_date: z.string().min(1, "Event date is required"),
   location: z.string().optional(),
   image_url: z.string().url().optional(),
+  is_featured: z.boolean().default(false),
   created_at: z.string().optional(),
 });
 export type CongressEvent = z.infer<typeof congressSchema>;

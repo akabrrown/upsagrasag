@@ -4,6 +4,8 @@ import { eventProgrammeService } from '@/lib/supabase/admin/index';
 
 export default async function EventsPage() {
   const events = (await eventProgrammeService.list()) as any[];
+  const filteredEvents = events.filter((e) => e.is_featured);
+  const eventsToShow = filteredEvents;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8 space-y-12 bg-background text-foreground">
@@ -23,12 +25,12 @@ export default async function EventsPage() {
       {/* Events loop */}
       {/* Events loop */}
       <div className="space-y-8">
-        {events.length === 0 ? (
+        {eventsToShow.length === 0 ? (
           <div className="text-center py-12 text-neutral-500">
             No events scheduled at the moment. Please check back later.
           </div>
         ) : (
-          events.map((e) => (
+          eventsToShow.map((e) => (
             <div
               key={e.id || e.title}
               className="group flex flex-col md:flex-row gap-6 bg-white rounded-3xl p-4 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300"

@@ -72,17 +72,29 @@ export class AdminCrudService<T extends { id?: string | number }> {
   }
 
   async get(id: string): Promise<T | null> {
+    if (!id) {
+      // No ID provided; treat as not found.
+      return null;
+    }
     const supabase = supabaseAdminClient;
     const { data, error } = await supabase
       .from(this.tableName)
       .select('*')
       .eq('id', id)
       .single();
-    if (error && error.code !== 'PGRST116') {
-      console.error(`[AdminCrudService get ${this.tableName}] error:`, error);
-      throw new Error(error.message);
+    // If error is null, return data.
+    if (!error) {
+      return data as T | null;
     }
-    return data as T | null;
+    // Handle "not found" errors (PostgREST returns code PGRST116) and empty error objects gracefully.
+    const isNotFound = error.code === 'PGRST116' || (error && Object.keys(error).length === 0);
+    if (isNotFound) {
+      // No record found; return null without throwing.
+      return null;
+    }
+    // For other errors, log and throw.
+    console.error(`[AdminCrudService get ${this.tableName}] error:`, error);
+    throw new Error(error.message ?? 'Error fetching record');
   }
 
   async create(item: Partial<T>): Promise<T> {

@@ -8,7 +8,7 @@ import { eventProgrammeSchema, EventProgramme, EventProgrammeRecord } from '@/ty
 
 
 
-type EventProgrammeForm = Pick<EventProgramme, 'title' | 'description' | 'event_date' | 'location' | 'image_url'>;
+type EventProgrammeForm = Pick<EventProgramme, 'title' | 'description' | 'event_date' | 'location' | 'image_url'> & { is_featured?: boolean };
 import CrudTable from '@/components/admin/CrudTable';
 import FormModal from '@/components/admin/FormModal';
 import { Plus } from 'lucide-react';
@@ -29,7 +29,7 @@ export default function AdminEventsPage() {
   const imageUrl = useWatch({ control, name: 'image_url' });
 
   const openCreate = () => {
-    reset({ title: '', description: '', event_date: '', location: '', image_url: '' });
+    reset({ title: '', description: '', event_date: '', location: '', image_url: '', is_featured: false });
     setEditingId(null);
     setIsModalOpen(true);
   };
@@ -80,8 +80,8 @@ export default function AdminEventsPage() {
   };
 
   const columns = [
-    { 
-      header: 'Cover', 
+    {
+      header: 'Cover',
       accessor: (row: EventProgrammeRecord) => row.image_url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={row.image_url} alt={row.title} className="w-16 h-10 object-cover rounded-md border" />
@@ -89,10 +89,16 @@ export default function AdminEventsPage() {
         <span className="text-xs text-slate-400">None</span>
       ),
     },
+    {
+      header: 'Featured',
+      accessor: (row: EventProgrammeRecord) => row.is_featured ? (
+        <span className="bg-primary text-white px-2 py-1 rounded text-xs">Featured</span>
+      ) : null,
+    },
     { header: 'Title', accessor: 'title' as keyof EventProgrammeRecord },
     { header: 'Location', accessor: 'location' as keyof EventProgrammeRecord },
-    { 
-      header: 'Event Date', 
+    {
+      header: 'Event Date',
       accessor: (row: EventProgrammeRecord) => <span suppressHydrationWarning>{new Date(row.event_date).toLocaleString()}</span>
     }
 ];
@@ -134,7 +140,10 @@ export default function AdminEventsPage() {
             {errors.title && <p className="text-sm text-red-600 mt-1">{errors.title.message as string}</p>}
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center space-x-2">
+            <input type="checkbox" id="is_featured" {...register('is_featured')} className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" />
+            <label htmlFor="is_featured" className="text-sm font-medium text-slate-700">Featured</label>
+          </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Date & Time</label>
               <input 
@@ -151,7 +160,7 @@ export default function AdminEventsPage() {
                 className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-          </div>
+          
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>

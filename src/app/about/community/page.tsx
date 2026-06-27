@@ -1,4 +1,5 @@
 "use client";
+export const runtime = 'nodejs';
 import React, { useState, useEffect, FormEvent } from 'react';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';

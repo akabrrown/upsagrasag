@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import useSWR from 'swr';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { adminUserSchema, AdminUser } from '@/types/admin';
@@ -10,29 +9,11 @@ type AdminUserForm = Pick<AdminUser, 'email' | 'role'>;
 import CrudTable from '@/components/admin/CrudTable';
 import FormModal from '@/components/admin/FormModal';
 import { Plus } from 'lucide-react';
-
-const fetcher = (url: string) => fetch(url).then(r => r.json());
+import { useAdminData } from '@/app/admin/AdminDataContext';
 
 export default function AdminUsersPage() {
-  const { data: users, error, isLoading, mutate } = useSWR<AdminUser[]>('/api/admin/users', fetcher);
-
-  // Mock fallback data when API is unavailable or returns no data
-  const mockUsers: AdminUser[] = [
-    {
-      id: 'mock-1',
-      email: 'admin@example.com',
-      role: 'admin',
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: 'mock-2',
-      email: 'editor@example.com',
-      role: 'editor',
-      created_at: new Date().toISOString(),
-    },
-  ];
-
-  const records = users ?? mockUsers;
+  const { adminUsers, createAdminUser, updateAdminUser, deleteAdminUser } = useAdminData();
+  const records = adminUsers;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -55,9 +36,8 @@ export default function AdminUsersPage() {
 
   const handleDelete = async (user: AdminUser) => {
     try {
-      const res = await fetch(`/api/admin/users/${user.id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to delete');
-      mutate();
+      await deleteAdminUser(user.id!);
+      // state updates via realtime subscription
     } catch (e: unknown) {
       if (e instanceof Error) alert(e.message);
     }
@@ -65,16 +45,12 @@ export default function AdminUsersPage() {
 
   const onSubmit = async (data: AdminUserForm) => {
     try {
-      const url = editingId ? `/api/admin/users/${editingId}` : '/api/admin/users';
-      const method = editingId ? 'PATCH' : 'POST';
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      if (!res.ok) throw new Error('Failed to save');
+      if (editingId) {
+        await updateAdminUser(editingId, data);
+      } else {
+        await createAdminUser(data);
+      }
       setIsModalOpen(false);
-      mutate();
     } catch (e: unknown) {
       if (e instanceof Error) alert(e.message);
     }
@@ -104,7 +80,6 @@ export default function AdminUsersPage() {
       <CrudTable 
         data={records} 
         columns={columns} 
-        isLoading={isLoading}
         onEdit={openEdit}
         onDelete={handleDelete}
       />

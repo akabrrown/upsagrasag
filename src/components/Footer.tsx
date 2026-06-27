@@ -16,8 +16,8 @@ export default function Footer() {
           {/* Brand Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-20 w-68 overflow-hidden bg-white rounded-md relative">
-                <Image src="/GRASAG-LOGO-text.png" alt="GRASAG UPSA Logo" className="object-contain w-full h-full rounded-full" width={272} height={80} />
+              <div className="relative h-12 w-auto flex items-center justify-start">
+                <Image src="/GRASAG-LOGO- white text.png" alt="GRASAG UPSA Logo" className="object-contain h-full w-auto" width={272} height={80} />
               </div>
             </div>
             <p className="text-sm text-neutral-400 leading-relaxed">

@@ -2,21 +2,39 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import type { CongressEvent } from '@/types/admin';
-import { Bot, Landmark } from 'lucide-react';
+import { Bot, Landmark, GraduationCap, Play } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import ChatModal from '@/components/ChatModal';
 import PartnerCarousel from '@/components/PartnerCarousel';
 import { supabaseClient } from '@/lib/supabaseClient';
 import Image from 'next/image';
+import { CongressEvent } from '@/types/admin';
 
 
 export default function HomePage() {
     const [isChatOpen, setIsChatOpen] = useState(false);
+
+    const [ceoCountdown, setCeoCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   // Countdown timer state
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
-  // Congress events state (fetched from DB)
+    const [featuredSlideIndex, setFeaturedSlideIndex] = useState(0);
+    const [featuredEvents, setFeaturedEvents] = useState<CongressEvent[]>([]);
+
+    // Fetch featured congress events (isFeatured = true)
+    useEffect(() => {
+      const fetchFeatured = async () => {
+        const { data, error } = await supabaseClient
+          .from('congress_events')
+          .select('id, title, description, event_date, image_url, location, is_featured')
+          .eq('is_featured', true)
+          .order('event_date', { ascending: true });
+        if (!error && data) setFeaturedEvents(data);
+      };
+      fetchFeatured();
+    }, []);
+
   const [events, setEvents] = useState<CongressEvent[]>([]);
   const [currentEventIndex, setCurrentEventIndex] = useState(0);
   const currentEvent = events[currentEventIndex] || null;
@@ -84,7 +102,7 @@ export default function HomePage() {
     const fetchCongress = async () => {
       const { data, error } = await supabaseClient
         .from('congress_events')
-        .select('title, description, event_date, image_url, location')
+        .select('title, description, event_date, image_url, location, is_featured')
         .gte('event_date', new Date().toISOString())
         .order('event_date', { ascending: true })
         .limit(5);
@@ -125,6 +143,36 @@ export default function HomePage() {
     }, 1000);
     return () => clearInterval(interval);
   }, [currentEvent?.event_date]);
+
+  // Featured events banner auto-advance effect (dynamic length)
+  useEffect(() => {
+    if (featuredEvents.length === 0) return;
+    const interval = setInterval(() => {
+      setFeaturedSlideIndex((prev) => (prev + 1) % featuredEvents.length);
+    }, 8500);
+    return () => clearInterval(interval);
+  }, [featuredEvents]);
+
+  // Featured CEO Connect event countdown effect (October 3, 2026)
+  useEffect(() => {
+    const targetDate = new Date('2026-10-03T09:00:00').getTime();
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const difference = targetDate - now;
+
+      if (difference < 0) {
+        clearInterval(interval);
+        setCeoCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      } else {
+        const d = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const h = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((difference % (1000 * 60)) / 1000);
+        setCeoCountdown({ days: d, hours: h, minutes: m, seconds: s });
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
     // Hero section state
   const [hero, setHero] = useState({
@@ -213,98 +261,177 @@ useEffect(() => {
 
   // Slides will be defined after hero defaults
   // Updated hero defaults for fallback when slide has no custom data
-  const heroTitle = hero.title || 'Partner with GRASAG-UPSA today';
-  const heroSubtitle = hero.subtitle || 'Join forces with GRASAG‑UPSA to shape graduate research, professional growth, and community impact across Ghana.';
-  const heroCtaText = hero.ctaText || 'Partner with us';
+  const heroTitle = hero.title || 'Inspiring Students To Uncover Their True Potential';
+  const heroSubtitle = hero.subtitle || 'Lorem ipsum dolor sit amet consectetur. Vel imperdiet quam nisl vehicula nec blandit orci. Cras laoreet urna in dui nisl et. Vestibulum fermentum.';
+  const heroCtaText = hero.ctaText || 'Explore Academics';
   const heroCtaLink = hero.ctaLink || '/opportunities';
 
 
-  // Define hero slides
+  // Define hero slides (reordered: Welcome first, Congratulations second, Inspiring third)
   const slides = [
-    {
-      title: heroTitle,
-      subtitle: heroSubtitle,
-      ctaText: heroCtaText,
-      ctaLink: heroCtaLink,
-      bgStyle: { backgroundImage: 'url(/IMG_5241.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' },
-    },
     {
       title: 'Welcome to the Graduate Student Association of Ghana - UPSA',
       subtitle: 'Join us in fostering graduate research, professional growth, and community impact across Ghana.',
       ctaText: 'Learn More',
       ctaLink: '/about',
-      bgStyle: { backgroundImage: 'url(/IMG_5241.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' },
+      imagePath: '/group-image.png',
+      bgStyle: { backgroundImage: 'url(/group-image.png)', backgroundSize: 'cover', backgroundPosition: 'center' },
+    },
+    {
+      title: 'Congratulations to the newly elected GRASAG executives for the 2026/2027 academic year',
+      subtitle: 'We welcome our new student leaders and look forward to a successful academic term of representation, excellence, and impact.',
+      ctaText: 'Meet the Team',
+      ctaLink: '/leadership',
+      imagePath: '/grasssag.png',
+      bgStyle: { backgroundImage: 'url(/grasssag.png)', backgroundSize: 'cover', backgroundPosition: 'center' },
+    },
+    {
+      title: heroTitle,
+      subtitle: heroSubtitle,
+      ctaText: heroCtaText,
+      ctaLink: heroCtaLink,
+      imagePath: '/grad23-2x.jpg',
+      bgStyle: { backgroundImage: 'url(/grad23-2x.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' },
     },
   ];
   const [slideIndex, setSlideIndex] = useState(0);
   useEffect(() => {
     const interval = setInterval(() => {
       setSlideIndex((prev) => (prev + 1) % slides.length);
-    }, 5000);
+    }, 8000);
     return () => clearInterval(interval);
   }, [slides.length]);
   const currentSlide = slides[slideIndex];
 
   const bgStyle = currentSlide?.bgStyle || {};
-  const sectionClass = `relative overflow-hidden px-4 py-8 lg:px-8 border-b border-neutral-100 flex items-center justify-center min-h-[700px] ${!bgStyle.backgroundImage ? 'bg-gradient-to-br from-slate-50 via-slate-100/50 to-white' : ''}`;
+  const sectionClass = `relative overflow-hidden border-b border-neutral-100 flex items-end justify-start min-h-[800px] pb-12 pt-32 px-6 sm:px-12 lg:px-24 ${!bgStyle.backgroundImage ? 'bg-gradient-to-br from-slate-50 via-slate-100/50 to-white' : ''}`;
 
   return (
     <div className="relative min-h-screen bg-background">
       {/* Hero Section */}
-      <section className={sectionClass} style={bgStyle}>
+      <section className={sectionClass}>
+        {/* Animated Background layer */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out" 
+          style={bgStyle}
+        />
         {/* Dark overlay for readability */}
         {bgStyle.backgroundImage && (
-          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute inset-0 bg-black/60" />
         )}
-        <div className="relative z-10 max-w-2xl text-center px-4">
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-white leading-tight">
-            {currentSlide.title}
-          </h1>
-          {currentSlide.subtitle && (
-            <p className="mt-2 text-base text-white/80">
-              {currentSlide.subtitle}
-            </p>
-          )}
-          {currentSlide.ctaText && currentSlide.ctaLink && (
-            <div className="mt-4">
-              <Link href={currentSlide.ctaLink} className="inline-block bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition">
-                {currentSlide.ctaText}
-              </Link>
-            </div>
-          )}
+        
+        <div className="relative z-10 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
+          {/* Text Content Left Column with modern slide transitions */}
+          <div className="lg:col-span-8 text-left h-full flex flex-col justify-end">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={slideIndex}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.6, ease: 'easeInOut' }}
+                className="space-y-4 sm:space-y-5"
+              >
+
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-[1.15] max-w-2xl">
+                  {currentSlide.title}
+                </h1>
+                
+                {currentSlide.subtitle && (
+                  <p className="text-white/80 text-sm sm:text-base max-w-xl leading-relaxed">
+                    {currentSlide.subtitle}
+                  </p>
+                )}
+                
+                <div className="pt-2">
+                  {currentSlide.ctaText && currentSlide.ctaLink && (
+                    <Link href={currentSlide.ctaLink} className="inline-block bg-[#d4af37] hover:bg-[#c39e2e] text-slate-900 font-bold px-6 py-3 rounded-md transition shadow-lg hover:scale-[1.02] transform duration-200">
+                      {currentSlide.ctaText}
+                    </Link>
+                  )}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+          
+          {/* Floating Images Right Column (now clickable and reflecting active slide index) */}
+          <div className="lg:col-span-4 hidden md:flex items-end justify-end gap-3 pb-2 w-full">
+            {slides.map((slide, idx) => (
+              <button
+                key={idx}
+                onClick={() => setSlideIndex(idx)}
+                className={`relative w-[110px] h-[75px] rounded-lg overflow-hidden border shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer ${
+                  slideIndex === idx 
+                    ? 'border-2 border-[#d4af37] scale-105' 
+                    : 'border-white/20 opacity-60 hover:opacity-100'
+                }`}
+              >
+                <Image src={slide.imagePath} alt={`Slide ${idx + 1} preview`} fill className="object-cover" />
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
 
-      {/* Welcome & About Section (Below Hero) */}
-      <section className="bg-neutral-50 border-y border-neutral-100">
-        <div className="mx-auto max-w-7xl px-4 py-16 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
-            {/* President Photo – Left Side */}
-            <div className="flex justify-center lg:justify-start lg:order-2">
-              <div className="relative w-full max-w-lg overflow-hidden rounded-2xl">
-                <Image
-                  src="/Sasu.jpeg"
-                  alt="President – Samuel Sasu Adonteng"
-                  width={300}
-                  height={150}
-                  className="object-cover w-full h-auto rounded-2xl"
-                />
-                <div className="pt-4 border-t border-neutral-200">
-                  <h3 className="text-lg font-bold text-neutral-900 italic">Samuel Sasu Adonteng</h3>
-                  <p className="text-sm font-semibold text-accent mt-1">GRASAG‑UPSA President</p>
-                </div>
-              </div>
-            </div>
+      {/* Message from our President – MTN-inspired */}
+      <section className="relative overflow-hidden bg-[#0a1628]">
+        {/* Subtle animated background pattern */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Large decorative quote marks */}
+          <motion.div
+            className="absolute top-8 left-[12%] text-[180px] font-serif text-white/[0.04] leading-none select-none hidden lg:block"
+            animate={{ y: [0, -8, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            &ldquo;
+          </motion.div>
+          <motion.div
+            className="absolute bottom-12 left-[38%] text-[120px] font-serif text-white/[0.04] leading-none select-none hidden lg:block"
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+          >
+            &rdquo;
+          </motion.div>
+          {/* Floating circles */}
+          <motion.div
+            className="absolute top-16 right-[45%] w-64 h-64 rounded-full border border-white/[0.03]"
+            animate={{ scale: [1, 1.08, 1], rotate: [0, 5, 0] }}
+            transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div
+            className="absolute -bottom-20 left-[5%] w-80 h-80 rounded-full border border-[#d4af37]/[0.06]"
+            animate={{ scale: [1, 1.05, 1], rotate: [0, -3, 0] }}
+            transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+          />
+          <motion.div
+            className="absolute top-1/2 left-[30%] w-3 h-3 rounded-full bg-[#d4af37]/10"
+            animate={{ y: [0, -20, 0], opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div
+            className="absolute top-[20%] left-[20%] w-2 h-2 rounded-full bg-white/10"
+            animate={{ y: [0, 15, 0], opacity: [0.2, 0.5, 0.2] }}
+            transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+          />
+        </div>
 
-            {/* Welcome Text – Right Side */}
-            <div className="space-y-6 lg:order-1">
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-primary leading-tight">
-                Welcome to the Graduate Student Association of Ghana - UPSA.
+        <div className="relative z-10 mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch min-h-[500px]">
+            
+            {/* Left: Text Content */}
+            <div className="lg:col-span-7 flex flex-col justify-center px-6 sm:px-10 lg:px-16 py-12 lg:py-16">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight mb-1">
+                Message{' '}
+                <span className="italic text-[#d4af37]">from our</span>{' '}
+                President
               </h2>
 
-              <div className="space-y-4 text-neutral-600 text-sm sm:text-base leading-relaxed">
+              {/* Scrollable body text */}
+              <div className="mt-5 max-h-[180px] overflow-y-auto pr-3 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent space-y-3 text-white/75 text-sm sm:text-base leading-relaxed"
+                style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.2) transparent' }}
+              >
                 <p>
                   The Graduate Student Association of Ghana (GRASAG), University of Professional Studies Chapter, warmly welcomes all graduate students, stakeholders, and partners to our vibrant academic community.
                 </p>
@@ -321,135 +448,250 @@ useEffect(() => {
                   Together, we can build a stronger academic and professional community that nurtures future leaders and contributes positively to society.
                 </p>
               </div>
+
+              {/* Name & title */}
+              <div className="mt-5">
+                <p className="text-white/60 text-sm">Samuel Sasu Adonteng</p>
+                <p className="text-white font-bold text-sm">GRASAG‑UPSA President</p>
+              </div>
+
+              {/* CTA Button */}
+              <div className="mt-5">
+                <Link
+                  href="/leadership"
+                  className="inline-block border-2 border-white/80 text-white text-sm font-bold px-6 py-2.5 rounded-md hover:bg-white hover:text-[#0a1628] transition-all duration-300 uppercase tracking-wider"
+                >
+                  View Leadership
+                </Link>
+              </div>
+            </div>
+
+            {/* Right: President Image (overlapping) */}
+            <div className="lg:col-span-5 relative flex items-end justify-center lg:justify-end">
+              {/* Gradient overlay for blending on the left edge */}
+              <div className="hidden lg:block absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#0a1628] to-transparent z-10" />
+              
+              {/* Image container — bigger on all breakpoints */}
+              <div className="relative w-full h-[380px] sm:h-[450px] lg:h-[120%] lg:-mt-[10%]">
+                <Image
+                  src="/sasu.png"
+                  alt="Samuel Sasu Adonteng – GRASAG‑UPSA President"
+                  fill
+                  className="object-contain object-bottom lg:object-right-bottom lg:scale-110"
+                  sizes="(max-width: 768px) 100vw, 45vw"
+                  priority
+                />
+                {/* Bottom gradient on mobile */}
+                <div className="lg:hidden absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#0a1628] to-transparent" />
+              </div>
             </div>
 
           </div>
         </div>
-    </section>
+      </section>
 
 {/* Upcoming Events Banner */}
-{events.length > 0 && (
-  <section className="mx-auto max-w-7xl px-4 py-12">
-    <div className="relative mx-auto max-w-5xl rounded-2xl overflow-hidden border border-primary/20 bg-white/30 backdrop-blur-xl shadow-2xl min-h-[150px] sm:min-h-[250px]">
-      {/* Background image */}
-      {currentEvent?.image_url && (
-        <Image
-          src={currentEvent.image_url}
-          alt="Event background"
-          width={400}
-          height={200}
-          className="object-contain opacity-30"
-          sizes="(max-width: 768px) 100vw, 50vw"
-        />
-      )}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/70 via-primary/50 to-secondary/70 mix-blend-multiply" />
-      <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 p-8 lg:p-12 text-center lg:text-left">
-        <div className="max-w-xl space-y-4">
-          <span className="inline-block rounded-full bg-[#d4af37]/20 px-4 py-1 text-sm font-semibold text-[#d4af37] uppercase tracking-wider border border-[#d4af37]/30">
-            Upcoming Event
-          </span>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-white">
-            {currentEvent?.title}
-          </h2>
-          {currentEvent?.location && (
-            <p className="text-base text-white font-medium mt-1">
-              Location: {currentEvent.location}
-            </p>
-          )}
-          <p className="text-base text-white max-w-prose font-medium">
-            {currentEvent?.description}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-6 justify-center lg:justify-end">
-          {[{ label: 'Days', value: timeLeft.days },
-            { label: 'Hours', value: timeLeft.hours },
-            { label: 'Min', value: timeLeft.minutes },
-            { label: 'Sec', value: timeLeft.seconds }].map(item => (
-            <div key={item.label} className="min-w-[70px] rounded-xl bg-primary/10 px-4 py-3 border border-primary/30 text-center">
-              <div className="text-2xl font-bold text-primary">{item.value}</div>
-              <div className="text-xs font-medium uppercase text-primary/80">{item.label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  </section>
-)}
 
-          {/* Our Focus Areas – redesigned */}
-          <section className="space-y-6">
-            <h2 className="text-2xl font-bold text-accent flex items-center gap-2">
-              <Landmark className="h-6 w-6 text-accent" /> Our Focus Areas
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* G – Good Governance */}
-              <div className="flex flex-col items-center text-center">
-                            <Image src="/aassest/letter_g_stylish_1782309960852.png" alt="Good Governance" width={64} height={64} className="mb-2" />
-                            <h3 className="text-lg font-bold text-accent">Good Governance, Representation and Accountability</h3>
-                            <p className="text-sm text-neutral-500">
-                              GRASAG-UPSA promotes transparent, accountable and responsive leadership through effective representation, timely communication, responsible resource management and constitutional governance. We remain committed to leadership that is accessible, answerable and focused on the welfare of all postgraduate students.
+
+          {/* Our Focus Areas – Horizontally Scrolling Cards */}
+          <section className="bg-neutral-50 border-y border-neutral-100 py-20 overflow-hidden">
+            <div className="mx-auto max-w-7xl px-6 lg:px-8 mb-12">
+              <p className="text-sm font-bold text-[#B8860B] uppercase tracking-widest mb-2">Our Agenda</p>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
+                Our Focus Areas,<br />
+                <span className="text-neutral-500">Championing Graduate Excellence</span>
+              </h2>
+            </div>
+
+            {/* Scrolling marquee container */}
+            <div className="relative w-full overflow-hidden py-4">
+              {/* Fade gradient overlays on the sides */}
+              <div className="pointer-events-none absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-neutral-50 to-transparent z-10" />
+              <div className="pointer-events-none absolute inset-y-0 right-0 w-16 md:w-32 bg-gradient-to-l from-neutral-50 to-transparent z-10" />
+
+              <div className="animate-marquee flex gap-6">
+                {(() => {
+                  const cardList = [
+                    {
+                      title: 'Good Governance, Representation and Accountability',
+                      description: 'GRASAG-UPSA promotes transparent, accountable and responsive leadership through effective representation, timely communication, responsible resource management and constitutional governance.',
+                      image: '/president-speech.png',
+                      icon_name: 'Scale',
+                      link: '/about',
+                    },
+                    {
+                      title: 'Student Welfare, Support and Wellbeing',
+                      description: 'GRASAG-UPSA prioritises the welfare and wellbeing of graduate students, including mental health, psychosocial support, student-parent support, campus services and emergency support systems.',
+                      image: '/dsdsee.jpg',
+                      icon_name: 'HeartHandshake',
+                      link: '/welfare',
+                    },
+                    {
+                      title: 'Research, Academic Excellence and Innovation',
+                      description: 'GRASAG-UPSA supports research, academic excellence and innovation through thesis support, research capacity-building, academic publishing, peer learning and scholarly engagement.',
+                      image: '/researchhh.png',
+                      icon_name: 'GraduationCap',
+                      link: '/research-and-opportunities',
+                    },
+                    {
+                      title: 'Access, Equity, Inclusion and Digital Transformation',
+                      description: 'GRASAG-UPSA promotes equal access, inclusion and non-discrimination for all graduate students, regardless of gender, religion, ethnicity, disability, nationality or social background.',
+                      image: '/inclusive.png',
+                      icon_name: 'Globe',
+                      link: '/about',
+                    },
+                    {
+                      title: 'Graduate Community, Identity and Engagement',
+                      description: 'GRASAG-UPSA builds a united and active graduate community through student engagement, social interaction, leadership development, recognition programmes, sports, culture and volunteerism.',
+                      image: '/communittty.jpg',
+                      icon_name: 'Users',
+                      link: '/about',
+                    },
+                    {
+                      title: 'Advancement, Employability, Entrepreneurship and Partnerships',
+                      description: 'GRASAG-UPSA connects graduate education to career growth, entrepreneurship and national development through employability initiatives, mentorship, alumni engagement and strategic partnerships.',
+                      image: '/WhatsApp Image 2026-06-20 at 3.52.26 AM.jpeg',
+                      icon_name: 'Briefcase',
+                      link: '/opportunities',
+                    },
+                  ];
+
+                  // Triplicate the cards to guarantee smooth loop even on wide displays
+                  const triplicatedCards = [...cardList, ...cardList, ...cardList];
+
+                  return triplicatedCards.map((card, idx) => {
+                    const IconComponent = (LucideIcons as any)[card.icon_name] || LucideIcons.HelpCircle;
+                    return (
+                      <div
+                        key={idx}
+                        className="flex-shrink-0 flex w-[520px] sm:w-[600px] md:w-[660px] h-[280px] sm:h-[320px] md:h-[350px] bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-[1.01]"
+                      >
+                        {/* Left Side: Content */}
+                        <div className="w-[55%] p-5 sm:p-6 md:p-8 flex flex-col justify-between text-left">
+                          <div>
+                            {/* Icon Wrapper */}
+                            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#FAF6EC] border border-[#F5EAD2] flex items-center justify-center mb-3 sm:mb-4">
+                              <IconComponent className="w-6 h-6 sm:w-7 sm:h-7 text-[#B8860B]" strokeWidth={1.5} />
+                            </div>
+                            <h3 className="text-lg sm:text-xl font-extrabold text-neutral-900 leading-snug mb-1.5 sm:mb-2.5 line-clamp-2">
+                              {card.title}
+                            </h3>
+                            <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed line-clamp-3">
+                              {card.description}
                             </p>
                           </div>
-                          <div className="flex flex-col items-center text-center">
-                            <Image src="/aassest/letter_r_stylish_1782310071931.png" alt="Research" width={64} height={64} className="mb-2" />
-                            <h3 className="text-lg font-bold text-accent">Research, Academic Excellence and Innovation</h3>
-                            <p className="text-sm text-neutral-500">
-                              GRASAG-UPSA supports research, academic excellence and innovation through thesis support, research capacity-building, academic publishing, peer learning and scholarly engagement. We encourage solution-driven research that contributes to institutional improvement, industry practice and national development.
-                            </p>
-                          </div>
-                          <div className="flex flex-col items-center text-center">
-                            <Image src="/aassest/letter_a_stylish_1782310150000_1782310122240.png" alt="Access" width={64} height={64} className="mb-2" />
-                            <h3 className="text-lg font-bold text-accent">Access, Equity, Inclusion and Digital Transformation</h3>
-                            <p className="text-sm text-neutral-500">
-                              GRASAG-UPSA promotes equal access, inclusion and non-discrimination for all graduate students, regardless of gender, religion, ethnicity, disability, nationality or social background. We also support digital transformation, accessible communication, technology-enabled services and improved access to digital learning resources.
-                            </p>
-                          </div>
-                          <div className="flex flex-col items-center text-center">
-                            <Image src="/aassest/letter_s_stylish_1782310200000_1782310253075.png" alt="Welfare" width={64} height={64} className="mb-2" />
-                            <h3 className="text-lg font-bold text-accent">Student Welfare, Support and Wellbeing</h3>
-                            <p className="text-sm text-neutral-500">
-                              GRASAG-UPSA prioritises the welfare and wellbeing of graduate students, including mental health, psychosocial support, student-parent support, campus services and emergency support systems. We are committed to building a caring graduate community where students feel supported beyond the classroom.
-                            </p>
-                          </div>
-                          <div className="flex flex-col items-center text-center">
-                            <Image src="/aassest/letter_a_stylish_1782310150000_1782310122240.png" alt="Advancement" width={64} height={64} className="mb-2" />
-                            <h3 className="text-lg font-bold text-accent">Advancement, Employability, Entrepreneurship and Partnerships</h3>
-                            <p className="text-sm text-neutral-500">
-                              GRASAG-UPSA connects graduate education to career growth, entrepreneurship and national development through employability initiatives, mentorship, alumni engagement, industry networking and strategic partnerships. We help students translate knowledge into professional progress, enterprise and social impact.
-                            </p>
-                          </div>
-                          <div className="flex flex-col items-center text-center">
-                            <Image src="/aassest/letter_g_stylish_1782309960852.png" alt="Graduate Community" width={64} height={64} className="mb-2" />
-                            <h3 className="text-lg font-bold text-accent">Graduate Community, Identity and Engagement</h3>
-                            <p className="text-sm text-neutral-500">
-                             GRASAG-UPSA builds a united and active graduate community through student engagement, social interaction, leadership development, recognition programmes, sports, culture and volunteerism. We seek to strengthen identity, belonging and pride among postgraduate students of UPSA.
-                            </p>
-                          </div>
+                          <Link
+                            href={card.link}
+                            className="text-sm sm:text-base font-bold text-[#B8860B] hover:text-primary transition-colors flex items-center gap-1 mt-2 w-fit"
+                          >
+                            Explore More <span className="text-sm font-normal">→</span>
+                          </Link>
+                        </div>
+                        {/* Right Side: Image */}
+                        <div className="w-[45%] relative h-full">
+                          <Image
+                            src={card.image}
+                            alt={card.title}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 30vw, 20vw"
+                          />
+                        </div>
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
             </div>
           </section>
 
-          {/* Quick Links Section */}
-          <h2 className="text-2xl font-bold text-accent mb-4 mt-12">Quick Links</h2>
-          {quickLinks.length > 0 && (
-            <section className="mx-auto max-w-5xl px-4 py-8 mb-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-                {quickLinks.map((link) => {
-                  const IconComponent = (LucideIcons as any)[link.icon_name] || LucideIcons.Link;
-                  return (
-                    <Link key={link.id} href={link.url} className="flex items-start gap-5 p-4 rounded-2xl bg-gray-50 border border-gray-200 hover:bg-white hover:shadow-sm transition-all group">
-                      <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-white shadow-sm border border-neutral-100 flex items-center justify-center group-hover:border-accent/30 group-hover:shadow-md transition-all">
-                        <IconComponent className="w-6 h-6 text-primary" strokeWidth={2} />
-                      </div>
-                      <div className="flex flex-col justify-center min-h-[3.5rem]">
-                        <h3 className="text-lg font-extrabold text-neutral-800 group-hover:text-primary transition-colors">{link.title}</h3>
-                        {link.subtitle && <p className="text-sm font-medium text-neutral-500 mt-0.5">{link.subtitle}</p>}
-                      </div>
-                    </Link>
-                  );
-                })}
+          {/* Featured Upcoming Events Banner Section */}
+          <section className="w-full relative overflow-hidden bg-slate-950 min-h-[480px] flex flex-col justify-end">
+            
+              {/* Dynamic Background Image */}
+              <div className="absolute inset-0 bg-[#050505]">
+                <div
+                  className="absolute inset-0 md:left-1/4 transition-opacity duration-1000 ease-in-out bg-cover md:bg-contain bg-center md:bg-right bg-no-repeat opacity-60 md:opacity-100"
+                  style={{
+                    backgroundImage: `url(${featuredEvents[featuredSlideIndex]?.image_url || ''})`,
+                  }}
+                >
+                  {/* Gradient overlay to smoothly blend the image with the solid background */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/80 to-transparent md:bg-gradient-to-r md:from-[#050505] md:via-[#050505]/50 md:to-transparent" />
+                </div>
               </div>
-            </section>
-          )}
+
+            {/* Slider Content */}
+            <div className="relative z-20 max-w-7xl mx-auto px-6 sm:px-12 lg:px-24 py-16 sm:py-20 md:py-24 flex flex-col justify-between h-full min-h-[480px] text-left w-full">
+              {/* Upper Badge */}
+              <div>
+                <span className="inline-block rounded-full bg-[#B8860B]/20 px-4 py-1 text-xs sm:text-sm font-semibold text-[#B8860B] uppercase tracking-widest border border-[#B8860B]/30">
+                  Featured Event
+                </span>
+              </div>
+
+              {/* Main Content Area */}
+              <div className="mt-8 flex flex-col md:flex-row md:items-end justify-between gap-8">
+                {/* Left Column: Text Information */}
+                <div className="max-w-2xl space-y-4">
+                  
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
+                    {featuredEvents[featuredSlideIndex]?.title || 'Featured Event'}
+                  </h2>
+                  {featuredEvents[featuredSlideIndex]?.location && (
+                    <h3 className="text-base sm:text-lg font-bold text-[#B8860B]">
+                      {featuredEvents[featuredSlideIndex].location}
+                    </h3>
+                  )}
+                  {featuredEvents[featuredSlideIndex]?.description && (
+                    <p className="text-sm sm:text-base text-white/80 leading-relaxed font-medium">
+                      {featuredEvents[featuredSlideIndex].description}
+                    </p>
+                  )}
+                  {/* CTA Button */}
+                  <div className="pt-2">
+                    <Link
+                      href={`/events/${featuredEvents[featuredSlideIndex]?.id}`}
+                      className="inline-block bg-[#B8860B] hover:bg-[#9A7C1C] text-white font-bold px-6 py-3 rounded-lg transition shadow-lg hover:scale-[1.02] transform duration-200 uppercase text-xs tracking-wider"
+                    >
+                      View Details
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Right Column: Countdown Timer */}
+                {featuredEvents[featuredSlideIndex]?.event_date && (
+                  <div className="flex flex-wrap gap-4 items-center justify-start md:justify-end">
+                    {[
+                      { label: 'Days', value: ceoCountdown.days },
+                      { label: 'Hours', value: ceoCountdown.hours },
+                      { label: 'Min', value: ceoCountdown.minutes },
+                      { label: 'Sec', value: ceoCountdown.seconds }
+                    ].map(item => (
+                      <div key={item.label} className="min-w-[65px] rounded-2xl bg-white/10 backdrop-blur-md px-3 py-2.5 border border-white/10 text-center shadow-lg">
+                        <div className="text-xl sm:text-2xl font-black text-white">{item.value}</div>
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-white/60">{item.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Slider Dot Indicators */}
+              <div className="flex gap-2.5 mt-8 justify-start">
+                {featuredEvents.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setFeaturedSlideIndex(idx)}
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      featuredSlideIndex === idx ? 'w-8 bg-[#B8860B]' : 'w-2 bg-white/40 hover:bg-white/70'
+                    }`}
+                    aria-label={`Go to slide ${idx + 1}`}
+                  />
+                ))}
+              </div>
+            </div>
+          </section>
 
           {/* Latest News Section */}
           <section className="mx-auto max-w-7xl px-4 py-16">
@@ -550,6 +792,29 @@ useEffect(() => {
                 </Link>
               </div>
             </div>
+          </section>
+
+          {/* Quick Links Section (moved before footer) */}
+          <section className="mx-auto max-w-5xl px-4 py-16">
+            <h2 className="text-2xl font-bold text-accent mb-6">Quick Links</h2>
+            {quickLinks.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                {quickLinks.map((link) => {
+                  const IconComponent = (LucideIcons as any)[link.icon_name] || LucideIcons.Link;
+                  return (
+                    <Link key={link.id} href={link.url} className="flex items-start gap-5 p-4 rounded-2xl bg-gray-50 border border-gray-200 hover:bg-white hover:shadow-sm transition-all group">
+                      <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-white shadow-sm border border-neutral-100 flex items-center justify-center group-hover:border-accent/30 group-hover:shadow-md transition-all">
+                        <IconComponent className="w-6 h-6 text-primary" strokeWidth={2} />
+                      </div>
+                      <div className="flex flex-col justify-center min-h-[3.5rem]">
+                        <h3 className="text-lg font-extrabold text-neutral-800 group-hover:text-primary transition-colors">{link.title}</h3>
+                        {link.subtitle && <p className="text-sm font-medium text-neutral-500 mt-0.5">{link.subtitle}</p>}
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </section>
 
       {/* Floating Chatbot Indicator */}

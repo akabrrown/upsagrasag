@@ -1,4 +1,5 @@
-'use client';
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, Loader2 } from 'lucide-react';

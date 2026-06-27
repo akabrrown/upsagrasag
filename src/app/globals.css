@@ -293,3 +293,164 @@ html, body {
 .prose a:hover {
   color: #003366;
 }
+
+/* Hide scrollbar for horizontal scroll containers */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Endless scroll marquee animation */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Google Translate styling */
+#google_translate_element {
+  display: inline-block;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+/* Hide standard "Powered by Google" text */
+.goog-te-gadget {
+  font-family: inherit !important;
+  color: transparent !important;
+  font-size: 0px !important;
+}
+
+.goog-te-gadget > span {
+  display: none !important;
+}
+
+/* 1. STYLING FOR THE COMBOBOX LAYOUT (dropdown select) */
+.goog-te-gadget .goog-te-combo {
+  background: transparent !important;
+  color: #d4d4d8 !important; /* text-neutral-300 */
+  border: none !important;
+  padding: 0 16px 0 0 !important;
+  margin: 0 !important;
+  font-size: 12px !important; /* text-xs */
+  font-weight: 500 !important;
+  outline: none !important;
+  cursor: pointer !important;
+  font-family: inherit !important;
+  transition: color 0.15s ease-in-out !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23a3a3a3' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E") !important;
+  background-position: right center !important;
+  background-repeat: no-repeat !important;
+  background-size: 14px !important;
+}
+
+.goog-te-gadget .goog-te-combo:hover {
+  color: #B8860B !important;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23B8860B' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E") !important;
+}
+
+.goog-te-gadget .goog-te-combo option {
+  background-color: #0c0a09 !important;
+  color: #f5f5f4 !important;
+  font-size: 13px !important;
+  padding: 8px !important;
+}
+
+/* 2. STYLING FOR THE SIMPLE LAYOUT (anchor/span button widget) */
+#google_translate_element .goog-te-gadget-simple {
+  background-color: transparent !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  font-family: inherit !important;
+  box-shadow: none !important;
+}
+
+/* Style the text anchor inside the simple widget */
+#google_translate_element a.VIpgJd-ZVi9od-xl07Ob-lTBxed {
+  color: #d4d4d8 !important; /* text-neutral-300 */
+  text-decoration: none !important;
+  font-size: 12px !important; /* text-xs */
+  font-weight: 500 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  font-family: inherit !important;
+  transition: color 0.15s ease-in-out !important;
+}
+
+#google_translate_element a.VIpgJd-ZVi9od-xl07Ob-lTBxed:hover,
+#google_translate_element a.VIpgJd-ZVi9od-xl07Ob-lTBxed:hover * {
+  color: #B8860B !important; /* Gold hover */
+}
+
+/* Hide default Google Translate logo image inside the simple container */
+#google_translate_element img,
+#google_translate_element .goog-te-gadget-icon {
+  display: none !important;
+}
+
+/* Hide vertical border line separator */
+#google_translate_element .goog-te-gadget-simple span {
+  border-left: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Style the text node span directly */
+#google_translate_element a.VIpgJd-ZVi9od-xl07Ob-lTBxed span {
+  color: inherit !important;
+  font-family: inherit !important;
+  font-size: 12px !important;
+}
+
+/* Style the down triangle ▼ icon inside the simple layout */
+#google_translate_element a.VIpgJd-ZVi9od-xl07Ob-lTBxed span:last-child {
+  color: inherit !important;
+  font-size: 8px !important;
+  margin-left: 2px !important;
+  vertical-align: middle !important;
+}
+
+/* Hide Google Translate frames and banners */
+iframe.skiptranslate,
+.goog-te-banner-frame,
+#goog-gt-tt,
+.goog-te-balloon-frame {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+body {
+  top: 0px !important;
+}
+
+/* Glassmorphic Mega Menu Dropdown Panel styling */
+.mega-menu-panel {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
