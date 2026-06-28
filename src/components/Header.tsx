@@ -6,7 +6,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full h-12 flex items-center justify-between border-b border-border bg-background/80 backdrop-blur-md px-4">
       <Link href="/" className="flex items-center gap-3">
         <div className="relative flex h-12 w-72 overflow-hidden bg-background">
-          <Image src="/GRASAG-LOGO- white text.png" alt="GRASAG UPSA Logo" className="object-contain w-full h-full rounded-full" width={272} height={80} />
+          <Image src="/GRASAG-LOGO-%20white%20text.png" alt="GRASAG UPSA Logo" className="object-contain w-full h-full rounded-full" width={272} height={80} />
         </div>
       </Link>
       <nav className="hidden lg:flex flex-1 justify-center items-center gap-1 mx-auto">

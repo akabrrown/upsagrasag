@@ -51,7 +51,8 @@ export default function AdminGalleryPage() {
       const preset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'grasag';
       const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dldph7uzu';
 
-      const uploadPromises = files.map(async (file) => {
+      const uploadedUrls: string[] = [];
+      for (const file of files) {
         const uploadData = new FormData();
         uploadData.append('file', file);
         uploadData.append('upload_preset', preset);
@@ -62,15 +63,14 @@ export default function AdminGalleryPage() {
         const res = await fetch(url, { method: 'POST', body: uploadData });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error?.message || 'Upload to Cloudinary failed');
-        return data.secure_url;
-      });
-
-      const uploadedUrls = await Promise.all(uploadPromises);
+        
+        uploadedUrls.push(data.secure_url);
+      }
 
       // 2. Submit the uploaded URLs and metadata to the Next.js API
       const payload = uploadedUrls.map((url) => ({
         url,
-        title: titleValue || null,
+        title: titleValue || 'Untitled',
         description: descValue || null,
       }));
 

@@ -8,7 +8,7 @@ type PastQuestionRecord = {
   course_title: string;
   year: string;
   title: string | null;
-  file_path: string;
+  file_url: string;
   created_at: string;
 };
 
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
   const supabase = supabaseAdminClient;
   let query = supabase
     .from('past_questions')
-    .select('id, program_slug, course_code, course_title, year, title, file_path, created_at');
+    .select('id, program_slug, course_code, course_title, year, title, file_url, created_at')
 
   if (programSlug) {
     // Directly filter on program_slug column
@@ -28,8 +28,7 @@ export async function GET(request: NextRequest) {
   const { data, error } = await query.order('created_at', { ascending: false });
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
-  // Transform to public URLs
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || `http://localhost:${process.env.PORT || 3000}`;
+
   const items: PastQuestion[] = (data as PastQuestionRecord[]).map((item) => ({
     id: item.id.toString(),
     programSlug: item.program_slug,
@@ -37,7 +36,7 @@ export async function GET(request: NextRequest) {
     course_title: item.course_title,
     year: item.year,
     title: item.title ?? undefined,
-    file_url: `${baseUrl}/${item.file_path}`,
+    file_url: item.file_url,
     created_at: item.created_at,
   }));
   return NextResponse.json(items);

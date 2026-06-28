@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import useSWR from 'swr';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { congressSchema, CongressEvent } from '@/types/admin';
 import CrudTable from '@/components/admin/CrudTable';
 import FormModal from '@/components/admin/FormModal';
@@ -12,21 +13,29 @@ import CloudinaryUpload from '@/components/CloudinaryUpload';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
+
 export default function AdminCongressPage() {
   const { data: records, error, isLoading, mutate } = useSWR<CongressEvent[]>('/api/admin/congress', fetcher);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const { register, handleSubmit, reset, setValue, watch, formState: { errors, isSubmitting } } = useForm<CongressEvent>({
+const { register, handleSubmit, reset, setValue, watch, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(congressSchema) as any,
-    defaultValues: { is_featured: false, image_url: '' }
+    defaultValues: {
+      title: '',
+      description: '',
+      event_date: '',
+      location: '',
+      image_url: '',
+      is_featured: false
+    }
   });
 
   const imageUrl = watch('image_url');
 
   const openCreate = () => {
-    reset({ title: '', description: '', event_date: '', image_url: '', location: '' });
+    reset();
     setEditingId(null);
     setIsModalOpen(true);
   };

@@ -5,6 +5,13 @@ import { promises as fs } from 'fs';
 import path from 'path';
 
 export async function POST(req: Request) {
+  // Cloudinary upload settings
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+  if (!cloudName || !uploadPreset) {
+    return NextResponse.json({ error: 'Cloudinary configuration missing' }, { status: 500 });
+  }
+
   const form = await req.formData();
   const programSlug = form.get('programSlug') as string;
   const files = form.getAll('files') as File[];
@@ -28,9 +35,6 @@ export async function POST(req: Request) {
     .single();
   if (progErr) return NextResponse.json({ error: progErr.message }, { status: 400 });
 
-  const uploadDir = path.join(process.cwd(), 'public', 'programs', programSlug);
-  await fs.mkdir(uploadDir, { recursive: true });
-
   const uploaded: any[] = [];
   for (const file of files) {
     if (file.type !== 'application/pdf') {
@@ -41,9 +45,19 @@ export async function POST(req: Request) {
     }
     const rawName = path.parse(file.name).name;
     const safeName = slugify(rawName) + '.pdf';
-    const filePath = path.join(uploadDir, safeName);
     const buffer = Buffer.from(await file.arrayBuffer());
-    await fs.writeFile(filePath, buffer);
+
+    // Upload PDF to Cloudinary
+    const formData = new FormData();
+    formData.append('file', new Blob([buffer], { type: file.type }));
+    formData.append('upload_preset', uploadPreset);
+    const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
+    const uploadRes = await fetch(cloudinaryUrl, { method: 'POST', body: formData });
+    const uploadData = await uploadRes.json();
+    if (!uploadRes.ok) {
+      return NextResponse.json({ error: `Cloudinary upload failed: ${uploadData.error?.message || 'unknown'}` }, { status: 500 });
+    }
+    const secureUrl = uploadData.secure_url;
 
     const { data: inserted } = await supabaseAdminClient.from('past_questions').insert({
         program_slug: programSlug,
@@ -51,11 +65,10 @@ export async function POST(req: Request) {
         course_code: course_code || null,
         course_title: course_title || null,
         year: year || null,
-        file_path: `programs/${programSlug}/${safeName}`,
+        file_url: secureUrl,
     }).select();
     if (inserted && inserted.length) {
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
-      uploaded.push({ title: file.name, url: `${baseUrl}/${inserted[0].file_path}` });
+      uploaded.push({ title: file.name, url: secureUrl });
     }
   }
   return NextResponse.json({ success: true, files: uploaded });

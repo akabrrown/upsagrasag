@@ -14,27 +14,10 @@ import { CongressEvent } from '@/types/admin';
 
 export default function HomePage() {
     const [isChatOpen, setIsChatOpen] = useState(false);
-
-    const [ceoCountdown, setCeoCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   // Countdown timer state
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
-    const [featuredSlideIndex, setFeaturedSlideIndex] = useState(0);
-    const [featuredEvents, setFeaturedEvents] = useState<CongressEvent[]>([]);
-
-    // Fetch featured congress events (isFeatured = true)
-    useEffect(() => {
-      const fetchFeatured = async () => {
-        const { data, error } = await supabaseClient
-          .from('congress_events')
-          .select('id, title, description, event_date, image_url, location, is_featured')
-          .eq('is_featured', true)
-          .order('event_date', { ascending: true });
-        if (!error && data) setFeaturedEvents(data);
-      };
-      fetchFeatured();
-    }, []);
-
+  // Congress events state (fetched from DB)
   const [events, setEvents] = useState<CongressEvent[]>([]);
   const [currentEventIndex, setCurrentEventIndex] = useState(0);
   const currentEvent = events[currentEventIndex] || null;
@@ -144,35 +127,6 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, [currentEvent?.event_date]);
 
-  // Featured events banner auto-advance effect (dynamic length)
-  useEffect(() => {
-    if (featuredEvents.length === 0) return;
-    const interval = setInterval(() => {
-      setFeaturedSlideIndex((prev) => (prev + 1) % featuredEvents.length);
-    }, 8500);
-    return () => clearInterval(interval);
-  }, [featuredEvents]);
-
-  // Featured CEO Connect event countdown effect (October 3, 2026)
-  useEffect(() => {
-    const targetDate = new Date('2026-10-03T09:00:00').getTime();
-    const interval = setInterval(() => {
-      const now = Date.now();
-      const difference = targetDate - now;
-
-      if (difference < 0) {
-        clearInterval(interval);
-        setCeoCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-      } else {
-        const d = Math.floor(difference / (1000 * 60 * 60 * 24));
-        const h = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-        const s = Math.floor((difference % (1000 * 60)) / 1000);
-        setCeoCountdown({ days: d, hours: h, minutes: m, seconds: s });
-      }
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
     // Hero section state
   const [hero, setHero] = useState({
@@ -270,20 +224,20 @@ useEffect(() => {
   // Define hero slides (reordered: Welcome first, Congratulations second, Inspiring third)
   const slides = [
     {
-      title: 'Congratulations to the newly elected GRASAG executives for the 2026/2027 academic year',
-      subtitle: 'We welcome our new student leaders and look forward to a successful academic term of representation, excellence, and impact.',
-      ctaText: 'Meet the Team',
-      ctaLink: '/leadership',
-      imagePath: '/group-image.png',
-      bgStyle: { backgroundImage: 'url(/group-image.png)', backgroundSize: 'cover', backgroundPosition: 'center' },
-    },
-    {
       title: 'Welcome to the Graduate Student Association of Ghana - UPSA',
       subtitle: 'Join us in fostering graduate research, professional growth, and community impact across Ghana.',
       ctaText: 'Learn More',
       ctaLink: '/about',
       imagePath: '/IMG_1619-scaled-2.jpg',
       bgStyle: { backgroundImage: 'url(/IMG_1619-scaled-2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' },
+    },
+    {
+      title: 'Congratulations to the newly elected GRASAG executives for the 2026/2027 academic year',
+      subtitle: 'We welcome our new student leaders and look forward to a successful academic term of representation, excellence, and impact.',
+      ctaText: 'Meet the Team',
+      ctaLink: '/leadership',
+      imagePath: '/group-image.png',
+      bgStyle: { backgroundImage: 'url(/group-image.png)', backgroundSize: 'cover', backgroundPosition: 'center' },
     },
     {
       title: heroTitle,
@@ -375,122 +329,7 @@ useEffect(() => {
 
 
 
-      {/* Message from our President – MTN-inspired */}
-      <section className="relative overflow-hidden bg-[#0a1628]">
-        {/* Subtle animated background pattern */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* Large decorative quote marks */}
-          <motion.div
-            className="absolute top-8 left-[12%] text-[180px] font-serif text-white/[0.04] leading-none select-none hidden lg:block"
-            animate={{ y: [0, -8, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            &ldquo;
-          </motion.div>
-          <motion.div
-            className="absolute bottom-12 left-[38%] text-[120px] font-serif text-white/[0.04] leading-none select-none hidden lg:block"
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-          >
-            &rdquo;
-          </motion.div>
-          {/* Floating circles */}
-          <motion.div
-            className="absolute top-16 right-[45%] w-64 h-64 rounded-full border border-white/[0.03]"
-            animate={{ scale: [1, 1.08, 1], rotate: [0, 5, 0] }}
-            transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <motion.div
-            className="absolute -bottom-20 left-[5%] w-80 h-80 rounded-full border border-[#d4af37]/[0.06]"
-            animate={{ scale: [1, 1.05, 1], rotate: [0, -3, 0] }}
-            transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-          />
-          <motion.div
-            className="absolute top-1/2 left-[30%] w-3 h-3 rounded-full bg-[#d4af37]/10"
-            animate={{ y: [0, -20, 0], opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <motion.div
-            className="absolute top-[20%] left-[20%] w-2 h-2 rounded-full bg-white/10"
-            animate={{ y: [0, 15, 0], opacity: [0.2, 0.5, 0.2] }}
-            transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
-          />
-        </div>
 
-        <div className="relative z-10 mx-auto max-w-7xl">
-          <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch min-h-[500px]">
-            
-            {/* Left: Text Content */}
-            <div className="lg:col-span-7 flex flex-col justify-center px-6 sm:px-10 lg:px-16 py-12 lg:py-16">
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight mb-1">
-                Message{' '}
-                <span className="italic text-[#d4af37]">from our</span>{' '}
-                President
-              </h2>
-
-              {/* Scrollable body text */}
-              <div className="mt-5 max-h-[180px] overflow-y-auto pr-3 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent space-y-3 text-white/75 text-sm sm:text-base leading-relaxed"
-                style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.2) transparent' }}
-              >
-                <p>
-                  The Graduate Student Association of Ghana (GRASAG), University of Professional Studies Chapter, warmly welcomes all graduate students, stakeholders, and partners to our vibrant academic community.
-                </p>
-                <p>
-                  As a body representing graduate students, we are committed to promoting academic excellence, professional development, leadership, research, innovation, and student welfare. We serve as a platform that unites graduate students, amplifies their voices, and creates opportunities for personal and collective growth.
-                </p>
-                <p>
-                  Through seminars, conferences, mentorship programs, research initiatives, community engagements, and professional networking events, we strive to equip our members with the skills and exposure needed to excel both academically and professionally.
-                </p>
-                <p>
-                  We also recognize the importance of collaboration in achieving impactful results. Therefore, we warmly invite organizations, institutions, corporate bodies, alumni, and individuals who share our vision to partner with us in creating meaningful opportunities and lasting impact for graduate students.
-                </p>
-                <p>
-                  Together, we can build a stronger academic and professional community that nurtures future leaders and contributes positively to society.
-                </p>
-              </div>
-
-              {/* Name & title */}
-              <div className="mt-5">
-                <p className="text-white/60 text-sm">Samuel Sasu Adonteng</p>
-                <p className="text-white font-bold text-sm">GRASAG‑UPSA President</p>
-              </div>
-
-              {/* CTA Button */}
-              <div className="mt-5">
-                <Link
-                  href="/leadership"
-                  className="inline-block border-2 border-white/80 text-white text-sm font-bold px-6 py-2.5 rounded-md hover:bg-white hover:text-[#0a1628] transition-all duration-300 uppercase tracking-wider"
-                >
-                  View Leadership
-                </Link>
-              </div>
-            </div>
-
-            {/* Right: President Image (overlapping) */}
-            <div className="lg:col-span-5 relative flex items-end justify-center lg:justify-end">
-              {/* Gradient overlay for blending on the left edge */}
-              <div className="hidden lg:block absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#0a1628] to-transparent z-10" />
-              
-              {/* Image container — bigger on all breakpoints */}
-              <div className="relative w-full h-[380px] sm:h-[450px] lg:h-[120%] lg:-mt-[10%]">
-                <Image
-                  src="/sasu.png"
-                  alt="Samuel Sasu Adonteng – GRASAG‑UPSA President"
-                  fill
-                  className="object-contain object-bottom lg:object-right-bottom lg:scale-110"
-                  sizes="(max-width: 768px) 100vw, 45vw"
-                  priority
-                />
-                {/* Bottom gradient on mobile */}
-                <div className="lg:hidden absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#0a1628] to-transparent" />
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-{/* Upcoming Events Banner */}
 
 
           {/* Our Focus Areas – Horizontally Scrolling Cards */}
@@ -606,92 +445,86 @@ useEffect(() => {
           </section>
 
           {/* Featured Upcoming Events Banner Section */}
-          <section className="w-full relative overflow-hidden bg-slate-950 min-h-[480px] flex flex-col justify-end">
-            
-              {/* Dynamic Background Image */}
-              <div className="absolute inset-0 bg-[#050505]">
-                <div
-                  className="absolute inset-0 md:left-1/4 transition-opacity duration-1000 ease-in-out bg-cover md:bg-contain bg-center md:bg-right bg-no-repeat opacity-60 md:opacity-100"
-                  style={{
-                    backgroundImage: `url(${featuredEvents[featuredSlideIndex]?.image_url || ''})`,
-                  }}
-                >
-                  {/* Gradient overlay to smoothly blend the image with the solid background */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/80 to-transparent md:bg-gradient-to-r md:from-[#050505] md:via-[#050505]/50 md:to-transparent" />
-                </div>
-              </div>
-
-            {/* Slider Content */}
-            <div className="relative z-20 max-w-7xl mx-auto px-6 sm:px-12 lg:px-24 py-16 sm:py-20 md:py-24 flex flex-col justify-between h-full min-h-[480px] text-left w-full">
-              {/* Upper Badge */}
-              <div>
-                <span className="inline-block rounded-full bg-[#B8860B]/20 px-4 py-1 text-xs sm:text-sm font-semibold text-[#B8860B] uppercase tracking-widest border border-[#B8860B]/30">
-                  Featured Event
-                </span>
-              </div>
-
-              {/* Main Content Area */}
-              <div className="mt-8 flex flex-col md:flex-row md:items-end justify-between gap-8">
-                {/* Left Column: Text Information */}
-                <div className="max-w-2xl space-y-4">
-                  
-                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
-                    {featuredEvents[featuredSlideIndex]?.title || 'Featured Event'}
-                  </h2>
-                  {featuredEvents[featuredSlideIndex]?.location && (
-                    <h3 className="text-base sm:text-lg font-bold text-[#B8860B]">
-                      {featuredEvents[featuredSlideIndex].location}
-                    </h3>
-                  )}
-                  {featuredEvents[featuredSlideIndex]?.description && (
-                    <p className="text-sm sm:text-base text-white/80 leading-relaxed font-medium">
-                      {featuredEvents[featuredSlideIndex].description}
-                    </p>
-                  )}
-                  {/* CTA Button */}
-                  <div className="pt-2">
-                    <Link
-                      href={`/events/${featuredEvents[featuredSlideIndex]?.id}`}
-                      className="inline-block bg-[#B8860B] hover:bg-[#9A7C1C] text-white font-bold px-6 py-3 rounded-lg transition shadow-lg hover:scale-[1.02] transform duration-200 uppercase text-xs tracking-wider"
-                    >
-                      View Details
-                    </Link>
+          {events.length > 0 && (
+            <section className="w-full relative overflow-hidden bg-slate-950 min-h-[480px] flex flex-col justify-end">
+              <div className="absolute inset-0">
+                {events.map((event, idx) => (
+                  <div 
+                    key={idx}
+                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out bg-cover bg-center ${
+                      currentEventIndex === idx ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                    }`}
+                    style={{ backgroundImage: `url('${event.image_url || '/bkg-grasag.jpg'}')` }}
+                  >
+                    <div className="absolute inset-0 bg-black/60 md:bg-black/50" />
                   </div>
+                ))}
+              </div>
+
+              <div className="relative z-20 max-w-7xl mx-auto px-6 sm:px-12 lg:px-24 py-16 sm:py-20 md:py-24 flex flex-col justify-between h-full min-h-[480px] text-left w-full">
+                <div>
+                  <span className="inline-block rounded-full bg-[#B8860B]/20 px-4 py-1 text-xs sm:text-sm font-semibold text-[#B8860B] uppercase tracking-widest border border-[#B8860B]/30">
+                    Featured Event
+                  </span>
+                </div>
+                
+                <div className="mt-8 flex flex-col md:flex-row md:items-end justify-between gap-8">
+                  <div className="max-w-2xl space-y-4">
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
+                      {currentEvent?.title}
+                    </h2>
+                    {currentEvent?.location && (
+                      <h3 className="text-base sm:text-lg font-bold text-[#B8860B]">
+                        Location: {currentEvent.location}
+                      </h3>
+                    )}
+                    <p className="text-sm sm:text-base text-white/80 leading-relaxed font-medium">
+                      {currentEvent?.description}
+                    </p>
+                    <div className="pt-2">
+                      <Link
+                        href="/events"
+                        className="inline-block bg-[#B8860B] hover:bg-[#9A7C1C] text-white font-bold px-6 py-3 rounded-lg transition shadow-lg hover:scale-[1.02] transform duration-200 uppercase text-xs tracking-wider"
+                      >
+                        Learn More
+                      </Link>
+                    </div>
+                  </div>
+
+                  {currentEvent?.event_date && (
+                    <div className="flex flex-wrap gap-4 items-center justify-start md:justify-end">
+                      {[
+                        { label: 'Days', value: timeLeft.days },
+                        { label: 'Hours', value: timeLeft.hours },
+                        { label: 'Min', value: timeLeft.minutes },
+                        { label: 'Sec', value: timeLeft.seconds }
+                      ].map(item => (
+                        <div key={item.label} className="min-w-[65px] rounded-2xl bg-white/10 backdrop-blur-md px-3 py-2.5 border border-white/10 text-center shadow-lg">
+                          <div className="text-xl sm:text-2xl font-black text-white">{item.value}</div>
+                          <div className="text-[10px] font-bold uppercase tracking-wider text-white/60">{item.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                {/* Right Column: Countdown Timer */}
-                {featuredEvents[featuredSlideIndex]?.event_date && (
-                  <div className="flex flex-wrap gap-4 items-center justify-start md:justify-end">
-                    {[
-                      { label: 'Days', value: ceoCountdown.days },
-                      { label: 'Hours', value: ceoCountdown.hours },
-                      { label: 'Min', value: ceoCountdown.minutes },
-                      { label: 'Sec', value: ceoCountdown.seconds }
-                    ].map(item => (
-                      <div key={item.label} className="min-w-[65px] rounded-2xl bg-white/10 backdrop-blur-md px-3 py-2.5 border border-white/10 text-center shadow-lg">
-                        <div className="text-xl sm:text-2xl font-black text-white">{item.value}</div>
-                        <div className="text-[10px] font-bold uppercase tracking-wider text-white/60">{item.label}</div>
-                      </div>
+                {events.length > 1 && (
+                  <div className="flex gap-2.5 mt-8 justify-start">
+                    {events.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setCurrentEventIndex(idx)}
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          currentEventIndex === idx ? 'w-8 bg-[#B8860B]' : 'w-2 bg-white/40 hover:bg-white/70'
+                        }`}
+                        aria-label={`Go to slide ${idx + 1}`}
+                      />
                     ))}
                   </div>
                 )}
               </div>
-
-              {/* Slider Dot Indicators */}
-              <div className="flex gap-2.5 mt-8 justify-start">
-                {featuredEvents.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setFeaturedSlideIndex(idx)}
-                    className={`h-2 rounded-full transition-all duration-300 ${
-                      featuredSlideIndex === idx ? 'w-8 bg-[#B8860B]' : 'w-2 bg-white/40 hover:bg-white/70'
-                    }`}
-                    aria-label={`Go to slide ${idx + 1}`}
-                  />
-                ))}
-              </div>
-            </div>
-          </section>
+            </section>
+          )}
 
           {/* Latest News Section */}
           <section className="mx-auto max-w-7xl px-4 py-16">

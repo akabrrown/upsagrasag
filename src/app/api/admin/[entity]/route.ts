@@ -3,6 +3,8 @@ import { serviceMap, schemaMap } from '@/lib/supabase/admin/index';
 import { requireAdmin } from '@/lib/authHelpers';
 import { ZodError } from 'zod';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ entity: string }> }
