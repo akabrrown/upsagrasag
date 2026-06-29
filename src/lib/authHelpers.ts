@@ -13,10 +13,14 @@ export async function requireAdmin() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // Check if role is admin in app_metadata (or fallback to a role column if you store it elsewhere)
-  const role = user.app_metadata?.role;
-  if (role !== 'admin') {
-    // In development allow any authenticated user
+  // Determine admin role from possible locations
+  const possibleRole =
+    // Primary: app_metadata.role set by Supabase Auth
+    user.app_metadata?.role ||
+    // Fallback: user_metadata.role if stored there
+    user.user_metadata?.role;
+  if (possibleRole !== 'admin') {
+    // In development allow any authenticated user for faster iteration
     if (process.env.NODE_ENV === 'development') {
       return null;
     }
