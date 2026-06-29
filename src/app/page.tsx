@@ -22,6 +22,33 @@ export default function HomePage() {
   const [currentEventIndex, setCurrentEventIndex] = useState(0);
   const currentEvent = events[currentEventIndex] || null;
 
+useEffect(() => {
+  // If no event or no date, reset timer
+  if (!currentEvent?.event_date) {
+    setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+    return;
+  }
+  // Parse date string as UTC (ISO format)
+  const targetDate = new Date(currentEvent.event_date);
+  const calculate = () => {
+    const now = new Date();
+    const diff = targetDate.getTime() - now.getTime();
+    if (diff <= 0) {
+      setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      return;
+    }
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+    setTimeLeft({ days, hours, minutes, seconds });
+  };
+  // Initial calculation
+  calculate();
+  const interval = setInterval(calculate, 1000);
+  return () => clearInterval(interval);
+}, [currentEvent?.event_date]);
+
   // News updates state
   const [newsUpdates, setNewsUpdates] = useState<{id: string; title: string; content: string; image_url: string; created_at: string; category: string}[]>([]);
 
@@ -86,7 +113,7 @@ export default function HomePage() {
       const { data, error } = await supabaseClient
         .from('congress_events')
         .select('title, description, event_date, image_url, location, is_featured')
-        .gte('event_date', new Date().toISOString())
+        .eq('is_featured', true)
         .order('event_date', { ascending: true })
         .limit(5);
       if (!error && data) {
@@ -107,25 +134,44 @@ export default function HomePage() {
 
   // Countdown effect – uses currentEvent event_date from the DB
   useEffect(() => {
-    if (!currentEvent?.event_date) return;
-    const targetDate = new Date(currentEvent.event_date).getTime();
-    const interval = setInterval(() => {
+    if (!currentEvent?.event_date) {
+      setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      return;
+    }
+    
+    // Replace spaces with 'T' to fix Safari/iOS parsing bugs if the DB returns "YYYY-MM-DD HH:mm:ss"
+    const safeDateString = currentEvent.event_date.replace(' ', 'T');
+    const targetDate = new Date(safeDateString).getTime();
+
+    const updateTimer = () => {
       const now = Date.now();
       const difference = targetDate - now;
+
+      if (difference <= 0 || isNaN(targetDate)) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return true; // indicates it should clear
+      }
+      
       const d = Math.floor(difference / (1000 * 60 * 60 * 24));
       const h = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
       const s = Math.floor((difference % (1000 * 60)) / 1000);
+      
+      setTimeLeft({ days: d, hours: h, minutes: m, seconds: s });
+      return false;
+    };
 
-      if (difference < 0) {
+    const shouldClear = updateTimer();
+    if (shouldClear) return;
+
+    const interval = setInterval(() => {
+      if (updateTimer()) {
         clearInterval(interval);
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-      } else {
-        setTimeLeft({ days: d, hours: h, minutes: m, seconds: s });
       }
     }, 1000);
+
     return () => clearInterval(interval);
-  }, [currentEvent?.event_date]);
+  }, [currentEventIndex, events, currentEvent?.event_date]);
 
 
     // Hero section state
@@ -451,12 +497,12 @@ useEffect(() => {
                 {events.map((event, idx) => (
                   <div 
                     key={idx}
-                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out bg-cover bg-center ${
+                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out bg-contain bg-right bg-no-repeat ${
                       currentEventIndex === idx ? 'opacity-100 z-10' : 'opacity-0 z-0'
                     }`}
-                    style={{ backgroundImage: `url('${event.image_url || '/bkg-grasag.jpg'}')` }}
+                    style={{ backgroundImage: `url('${event.image_url || '/bkg-grasag.jpg'}')`, backgroundSize: 'auto 100%' }}
                   >
-                    <div className="absolute inset-0 bg-black/60 md:bg-black/50" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
                   </div>
                 ))}
               </div>

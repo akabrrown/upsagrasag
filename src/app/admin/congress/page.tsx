@@ -21,16 +21,16 @@ export default function AdminCongressPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
 
 const { register, handleSubmit, reset, setValue, watch, formState: { errors, isSubmitting } } = useForm({
-    resolver: zodResolver(congressSchema) as any,
-    defaultValues: {
-      title: '',
-      description: '',
-      event_date: '',
-      location: '',
-      image_url: '',
-      is_featured: false
-    }
-  });
+  resolver: zodResolver(congressSchema),
+  defaultValues: {
+    title: '',
+    description: '',
+    event_date: '',
+    location: '',
+    image_url: '',
+    is_featured: false
+  }
+});
 
   const imageUrl = watch('image_url');
 

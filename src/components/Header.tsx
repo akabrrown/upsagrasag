@@ -5,9 +5,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full h-12 flex items-center justify-between border-b border-border bg-background/80 backdrop-blur-md px-4">
       <Link href="/" className="flex items-center gap-3">
-        <div className="relative flex h-12 w-72 overflow-hidden bg-background">
-          <Image src="/GRASAG-LOGO-%20white%20text.png" alt="GRASAG UPSA Logo" className="object-contain w-full h-full rounded-full" width={272} height={80} />
-        </div>
+        <Image src="/GRASAG-LOGO-white-text.png" alt="GRASAG UPSA Logo" width={272} height={80} className="object-contain" />
       </Link>
       <nav className="hidden lg:flex flex-1 justify-center items-center gap-1 mx-auto">
         <Link className="rounded-lg px-4 py-2.5 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-primary transition-all" href="/">Home</Link>
@@ -16,7 +14,6 @@ export default function Header() {
         <Link className="rounded-lg px-4 py-2.5 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-primary transition-all" href="/leadership">Leadership</Link>
         <Link className="rounded-lg px-4 py-2.5 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-primary transition-all" href="/opportunities">Opportunities</Link>
         <Link className="rounded-lg px-4 py-2.5 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-primary transition-all" href="/welfare">Welfare</Link>
-
         <Link className="rounded-lg px-4 py-2.5 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-primary transition-all" href="/academics/past-questions">Past Questions</Link>
         <Link className="rounded-lg px-4 py-2.5 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-primary transition-all" href="/academics/tutorials">Tutorials</Link>
         <Link className="rounded-lg px-4 py-2.5 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-primary transition-all" href="/events">Events</Link>

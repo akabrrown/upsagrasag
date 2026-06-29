@@ -160,7 +160,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center" onMouseEnter={() => setHoveredDropdown(null)}>
             <div className="relative h-12 w-auto flex items-center justify-center">
-              <Image src="/GRASAG-LOGO-text.png" alt="GRASAG UPSA Logo" className="object-contain h-full w-auto" width={272} height={80} priority />
+              <Image src="/GRASAG-LOGO-white-text.png" alt="GRASAG UPSA Logo" className="object-contain h-full w-auto" width={272} height={80} priority />
             </div>
           </Link>
 
