@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import { 
   LayoutDashboard, 
   Users, 
@@ -49,8 +48,6 @@ const navItems = [
 
 export default function AdminSidebar() {
   const pathname = usePathname();
-  const { data: session } = useSession();
-  const isAdmin = session?.user?.role === 'admin';
   const router = useRouter();
   // Add admin-page class for global styling (hide footer)
   useEffect(() => {
@@ -62,6 +59,7 @@ export default function AdminSidebar() {
 
   // Collapse state for sidebar
   const [collapsed, setCollapsed] = useState(false);
+
 
 
   const handleLogout = async () => {

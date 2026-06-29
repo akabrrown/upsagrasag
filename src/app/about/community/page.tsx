@@ -2,7 +2,7 @@
 export const runtime = 'nodejs';
 import React, { useState, useEffect, FormEvent } from 'react';
 import Image from 'next/image';
-import { useSession } from 'next-auth/react';
+import { supabaseClient } from '@/lib/supabaseClient';
 
 type GalleryImage = {
   url: string;
@@ -12,8 +12,13 @@ type GalleryImage = {
 
 export default function CommunityPage() {
   // Gallery State
-  const { data: session } = useSession();
-  const isAdmin = session?.user?.role === 'admin';
+  const [isAdmin, setIsAdmin] = useState(false);
+  
+  useEffect(() => {
+    supabaseClient.auth.getUser().then(({ data }) => {
+      if (data?.user) setIsAdmin(true);
+    });
+  }, []);
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

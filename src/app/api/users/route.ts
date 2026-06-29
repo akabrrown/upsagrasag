@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requireAdmin } from '@/lib/authHelpers';
 import { supabaseClient } from '@/lib/supabaseClient';
 import { hashPassword } from '@/lib/hash';
 
@@ -15,8 +14,8 @@ export async function GET() {
 
 // POST create new admin user (expects JSON body { email, name?, password, role? })
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 });
+  const authError = await requireAdmin();
+  if (authError) return authError;
   const { email, name, password, role } = await request.json();
   const hashed = await hashPassword(password);
   const { data: user, error } = await supabaseClient
@@ -29,8 +28,8 @@ export async function POST(request: Request) {
 
 // PUT update admin user (expects { id, email?, name?, password?, role? })
 export async function PUT(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 });
+  const authError = await requireAdmin();
+  if (authError) return authError;
   const { id, email, name, password, role } = await request.json();
   const updates: any = {};
   if (email) updates.email = email;
@@ -48,8 +47,8 @@ export async function PUT(request: Request) {
 
 // DELETE admin user (expects { id })
 export async function DELETE(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 });
+  const authError = await requireAdmin();
+  if (authError) return authError;
   const { id } = await request.json();
   const { error } = await supabaseClient.from('admin_user').delete().eq('id', id);
   if (error) throw error;

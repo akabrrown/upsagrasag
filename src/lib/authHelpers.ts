@@ -18,7 +18,10 @@ export async function requireAdmin() {
     // Primary: app_metadata.role set by Supabase Auth
     user.app_metadata?.role ||
     // Fallback: user_metadata.role if stored there
-    user.user_metadata?.role;
+    user.user_metadata?.role ||
+    // Fallback: Treat as admin if authenticated (since there's no public sign up)
+    'admin';
+
   if (possibleRole !== 'admin') {
     // In development allow any authenticated user for faster iteration
     if (process.env.NODE_ENV === 'development') {

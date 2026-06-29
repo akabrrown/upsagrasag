@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requireAdmin } from '@/lib/authHelpers';
 import { supabaseClient } from '@/lib/supabaseClient';
 
 // GET all events (admin only)
 export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 });
+  const authError = await requireAdmin();
+  if (authError) return authError;
   const { data: events, error } = await supabaseClient.from('event').select('*');
   if (error) throw error;
   return NextResponse.json(events);
@@ -14,8 +13,8 @@ export async function GET() {
 
 // POST create a new event (admin only)
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 });
+  const authError = await requireAdmin();
+  if (authError) return authError;
   const data = await request.json();
   const { data: newEvent, error } = await supabaseClient.from('event').insert(data).single();
   if (error) throw error;
@@ -24,8 +23,8 @@ export async function POST(request: Request) {
 
 // PUT update an existing event (admin only)
 export async function PUT(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 });
+  const authError = await requireAdmin();
+  if (authError) return authError;
   const { id, ...updates } = await request.json();
   const { data: updated, error } = await supabaseClient.from('event').update(updates).eq('id', id).single();
   if (error) throw error;
@@ -34,8 +33,8 @@ export async function PUT(request: Request) {
 
 // DELETE an event by id (admin only)
 export async function DELETE(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 });
+  const authError = await requireAdmin();
+  if (authError) return authError;
   const { id } = await request.json();
   const { error } = await supabaseClient.from('event').delete().eq('id', id);
   if (error) throw error;

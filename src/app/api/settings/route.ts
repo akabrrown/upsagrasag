@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requireAdmin } from '@/lib/authHelpers';
 import { supabaseClient } from '@/lib/supabaseClient';
 
 // GET all settings (key-value pairs)
@@ -14,8 +13,8 @@ export async function GET() {
 
 // POST create or update a setting { key, value }
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 });
+  const authError = await requireAdmin();
+  if (authError) return authError;
   const { key, value } = await req.json();
   const { data: existing, error: getErr } = await supabaseClient
     .from('setting')
@@ -42,8 +41,8 @@ export async function POST(req: Request) {
 
 // PUT update a setting (same as POST but forces update)
 export async function PUT(req: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 });
+  const authError = await requireAdmin();
+  if (authError) return authError;
   const { key, value } = await req.json();
   const { data: updated, error } = await supabaseClient
     .from('setting')
@@ -56,8 +55,8 @@ export async function PUT(req: Request) {
 
 // DELETE a setting by key
 export async function DELETE(req: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 });
+  const authError = await requireAdmin();
+  if (authError) return authError;
   const { key } = await req.json();
   const { error } = await supabaseClient
     .from('setting')
