@@ -5,7 +5,7 @@ import { AdminUser } from '@/types/admin';
 
 type AdminDataContextType = {
   adminUsers: AdminUser[];
-  createAdminUser: (data: Omit<AdminUser, 'id' | 'created_at'>) => Promise<void>;
+  createAdminUser: (data: Omit<AdminUser, 'id' | 'created_at'>) => Promise<{ admin: AdminUser; tempPassword: string }>;
   updateAdminUser: (id: string, data: Partial<AdminUser>) => Promise<void>;
   deleteAdminUser: (id: string) => Promise<void>;
 };
@@ -48,11 +48,19 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const createAdminUser = async (data: Omit<AdminUser, 'id' | 'created_at'>) => {
-    const { error } = await supabaseClient
-      .from('admin_users')
-      .insert(data);
-    if (error) throw error;
-    // Real‑time listener will add the new record to state
+    // Call backend service that creates auth user and returns temp password
+    const response = await fetch('/api/admin/create-admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error(err);
+    }
+    const { admin, tempPassword } = await response.json();
+    // Real‑time listener will update state, but we also return the temp password for UI
+    return { admin, tempPassword } as const;
   };
 
   const updateAdminUser = async (id: string, data: Partial<AdminUser>) => {

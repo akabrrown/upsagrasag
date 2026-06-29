@@ -8,7 +8,7 @@ import { platformSettingsSchema, PlatformSettings } from '@/types/admin';
 import { Save, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import { supabaseClient } from '@/lib/supabaseClient';
 
-const fetcher = (url: string) => fetch(url).then(r => r.json());
+const fetcher = (url: string) => fetch(url, { credentials: 'include' }).then(r => r.json());
 
 export default function AdminSettingsPage() {
   const { data: settings, error, isLoading, mutate } = useSWR<PlatformSettings>('/api/admin/settings', fetcher);

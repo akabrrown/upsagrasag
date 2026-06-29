@@ -17,10 +17,40 @@ export default function HomePage() {
   // Countdown timer state
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
-  // Congress events state (fetched from DB)
   const [events, setEvents] = useState<CongressEvent[]>([]);
   const [currentEventIndex, setCurrentEventIndex] = useState(0);
   const currentEvent = events[currentEventIndex] || null;
+
+  // President speech state
+  const [president, setPresident] = useState<{name: string, speech: string, image_url: string} | null>(null);
+
+  useEffect(() => {
+    const fetchPresident = async () => {
+      try {
+        const { data, error } = await supabaseClient
+          .from('homepage_president')
+          .select('*')
+          .limit(1)
+          .maybeSingle();
+        if (!error && data) {
+          setPresident(data);
+        } else {
+          setPresident({
+            name: 'Samuel Sasu Adonteng',
+            speech: 'The Graduate Student Association of Ghana (GRASAG), University of Professional Studies Chapter, warmly welcomes all graduate students, stakeholders, and partners to our vibrant academic community.\n\nAs a body representing graduate students, we are committed to promoting academic excellence, professional development, leadership, research, innovation, and student welfare. We serve as a platform that unites graduate students, amplifies their voices, and creates opportunities for personal and collective growth.\n\nThrough seminars, conferences, mentorship programs, research initiatives, community engagements, and professional networking events, we strive to equip our members with the skills and exposure needed to excel both academically and professionally.\n\nWe also recognize the importance of collaboration in achieving impactful results. Therefore, we warmly invite organizations, institutions, corporate bodies, alumni, and individuals who share our vision to partner with us in creating meaningful opportunities and lasting impact for graduate students.\n\nTogether, we can build a stronger academic and professional community that nurtures future leaders and contributes positively to society.',
+            image_url: '/sasu.png'
+          });
+        }
+      } catch (err) {
+        setPresident({
+          name: 'Samuel Sasu Adonteng',
+          speech: 'The Graduate Student Association of Ghana (GRASAG), University of Professional Studies Chapter, warmly welcomes all graduate students, stakeholders, and partners to our vibrant academic community.\n\nAs a body representing graduate students, we are committed to promoting academic excellence, professional development, leadership, research, innovation, and student welfare. We serve as a platform that unites graduate students, amplifies their voices, and creates opportunities for personal and collective growth.\n\nThrough seminars, conferences, mentorship programs, research initiatives, community engagements, and professional networking events, we strive to equip our members with the skills and exposure needed to excel both academically and professionally.\n\nWe also recognize the importance of collaboration in achieving impactful results. Therefore, we warmly invite organizations, institutions, corporate bodies, alumni, and individuals who share our vision to partner with us in creating meaningful opportunities and lasting impact for graduate students.\n\nTogether, we can build a stronger academic and professional community that nurtures future leaders and contributes positively to society.',
+          image_url: '/sasu.png'
+        });
+      }
+    };
+    fetchPresident();
+  }, []);
 
 useEffect(() => {
   // If no event or no date, reset timer
@@ -69,26 +99,24 @@ useEffect(() => {
 ]);
   useEffect(() => {
     const fetchQuickLinks = async () => {
-      try {
-        const { data, error } = await supabaseClient
-          .from('quick_links')
-          .select('*')
-          .order('display_order', { ascending: true });
-        if (!error && data && data.length > 0) {
-          setQuickLinks(data);
-        } else if (error) {
-          console.error('Error fetching quick links:', error);
-          // Fallback sample links in case of error
-          setQuickLinks([
-            { id: '1', title: 'Volunteer with Us', subtitle: '', icon_name: 'Heart', url: '/volunteer', display_order: 1 },
-            { id: '2', title: 'Reach Out', subtitle: 'Report A Case', icon_name: 'AlertCircle', url: '/report', display_order: 2 },
-            { id: '3', title: 'Apply for a Job', subtitle: 'Upload a Job Opportunity', icon_name: 'Briefcase', url: '/jobs', display_order: 3 },
-            { id: '4', title: 'Reports and Publications', subtitle: '', icon_name: 'FileText', url: '/reports', display_order: 4 },
-          ]);
-        }
-      } catch (e) {
-        console.error('Unexpected error fetching quick links:', e);
-        // Keep existing sample links
+      const { data, error } = await supabaseClient
+        .from('quick_links')
+        .select('*')
+        .order('display_order', { ascending: true });
+      // Log meaningful errors only
+      if (error && typeof (error as any).message === 'string' && (error as any).message.length > 0) {
+        console.error('Error fetching quick links:', error);
+      }
+      if (!error && data && data.length > 0) {
+        setQuickLinks(data);
+      } else {
+        // Fallback sample links in case of error or empty data
+        setQuickLinks([
+          { id: '1', title: 'Volunteer with Us', subtitle: '', icon_name: 'Heart', url: '/volunteer', display_order: 1 },
+          { id: '2', title: 'Reach Out', subtitle: 'Report A Case', icon_name: 'AlertCircle', url: '/report', display_order: 2 },
+          { id: '3', title: 'Apply for a Job', subtitle: 'Upload a Job Opportunity', icon_name: 'Briefcase', url: '/jobs', display_order: 3 },
+          { id: '4', title: 'Reports and Publications', subtitle: '', icon_name: 'FileText', url: '/reports', display_order: 4 },
+        ]);
       }
     };
     fetchQuickLinks();
@@ -282,8 +310,8 @@ useEffect(() => {
       subtitle: 'We welcome our new student leaders and look forward to a successful academic term of representation, excellence, and impact.',
       ctaText: 'Meet the Team',
       ctaLink: '/leadership',
-      imagePath: '/group-image.png',
-      bgStyle: { backgroundImage: 'url(/group-image.png)', backgroundSize: 'cover', backgroundPosition: 'center' },
+      imagePath: '/group-image_Execom.png',
+      bgStyle: { backgroundImage: 'url(/group-image_Execom.png)', backgroundSize: 'cover', backgroundPosition: 'top center' },
     },
     {
       title: heroTitle,
@@ -366,17 +394,134 @@ useEffect(() => {
                     : 'border-white/20 opacity-60 hover:opacity-100'
                 }`}
               >
-                <Image src={slide.imagePath} alt={`Slide ${idx + 1} preview`} fill className="object-cover" />
+                <Image src={slide.imagePath} alt={`Slide ${idx + 1} preview`} fill className="object-contain" />
               </button>
             ))}
           </div>
         </div>
       </section>
 
+      {/* Message from our President – MTN-inspired */}
+      <section className="relative overflow-hidden bg-[#0a1628]">
+        {/* Subtle animated background pattern */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Large decorative quote marks */}
+          <motion.div
+            className="absolute top-8 left-[12%] text-[180px] font-serif text-white/[0.04] leading-none select-none hidden lg:block"
+            animate={{ y: [0, -8, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            &ldquo;
+          </motion.div>
+          <motion.div
+            className="absolute bottom-12 left-[38%] text-[120px] font-serif text-white/[0.04] leading-none select-none hidden lg:block"
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+          >
+            &rdquo;
+          </motion.div>
+          {/* Floating circles */}
+          <motion.div
+            className="absolute top-16 right-[45%] w-64 h-64 rounded-full border border-white/[0.03]"
+            animate={{ scale: [1, 1.08, 1], rotate: [0, 5, 0] }}
+            transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div
+            className="absolute -bottom-20 left-[5%] w-80 h-80 rounded-full border border-[#d4af37]/[0.06]"
+            animate={{ scale: [1, 1.05, 1], rotate: [0, -3, 0] }}
+            transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+          />
+          <motion.div
+            className="absolute top-1/2 left-[30%] w-3 h-3 rounded-full bg-[#d4af37]/10"
+            animate={{ y: [0, -20, 0], opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div
+            className="absolute top-[20%] left-[20%] w-2 h-2 rounded-full bg-white/10"
+            animate={{ y: [0, 15, 0], opacity: [0.2, 0.5, 0.2] }}
+            transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+          />
+        </div>
 
+        <div className="relative z-10 mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch min-h-[500px]">
+            
+            {/* Left: Text Content */}
+            <div className="lg:col-span-7 flex flex-col justify-center px-6 sm:px-10 lg:px-16 py-12 lg:py-16">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight mb-1">
+                Message{' '}
+                <span className="italic text-[#d4af37]">from our</span>{' '}
+                President
+              </h2>
 
+              {/* Scrollable body text */}
+              <div className="mt-5 max-h-[180px] overflow-y-auto pr-3 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent space-y-3 text-white/75 text-sm sm:text-base leading-relaxed"
+                style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.2) transparent' }}
+              >
+                <p>
+                  The Graduate Student Association of Ghana (GRASAG), University of Professional Studies Chapter, warmly welcomes all graduate students, stakeholders, and partners to our vibrant academic community.
+                </p>
+                <p>
+                  As a body representing graduate students, we are committed to promoting academic excellence, professional development, leadership, research, innovation, and student welfare. We serve as a platform that unites graduate students, amplifies their voices, and creates opportunities for personal and collective growth.
+                </p>
+                <p>
+                  Through seminars, conferences, mentorship programs, research initiatives, community engagements, and professional networking events, we strive to equip our members with the skills and exposure needed to excel both academically and professionally.
+                </p>
+                <p>
+                  We also recognize the importance of collaboration in achieving impactful results. Therefore, we warmly invite organizations, institutions, corporate bodies, alumni, and individuals who share our vision to partner with us in creating meaningful opportunities and lasting impact for graduate students.
+                </p>
+                <p>
+                  Together, we can build a stronger academic and professional community that nurtures future leaders and contributes positively to society.
+                </p>
+              </div>
 
+              {/* Name & title */}
+              <div className="mt-5">
+                <p className="text-white/60 text-sm">{president?.name || 'Samuel Sasu Adonteng'}</p>
+                <p className="text-white font-bold text-sm">GRASAG‑UPSA President</p>
+              </div>
 
+              {/* View Leadership button */}
+              <div className="mt-6">
+                <Link
+                  href="/leadership"
+                  className="inline-block bg-[#d4af37] hover:bg-[#c39e2e] text-slate-900 font-bold px-8 py-3 rounded-md transition-all uppercase text-xs tracking-widest shadow-lg hover:scale-[1.02] transform duration-200"
+                >
+                  View Leadership
+                </Link>
+              </div>
+            </div>
+
+            {/* Right: President Image */}
+            <div className="lg:col-span-5 relative hidden lg:flex items-end justify-center">
+              {(president?.image_url) ? (
+                <div className="relative w-full h-full min-h-[500px]">
+                  <Image
+                    src={president.image_url}
+                    alt={president.name || 'President'}
+                    fill
+                    className="object-contain object-bottom drop-shadow-2xl"
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                    priority
+                  />
+                </div>
+              ) : (
+                <div className="relative w-full h-full min-h-[500px]">
+                  <Image
+                    src="/sasu.png"
+                    alt="President"
+                    fill
+                    className="object-contain object-bottom drop-shadow-2xl"
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                    priority
+                  />
+                </div>
+              )}
+            </div>
+
+          </div>
+        </div>
+      </section>
 
           {/* Our Focus Areas – Horizontally Scrolling Cards */}
           <section className="bg-neutral-50 border-y border-neutral-100 py-20 overflow-hidden">

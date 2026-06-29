@@ -135,6 +135,7 @@ export const adminUserSchema = z.object({
   id: z.string().uuid().optional(),
   email: z.string().email("Invalid email address"),
   role: z.string().min(1, "Role is required"),
+  must_change_password: z.boolean().default(false).optional(),
   created_at: z.string().optional(),
 });
 export type AdminUser = z.infer<typeof adminUserSchema>;
