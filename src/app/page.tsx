@@ -465,9 +465,9 @@ useEffect(() => {
             </div>
 
             {/* Right: President Image */}
-            <div className="lg:col-span-5 relative hidden lg:flex items-end justify-center">
+            <div className="lg:col-span-5 flex w-full justify-center items-center mt-8 lg:mt-0">
               {(president?.image_url) ? (
-                <div className="relative w-full h-full min-h-[500px]">
+                <div className="relative w-full h-full min-h-[300px] sm:min-h-[400px]">
                   <Image
                     src={president.image_url}
                     alt={president.name || 'President'}
