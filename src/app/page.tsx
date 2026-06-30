@@ -52,33 +52,6 @@ export default function HomePage() {
     fetchPresident();
   }, []);
 
-useEffect(() => {
-  // If no event or no date, reset timer
-  if (!currentEvent?.event_date) {
-    setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-    return;
-  }
-  // Parse date string as UTC (ISO format)
-  const targetDate = new Date(currentEvent.event_date);
-  const calculate = () => {
-    const now = new Date();
-    const diff = targetDate.getTime() - now.getTime();
-    if (diff <= 0) {
-      setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-      return;
-    }
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((diff / (1000 * 60)) % 60);
-    const seconds = Math.floor((diff / 1000) % 60);
-    setTimeLeft({ days, hours, minutes, seconds });
-  };
-  // Initial calculation
-  calculate();
-  const interval = setInterval(calculate, 1000);
-  return () => clearInterval(interval);
-}, [currentEvent?.event_date]);
-
   // News updates state
   const [newsUpdates, setNewsUpdates] = useState<{id: string; title: string; content: string; image_url: string; created_at: string; category: string}[]>([]);
 
@@ -160,46 +133,45 @@ useEffect(() => {
     return () => clearInterval(interval);
   }, [events]);
 
-  // Countdown effect – uses currentEvent event_date from the DB
+  // Consolidated countdown timer – parses date safely and updates every second
   useEffect(() => {
     if (!currentEvent?.event_date) {
       setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       return;
     }
-    
-    // Replace spaces with 'T' to fix Safari/iOS parsing bugs if the DB returns "YYYY-MM-DD HH:mm:ss"
-    const safeDateString = currentEvent.event_date.replace(' ', 'T');
-    const targetDate = new Date(safeDateString).getTime();
-
-    const updateTimer = () => {
+    // Attempt to parse the date string directly; fallback to replace space with 'T' for Safari/iOS
+    let parsed = Date.parse(currentEvent.event_date);
+    if (isNaN(parsed)) {
+      const safe = currentEvent.event_date.replace(' ', 'T');
+      parsed = Date.parse(safe);
+    }
+    const targetTime = parsed;
+    if (isNaN(targetTime)) {
+      console.warn('Invalid event_date format:', currentEvent.event_date);
+      setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      return;
+    }
+    // Set up interval to update countdown every second
+    let timerId: NodeJS.Timeout;
+    const update = () => {
       const now = Date.now();
-      const difference = targetDate - now;
-
-      if (difference <= 0 || isNaN(targetDate)) {
+      const diff = targetTime - now;
+      if (diff <= 0) {
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        return true; // indicates it should clear
+        clearInterval(timerId);
+        return;
       }
-      
-      const d = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const h = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-      const s = Math.floor((difference % (1000 * 60)) / 1000);
-      
-      setTimeLeft({ days: d, hours: h, minutes: m, seconds: s });
-      return false;
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      setTimeLeft({ days, hours, minutes, seconds });
     };
-
-    const shouldClear = updateTimer();
-    if (shouldClear) return;
-
-    const interval = setInterval(() => {
-      if (updateTimer()) {
-        clearInterval(interval);
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [currentEventIndex, events, currentEvent?.event_date]);
+    // Run once immediately and then start interval
+    update();
+    timerId = setInterval(update, 1000);
+    return () => clearInterval(timerId);
+  }, [currentEvent?.event_date]);
 
 
     // Hero section state
@@ -332,7 +304,7 @@ useEffect(() => {
   const currentSlide = slides[slideIndex];
 
   const bgStyle = currentSlide?.bgStyle || {};
-  const sectionClass = `relative overflow-hidden border-b border-neutral-100 flex items-end justify-start min-h-[800px] pb-12 pt-32 px-6 sm:px-12 lg:px-24 ${!bgStyle.backgroundImage ? 'bg-gradient-to-br from-slate-50 via-slate-100/50 to-white' : ''}`;
+  const sectionClass = `relative overflow-hidden bg-cover border-b border-neutral-100 flex items-end justify-start h-[800px] pb-12 pt-32 px-6 sm:px-12 lg:px-24 ${!bgStyle.backgroundImage ? 'bg-gradient-to-br from-slate-50 via-slate-100/50 to-white' : ''}`;
 
   return (
     <div className="relative min-h-screen bg-background">
@@ -637,22 +609,21 @@ useEffect(() => {
 
           {/* Featured Upcoming Events Banner Section */}
           {events.length > 0 && (
-            <section className="w-full relative overflow-hidden bg-slate-950 min-h-[480px] flex flex-col justify-end">
+            <section className="w-full relative overflow-hidden bg-slate-950 h-[405px] sm:h-[486px] flex flex-col justify-end">
               <div className="absolute inset-0">
                 {events.map((event, idx) => (
                   <div 
                     key={idx}
-                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out bg-contain bg-right bg-no-repeat ${
-                      currentEventIndex === idx ? 'opacity-100 z-10' : 'opacity-0 z-0'
-                    }`}
-                    style={{ backgroundImage: `url('${event.image_url || '/bkg-grasag.jpg'}')`, backgroundSize: 'auto 100%' }}
+                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${currentEventIndex === idx ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+                    <img src={event.image_url || '/bkg-grasag.jpg'} alt={event.title} className="absolute right-0 top-0 w-full md:w-1/2 h-full object-contain object-right md:object-center opacity-40 md:opacity-90"/>
+                    <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-transparent md:bg-gradient-to-r md:from-slate-950 md:via-slate-950/80 md:to-transparent" />
                   </div>
                 ))}
               </div>
 
-              <div className="relative z-20 max-w-7xl mx-auto px-6 sm:px-12 lg:px-24 py-16 sm:py-20 md:py-24 flex flex-col justify-between h-full min-h-[480px] text-left w-full">
+              {/* Content overlay positioned to stay visible */}
+              <div className="absolute inset-0 z-20 flex flex-col justify-center p-6 sm:p-12 max-w-7xl mx-auto text-left">
                 <div>
                   <span className="inline-block rounded-full bg-[#B8860B]/20 px-4 py-1 text-xs sm:text-sm font-semibold text-[#B8860B] uppercase tracking-widest border border-[#B8860B]/30">
                     Featured Event
