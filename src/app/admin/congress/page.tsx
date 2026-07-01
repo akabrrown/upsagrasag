@@ -184,17 +184,27 @@ const { register, handleSubmit, reset, setValue, watch, formState: { errors, isS
               />
               <label htmlFor="is_featured" className="text-sm font-medium text-slate-700">Featured Event</label>
             </div>
-          <div className="pt-4">
-            <label className="block text-sm font-medium text-slate-700 mb-1">Image Banner (Optional)</label>
-            <CloudinaryUpload 
-              onUpload={(url) => setValue('image_url', url, { shouldValidate: true })}
-            />
-            {imageUrl && (
-              <div className="mt-2">
-                <img src={imageUrl} alt="Preview" className="w-full h-32 object-cover rounded-md border" />
-              </div>
-            )}
-          </div>
+            <div className="pt-4">
+              <label className="block text-sm font-medium text-slate-700 mb-1">Image Banner (Optional)</label>
+              <CloudinaryUpload 
+                onUpload={(url) => setValue('image_url', url, { shouldValidate: true })}
+              />
+              {imageUrl && (
+                <div className="mt-2">
+                  <img src={imageUrl} alt="Preview" className="w-full h-32 object-cover rounded-md border" />
+                </div>
+              )}
+            </div>
+            <div className="pt-4">
+              <label className="block text-sm font-medium text-slate-700 mb-1">Event URL (Optional)</label>
+              <input 
+                {...register('url')} 
+                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+              />
+              {errors.url && (
+                <p className="text-sm text-red-600 mt-1">{errors.url.message as string}</p>
+              )}
+            </div>
           
           <div className="pt-4 flex justify-end gap-3">
             <button 

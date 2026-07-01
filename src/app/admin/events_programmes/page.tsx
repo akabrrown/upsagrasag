@@ -29,7 +29,7 @@ export default function AdminEventsPage() {
   const imageUrl = useWatch({ control, name: 'image_url' });
 
   const openCreate = () => {
-    reset({ title: '', description: '', event_date: '', location: '', image_url: '', is_featured: false });
+    reset({ title: '', description: '', event_date: '', location: '', image_url: '', url: '', is_featured: false });
     setEditingId(null);
     setIsModalOpen(true);
   };
@@ -171,18 +171,28 @@ export default function AdminEventsPage() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Cover Image (Optional)</label>
-            <CloudinaryUpload 
-              onUpload={(url: string) => setValue('image_url', url, { shouldValidate: true })}
-            />
-            {imageUrl && (
-              <div className="mt-2">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={imageUrl} alt="Preview" className="w-32 h-20 object-cover rounded-md border" />
-              </div>
-            )}
-          </div>
+            <div className="pt-4">
+              <label className="block text-sm font-medium text-slate-700 mb-1">Cover Image (Optional)</label>
+              <CloudinaryUpload 
+                onUpload={(url: string) => setValue('image_url', url, { shouldValidate: true })}
+              />
+              {imageUrl && (
+                <div className="mt-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={imageUrl} alt="Preview" className="w-32 h-20 object-cover rounded-md border" />
+                </div>
+              )}
+            </div>
+            <div className="pt-4">
+              <label className="block text-sm font-medium text-slate-700 mb-1">Event URL (Optional)</label>
+              <input 
+                {...register('url')}
+                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {errors.url && (
+                <p className="text-sm text-red-600 mt-1">{errors.url.message as string}</p>
+              )}
+            </div>
           
           <div className="pt-4 flex justify-end gap-3">
             <button 

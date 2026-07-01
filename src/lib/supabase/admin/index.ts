@@ -586,7 +586,27 @@ export const opportunityService = new AdminCrudService<Opportunity>('opportuniti
 export const resourceService = new AdminCrudService<Resource>('resources');
 export const pastQuestionService = new PastQuestionCrudService();
 export const tutorialService = new AdminCrudService<Tutorial>('tutorials');
-export const eventProgrammeService = new AdminCrudService<EventProgrammeRecord>('events_programmes');
+/* Custom service for events_programmes to safely handle optional fields */
+class EventProgrammeCrudService extends AdminCrudService<EventProgrammeRecord> {
+  constructor() {
+    super('events_programmes');
+  }
+
+  // Override update to avoid error when filtered payload is empty
+  async update(id: string, item: Partial<EventProgrammeRecord>): Promise<EventProgrammeRecord> {
+    const filtered = await this.filterPayload(item);
+    // If no columns to update (e.g., only 'url' which doesn't exist in DB), return existing record
+    if (Object.keys(filtered).length === 0) {
+      // Fetch and return the current record without making an update
+      const existing = await this.get(id);
+      if (!existing) throw new Error('Item not found');
+      return existing as EventProgrammeRecord;
+    }
+    return super.update(id, filtered);
+  }
+}
+
+export const eventProgrammeService = new EventProgrammeCrudService();
 export const researchOpportunityService = new AdminCrudService<ResearchOpportunity>('research_opportunities');
 export const newsUpdateService = new AdminCrudService<NewsUpdate>('news_updates');
 
