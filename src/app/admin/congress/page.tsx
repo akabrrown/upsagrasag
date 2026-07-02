@@ -37,7 +37,7 @@ export default function AdminCongressPage() {
     setValue,
     watch,
     formState: { errors, isSubmitting, isValid },
-  } = useForm<CongressEvent>({
+  } = useForm({
     resolver: zodResolver(congressSchema),
     mode: 'onChange',
     defaultValues: {
@@ -163,8 +163,8 @@ export default function AdminCongressPage() {
         });
         if (!res.ok) throw new Error('Failed to create');
         const created: CongressEvent = await res.json();
-        setCurrentEventId(created.id);
-        setEditingId(created.id);
+        setCurrentEventId(created.id ?? null);
+        setEditingId(created.id ?? null);
       }
       mutate();
       refreshSubEvents();
