@@ -8,7 +8,7 @@ import { eventProgrammeSchema, EventProgramme, EventProgrammeRecord } from '@/ty
 
 
 
-type EventProgrammeForm = Pick<EventProgramme, 'title' | 'description' | 'event_date' | 'location' | 'image_url'> & { is_featured?: boolean };
+type EventProgrammeForm = Pick<EventProgramme, 'title' | 'description' | 'event_date' | 'location' | 'image_url' | 'url'> & { is_featured?: boolean };
 import CrudTable from '@/components/admin/CrudTable';
 import FormModal from '@/components/admin/FormModal';
 import { Plus } from 'lucide-react';
