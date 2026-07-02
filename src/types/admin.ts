@@ -11,20 +11,20 @@ export const presidentSchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(1, "Name is required"),
   speech: z.string().optional(),
-  image_url: z.string().url().optional()
+  image_url: z.union([z.literal(''), z.string().url()]).optional()
 });
 // Congress schema is defined later in the file
 export const partnerSchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(1, "Name is required"),
-  logo_url: z.string().url().optional(),
+  logo_url: z.union([z.literal(''), z.string().url()]).optional(),
   display_order: z.number().int().optional()
 });
 export const constitutionSchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string().min(1, "Title is required"),
   version: z.string().optional(),
-  file_url: z.string().url().optional(),
+  file_url: z.union([z.literal(''), z.string().url()]).optional(),
   created_at: z.string().optional(),
 });
 export const leadershipSchema = z.object({
@@ -35,7 +35,7 @@ export const leadershipSchema = z.object({
   phone: z.string().optional(),
   type: z.enum(["executive", "advisor", "authority"]).default("executive"),
   bio: z.string().optional(),
-  image_url: z.string().url().optional(),
+  image_url: z.union([z.literal(''), z.string().url()]).optional(),
   display_order: z.number().int().min(0).optional(),
   contactInfo: z.any().optional()
 });
@@ -44,7 +44,7 @@ export const executiveSchema = z.object({
   name: z.string().min(1, "Name is required"),
   title: z.string().min(1, "Title is required"),
   bio: z.string().optional(),
-  photo_url: z.string().url().optional(),
+  photo_url: z.union([z.literal(''), z.string().url()]).optional(),
   display_order: z.number().int().default(0)
 });
 export const opportunitySchema = z.object({
@@ -54,15 +54,15 @@ export const opportunitySchema = z.object({
   type: z.enum(["Full-time","Part-time","Internship","Contract"]).optional().default("Full-time"),
   category: z.string().optional(),
   description: z.string().optional(),
-  apply_url: z.string().url().optional(),
-  image_url: z.string().url().optional()
+  apply_url: z.union([z.literal(''), z.string().url()]).optional(),
+  image_url: z.union([z.literal(''), z.string().url()]).optional()
 });
 export const resourceSchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  file_url: z.string().url().optional(),
-  link_url: z.string().url().optional()
+  file_url: z.union([z.literal(''), z.string().url()]).optional(),
+  link_url: z.union([z.literal(''), z.string().url()]).optional()
 });
 export const programSchema = z.object({
   id: z.string().uuid().optional(),
@@ -77,24 +77,36 @@ export const pastQuestionSchema = z.object({
   course_title: z.string().min(1, "Course title is required"),
   year: z.string().min(1, "Year is required"),
   title: z.string().optional(),
-  file_url: z.string().url().optional(),
+  file_url: z.union([z.literal(''), z.string().url()]).optional(),
   created_at: z.string().optional()
 });
 export const tutorialSchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  video_url: z.string().url().optional()
+  video_url: z.union([z.literal(''), z.string().url()]).optional()
 });
 export const eventProgrammeSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   event_date: z.string().min(1, "Event date is required"),
   location: z.string().optional(),
-  image_url: z.string().url().optional(),
-  url: z.string().url().optional(),
+  image_url: z.union([z.literal(''), z.string().url()]).optional(),
+  url: z.union([z.literal(''), z.string().url()]).optional(),
   is_featured: z.boolean().default(false)
 });
+
+// Sub‑event schema
+export const subEventSchema = z.object({
+  id: z.string().uuid().optional(),
+  event_id: z.string().uuid(),
+  title: z.string().min(1, "Sub‑event title is required"),
+  start_at: z.string().min(1, "Start time is required"),
+  end_at: z.string().optional(),
+  description: z.string().optional()
+});
+
+export type SubEvent = z.infer<typeof subEventSchema>;
 
 export type EventProgramme = z.infer<typeof eventProgrammeSchema>;
 export const researchOpportunitySchema = z.object({
@@ -102,7 +114,7 @@ export const researchOpportunitySchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   sub_type: z.enum(["scholarships", "calls", "publications", "careers"]).default("scholarships"),
-  link_url: z.string().url().optional(),
+  link_url: z.union([z.literal(''), z.string().url()]).optional(),
   deadline: z.string().optional()
 });
 export const newsUpdateSchema = z.object({
@@ -111,7 +123,7 @@ export const newsUpdateSchema = z.object({
   content: z.string().optional(),
   category: z.enum(["news","articles","announcements","press"]).default("news"),
   slug: z.string().optional(),
-  image_url: z.string().url().optional(),
+  image_url: z.union([z.literal(''), z.string().url()]).optional(),
   published_at: z.string().optional(),
   created_at: z.string().optional()
 });
@@ -128,7 +140,7 @@ export type Congress = z.infer<typeof congressSchema>;
 export type Resource = z.infer<typeof resourceSchema>;
 // duplicate export removed
 export type Tutorial = z.infer<typeof tutorialSchema>;
-export type EventProgrammeRecord = EventProgramme & { id: string };
+export type EventProgrammeRecord = EventProgramme & { id: string } & { subEvents?: SubEvent[] };
 export type ResearchOpportunity = z.infer<typeof researchOpportunitySchema>;
 export type NewsUpdate = z.infer<typeof newsUpdateSchema>;
 
@@ -148,8 +160,8 @@ export const congressSchema = z.object({
   description: z.string().optional(),
   event_date: z.string().min(1, "Event date is required"),
   location: z.string().optional(),
-  image_url: z.string().url().optional(),
-  url: z.string().url().optional(),
+  image_url: z.union([z.literal(''), z.string().url()]).optional(),
+  url: z.union([z.literal(''), z.string().url()]).optional(),
   is_featured: z.boolean().default(false),
   created_at: z.string().optional()
 });

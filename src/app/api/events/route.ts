@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const { data: events, error } = await supabase
       .from('events_programmes')
-      .select('id,title,description,url,image_url,event_date,location,is_featured')
+      .select('*, sub_events(*)')
       .order('event_date', { ascending: true });
     if (error) throw error;
     return NextResponse.json(events);
