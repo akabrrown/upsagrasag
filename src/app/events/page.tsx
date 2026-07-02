@@ -51,7 +51,7 @@ export default function EventsPage() {
                 className="relative group flex flex-col md:flex-row gap-6 bg-white rounded-3xl p-4 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 cursor-pointer"
                 onClick={() => setSelectedEvent(e)}
               >
-                {console.log('Event item:', e)}
+                {/* Event item logged for debugging */}
                 {/* Image Section */}
                 <div className="w-full md:w-1/3 h-56 md:h-auto relative overflow-hidden rounded-2xl bg-neutral-100 shrink-0">
                   {e.is_featured && (
