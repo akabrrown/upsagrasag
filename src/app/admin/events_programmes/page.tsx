@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import { useForm, useWatch } from 'react-hook-form';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { eventProgrammeSchema, EventProgrammeRecord, SubEvent } from '@/types/admin';
+import { eventProgrammeSchema, EventProgramme, EventProgrammeRecord, SubEvent } from '@/types/admin';
 import CrudTable from '@/components/admin/CrudTable';
 import FormModal from '@/components/admin/FormModal';
 import { Plus } from 'lucide-react';
@@ -29,7 +30,7 @@ export default function AdminEventsPage() {
   const [subEvents, setSubEvents] = useState<SubEvent[]>([]);
   const [currentEventId, setCurrentEventId] = useState<string | null>(null);
 
-  const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<EventProgrammeRecord>({
+  const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<z.input<typeof eventProgrammeSchema>>({
     resolver: zodResolver(eventProgrammeSchema)
   });
 
@@ -71,7 +72,7 @@ export default function AdminEventsPage() {
     }
   };
 
-  const onSubmit = async (data: EventProgrammeRecord) => {
+  const onSubmit = async (data: z.input<typeof eventProgrammeSchema>) => {
     try {
       const url = editingId ? `/api/admin/events_programmes/${editingId}` : '/api/admin/events_programmes';
       const method = editingId ? 'PATCH' : 'POST';
