@@ -3,10 +3,18 @@ import { createClient } from '@supabase/supabase-js';
 
 // Dedicated admin client that runs with service role privileges, bypassing RLS.
 // This is safe because all admin API routes are pre-validated using requireAdmin().
-const supabaseAdminClient = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabaseAdminClient = (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)
+  ? createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    )
+  : new Proxy({} as any, {
+      get(target, prop) {
+        return () => {
+          throw new Error("Supabase is not configured. Missing environment variables.");
+        };
+      }
+    });
 export { supabaseAdminClient };
 
 export class AdminCrudService<T extends { id?: string | number }> {
