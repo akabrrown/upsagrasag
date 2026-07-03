@@ -53,6 +53,8 @@ export const opportunitySchema = z.object({
   company: z.string().min(1, "Company is required"),
   type: z.enum(["Full-time","Part-time","Internship","Contract"]).optional().default("Full-time"),
   category: z.string().optional(),
+  location: z.string().optional(),
+  deadline: z.string().optional(),
   description: z.string().optional(),
   apply_url: z.string().url().optional(),
   image_url: z.string().url().optional()
@@ -93,7 +95,7 @@ export const eventProgrammeSchema = z.object({
   location: z.string().optional(),
   image_url: z.string().url().optional(),
   url: z.string().url().optional(),
-  is_featured: z.boolean().optional().default(false)
+  is_featured: z.boolean().default(false)
 });
 
 export type EventProgramme = z.infer<typeof eventProgrammeSchema>;
