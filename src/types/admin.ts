@@ -95,7 +95,7 @@ export const eventProgrammeSchema = z.object({
   location: z.string().optional(),
   image_url: z.string().url().optional(),
   url: z.string().url().optional(),
-  is_featured: z.boolean().default(false)
+  is_featured: z.boolean().optional().default(false)
 });
 
 export type EventProgramme = z.infer<typeof eventProgrammeSchema>;
