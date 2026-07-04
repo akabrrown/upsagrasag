@@ -1,18 +1,28 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { newsUpdateSchema, NewsUpdate } from '@/types/admin';
 import CloudinaryUpload from '@/components/CloudinaryUpload';
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Image from '@tiptap/extension-image';
 import { useRouter } from 'next/navigation';
+import FormModal from '@/components/admin/FormModal';
+import Input from '@/components/admin/ui/Input';
+import Select from '@/components/admin/ui/Select';
+import Textarea from '@/components/admin/ui/Textarea';
+import Button from '@/components/admin/ui/Button';
 
 interface NewsFormProps {
   initialData?: NewsUpdate;
   isEdit?: boolean;
 }
-
+const categoryOptions = [
+  { value: 'news', label: 'News' },
+  { value: 'press', label: 'Press Release' },
+  { value: 'reports', label: 'Report' },
+  { value: 'accountability', label: 'Accountability' },
+  { value: 'gallery', label: 'Gallery' },
+];
 export default function NewsForm({ initialData, isEdit = false }: NewsFormProps) {
   const router = useRouter();
   const [coverUrl, setCoverUrl] = useState<string>(initialData?.image_url || '');
@@ -34,16 +44,7 @@ export default function NewsForm({ initialData, isEdit = false }: NewsFormProps)
     },
   });
 
-  // tiptap editor
-  const editor = useEditor({
-    extensions: [StarterKit, Image],
-    content: initialData?.content || '',
-    onUpdate: ({ editor }) => {
-      setValue('content', editor.getHTML());
-    },
-  });
-
-  // keep form value in sync when cover image changes
+  // sync cover image with form
   useEffect(() => {
     setValue('image_url', coverUrl);
   }, [coverUrl, setValue]);
@@ -57,7 +58,7 @@ export default function NewsForm({ initialData, isEdit = false }: NewsFormProps)
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-      if (!res.ok) throw new Error('Failed to save');
+      if (!res.ok) throw new Error('Failed to save news');
       router.push('/admin/news_updates');
     } catch (e: any) {
       alert(e.message);
@@ -65,38 +66,37 @@ export default function NewsForm({ initialData, isEdit = false }: NewsFormProps)
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Form */}
+    <FormModal
+      isOpen={true}
+      onClose={() => router.back()}
+      title={isEdit ? 'Edit News' : 'Add News'}
+    >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Title</label>
-          <input
+          <Input
             {...register('title')}
-            className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="focus:ring-primary/50"
           />
           {errors.title && <p className="text-sm text-red-600 mt-1">{errors.title.message as string}</p>}
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
-          <select
+          <Select
             {...register('category')}
-            className="w-full px-3 py-2 border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="notices">Notice</option>
-            <option value="press">Press Release</option>
-            <option value="reports">Report</option>
-            <option value="accountability">Accountability</option>
-            <option value="gallery">Gallery</option>
-          </select>
+            options={categoryOptions}
+            className="focus:ring-primary/50"
+          />
           {errors.category && <p className="text-sm text-red-600 mt-1">{errors.category.message as string}</p>}
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Publish Date</label>
-          <input
+          <Input
             type="datetime-local"
             {...register('published_at')}
-            className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="focus:ring-primary/50"
           />
+          {errors.published_at && <p className="text-sm text-red-600 mt-1">{errors.published_at.message as string}</p>}
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Cover Image (required)</label>
@@ -106,52 +106,39 @@ export default function NewsForm({ initialData, isEdit = false }: NewsFormProps)
               <img src={coverUrl} alt="Cover preview" className="w-32 h-20 object-cover rounded-md border" />
             </div>
           )}
-          {errors.image_url && <p className="text-sm text-red-600 mt-1">{errors.image_url.message as string}</p>}
         </div>
-        {/* Inline image button for tiptap */}
-        <div className="flex space-x-2">
-          <button
-            type="button"
-            onClick={() => {
-              // trigger CloudinaryUpload via hidden component or simple prompt
-              const url = prompt('Enter image URL (or upload via Cloudinary)');
-              if (url && editor) {
-                editor.chain().focus().setImage({ src: url }).run();
-              }
-            }}
-            className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
-          >
-            Insert Image
-          </button>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Content</label>
+          <Controller
+            control={control}
+            name="content"
+            render={({ field }) => (
+              <Textarea
+            {...field}
+            rows={6}
+            className="w-full h-full focus:outline-none"
+          />
+            )}
+          />
+          {errors.content && <p className="text-sm text-red-600 mt-1">{errors.content.message as string}</p>}
         </div>
-        <div className="pt-4 flex justify-end space-x-3">
-          <button
+        <div className="flex justify-end space-x-3 pt-2">
+          <Button
             type="button"
             onClick={() => router.back()}
-            className="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded"
+            variant="secondary"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+            variant="primary"
           >
             {isSubmitting ? 'Saving...' : 'Save'}
-          </button>
+          </Button>
         </div>
       </form>
-
-      {/* Live preview */}
-      <div className="border border-slate-200 rounded p-4 overflow-y-auto max-h-[80vh]">
-        <h2 className="text-xl font-bold mb-2">Live Preview</h2>
-        {editor && (
-          <div
-            className="prose"
-            dangerouslySetInnerHTML={{ __html: editor.getHTML() }}
-          />
-        )}
-      </div>
-    </div>
+    </FormModal>
   );
 }

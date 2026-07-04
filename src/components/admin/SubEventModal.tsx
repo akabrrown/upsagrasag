@@ -5,13 +5,14 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { subEventSchema, SubEvent } from '@/types/admin';
 import { X } from 'lucide-react';
+import FormModal from '@/components/admin/FormModal';
 
 type SubEventModalProps = {
   isOpen: boolean;
   onClose: () => void;
   eventId: string;
-  subEvent?: SubEvent; // present when editing
-  onSuccess: () => void; // called after create/update/delete to refresh list
+  subEvent?: SubEvent;
+  onSuccess: () => void;
 };
 
 export default function SubEventModal({ isOpen, onClose, eventId, subEvent, onSuccess }: SubEventModalProps) {
@@ -20,7 +21,7 @@ export default function SubEventModal({ isOpen, onClose, eventId, subEvent, onSu
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting, isValid },
+    formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(subEventSchema),
     mode: 'onChange',
@@ -47,15 +48,12 @@ export default function SubEventModal({ isOpen, onClose, eventId, subEvent, onSu
   }, [isEditing, subEvent, reset]);
 
   const onSubmit = async (data: any) => {
-    console.log('Submitting sub-event', data);
     if (!eventId) {
       alert('Event ID is missing. Save the parent event first.');
       return;
     }
-    const payload: any = { ...data, event_id: eventId };
-    if (isEditing && subEvent?.id) {
-      payload.id = subEvent.id;
-    }
+    const payload = { ...data, event_id: eventId };
+    if (isEditing && subEvent?.id) payload.id = subEvent.id;
     const method = isEditing ? 'PATCH' : 'POST';
     try {
       const res = await fetch('/api/admin/sub_events', {
@@ -64,15 +62,11 @@ export default function SubEventModal({ isOpen, onClose, eventId, subEvent, onSu
         body: JSON.stringify(payload),
       });
       const result = await res.json();
-      if (!res.ok) {
-        const errMsg = result.error ? JSON.stringify(result.error) : res.statusText;
-        throw new Error(`Failed to save sub‑event: ${errMsg}`);
-      }
-      console.log('Response data', result);
+      if (!res.ok) throw new Error(result.error ? JSON.stringify(result.error) : res.statusText);
       onSuccess();
       onClose();
     } catch (e: any) {
-      console.error('Error saving sub-event', e);
+      console.error(e);
       alert(e.message);
     }
   };
@@ -93,80 +87,72 @@ export default function SubEventModal({ isOpen, onClose, eventId, subEvent, onSu
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-        
-      <div className="bg-white text-gray-900 rounded-lg shadow-xl w-full max-w-lg mx-4 p-6 relative">
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 text-slate-500 hover:text-slate-700"
-        >
-          <X size={20} />
-        </button>
-        <h2 className="text-xl font-semibold mb-4">
-          {isEditing ? 'Edit Sub‑Event' : 'Add Sub‑Event'}
-        </h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Title</label>
-            <input
-              {...register('title')}
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-            {errors.title && <p className="text-sm text-red-600 mt-1">{(errors.title.message as string) || 'Required'}</p>}
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Start At</label>
-            <input
-              type="datetime-local"
-              {...register('start_at')}
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-            {errors.start_at && <p className="text-sm text-red-600 mt-1">{(errors.start_at.message as string) || 'Required'}</p>}
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">End At (optional)</label>
-            <input
-              type="datetime-local"
-              {...register('end_at')}
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Description</label>
-            <textarea
-              {...register('description')}
-              rows={3}
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-          <div className="flex justify-end space-x-3 pt-2">
-            {isEditing && (
-              <button
-                type="button"
-                onClick={handleDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                disabled={isSubmitting}
-              >
-                Delete
-              </button>
-            )}
+    <FormModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={isEditing ? 'Edit Sub‑Event' : 'Add Sub‑Event'}
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Title</label>
+          <input
+            {...register('title')}
+            className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.title && <p className="text-sm text-red-600 mt-1">{errors.title.message as string}</p>}
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Start At</label>
+          <input
+            type="datetime-local"
+            {...register('start_at')}
+            className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.start_at && <p className="text-sm text-red-600 mt-1">{errors.start_at.message as string}</p>}
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">End At (optional)</label>
+          <input
+            type="datetime-local"
+            {...register('end_at')}
+            className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+          <textarea
+            {...register('description')}
+            rows={3}
+            className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div className="flex justify-end space-x-3 pt-2">
+          {isEditing && (
             <button
               type="button"
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
+              onClick={handleDelete}
+              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
               disabled={isSubmitting}
-              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark disabled:opacity-50"
             >
-              {isSubmitting ? 'Saving...' : 'Save'}
+              Delete
             </button>
-          </div>
-        </form>
-      </div>
-    </div>
+          )}
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+          >
+            {isSubmitting ? 'Saving...' : 'Save'}
+          </button>
+        </div>
+      </form>
+    </FormModal>
   );
 }

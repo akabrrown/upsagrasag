@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase';
-import { Mail, Lock, LogIn, ArrowRight } from 'lucide-react';
+import { Lock, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 
 export default function SignInPage() {
   const router = useRouter();
@@ -17,16 +18,13 @@ export default function SignInPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    console.log('Attempting sign‑in', { email, password });
     const { data, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    console.log('Supabase response', { data, authError });
     if (authError) {
       setError(authError.message);
     } else {
-      // Synchronize cookies with Next.js Server Components / Middleware
       router.refresh();
       router.push('/admin');
     }
@@ -34,80 +32,98 @@ export default function SignInPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[url('/IMG_5241.jpg')] bg-cover bg-center p-4 relative overflow-hidden text-blue-400">
-      {/* Decorative background elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-accent/20 blur-[120px] mix-blend-screen" />
-        <div className="absolute bottom-[10%] right-[5%] w-[40%] h-[60%] rounded-full bg-blue-500/10 blur-[150px] mix-blend-screen" />
-      </div>
+    <main className="min-h-screen flex items-center justify-center bg-[#f4f6f8] p-4 sm:p-8 font-sans">
+      <div className="max-w-5xl w-full bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.06)] overflow-hidden flex min-h-[650px]">
+        {/* Left Side - Image panel */}
+        <div className="hidden md:flex md:w-[45%] relative bg-[#004080] p-10 flex-col justify-between overflow-hidden">
+          <div className="absolute inset-0 bg-[url('/IMG_5241.jpg')] bg-cover bg-center opacity-60 mix-blend-overlay transition-transform duration-1000 hover:scale-105"></div>
+          {/* Subtle gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#004080]/30 via-[#004080]/50 to-[#004080]/90 pointer-events-none"></div>
+          
+          <div className="relative z-10 flex justify-between items-center text-white w-full">
+             <span className="font-semibold tracking-wide text-sm opacity-90">Admin Access</span>
+             <Link href="/" className="px-4 py-1.5 rounded-full border border-white/30 text-xs font-medium hover:bg-white/10 transition-colors flex items-center gap-2">
+                <ArrowLeft className="w-3 h-3" /> Back to Site
+             </Link>
+          </div>
+          
+          <div className="relative z-10 w-full mt-auto mb-4">
+             <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-[#FFB800] flex items-center justify-center shadow-lg border-2 border-[#004080]/20">
+                  <Lock className="w-5 h-5 text-[#004080]" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-lg leading-tight">Secure Portal</h3>
+                  <p className="text-white/80 text-sm font-medium">Authorized Personnel Only</p>
+                </div>
+             </div>
+          </div>
+        </div>
 
-      <div className="relative z-10 w-full max-w-md">
-        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 sm:p-10 shadow-2xl transition-all duration-500 hover:shadow-accent/10">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent/20 text-accent mb-4 ring-1 ring-accent/50 shadow-[0_0_15px_rgba(184,134,11,0.5)]">
-               <LogIn className="w-8 h-8" />
+        {/* Right Side - Form panel */}
+        <div className="w-full md:w-[55%] p-8 sm:p-12 lg:p-16 flex flex-col bg-white relative">
+          
+          <div className="flex justify-between items-center mb-12 sm:mb-16">
+            <h2 className="text-[#004080] font-black text-xl tracking-tight">GRASAG UPSA</h2>
+            <div className="px-3 py-1 bg-gray-50 rounded-full text-xs font-semibold text-gray-500 border border-gray-200">
+               EN ⌵
             </div>
-            <h1 className="text-3xl font-extrabold text-primary tracking-tight">Admin Portal</h1>
-                      <p className="text-primary mt-2 text-sm font-medium">GRASAG UPSA Management Dashboard</p>
           </div>
 
-          {error && (
-            <div className="mb-6 p-4 rounded-xl bg-error/20 border border-error/50 text-error-100 flex items-center animate-in fade-in slide-in-from-top-2">
-              <span className="text-sm font-semibold text-white">{error}</span>
+          <div className="flex-1 flex flex-col justify-center max-w-[360px] mx-auto w-full">
+            <div className="mb-10 text-center">
+              <h1 className="text-4xl font-extrabold text-gray-900 mb-3 tracking-tight">Hi Admin</h1>
+              <p className="text-gray-500 font-medium text-sm">Welcome to GRASAG UPSA</p>
             </div>
-          )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-                             <label className="text-xs font-bold text-primary uppercase tracking-wider ml-1">Email Address</label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-blue-300 group-focus-within:text-accent transition-colors">
-                  <Mail className="h-5 w-5" />
-                </div>
+            {error && (
+               <div className="mb-6 p-3.5 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm font-medium text-center">
+                 {error}
+               </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
                 <input
                   type="email"
-                  placeholder="admin@grasag-upsa.edu.gh"
+                  placeholder="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full bg-white/5 border border-white/10 text-white placeholder-blue-200/50 rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all duration-300"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-4 focus:outline-none focus:border-[#004080] focus:ring-1 focus:ring-[#004080] transition-colors placeholder:text-gray-400 text-gray-900 bg-white text-sm font-medium shadow-sm"
                 />
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <div className="flex justify-between items-center ml-1">
-                                 <label className="text-xs font-bold text-primary uppercase tracking-wider">Password</label>
-              </div>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-blue-300 group-focus-within:text-accent transition-colors">
-                  <Lock className="h-5 w-5" />
-                </div>
+              <div>
                 <input
                   type="password"
-                  placeholder="••••••••"
+                  placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full bg-white/5 border border-white/10 text-white placeholder-blue-200/50 rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all duration-300"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-4 focus:outline-none focus:border-[#004080] focus:ring-1 focus:ring-[#004080] transition-colors placeholder:text-gray-400 text-gray-900 bg-white text-sm font-medium shadow-sm"
                 />
+                <div className="text-right mt-3">
+                   <a href="#" className="text-xs font-semibold text-[#004080] hover:text-[#003060] transition-colors">Forgot password ?</a>
+                </div>
               </div>
-            </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-4 px-4 border border-transparent rounded-xl text-sm font-bold text-primary bg-accent hover:bg-[#cba028] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-primary transition-all duration-300 shadow-[0_0_20px_rgba(184,134,11,0.3)] hover:shadow-[0_0_25px_rgba(184,134,11,0.6)] disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                {loading ? 'Authenticating...' : 'Sign In'}
-                {!loading && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
-              </span>
-            </button>
-          </form>
-
-          <div className="mt-8 pt-6 border-t border-white/10 text-center">
-             <p className="text-xs text-primary font-medium tracking-wide">Secure Access • Authorized Personnel Only</p>
+              <div className="pt-4">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full flex justify-center items-center py-4 px-4 rounded-xl text-sm font-bold text-white bg-[#004080] hover:bg-[#003060] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#004080] transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg shadow-[#004080]/20"
+                >
+                  {loading ? 'Authenticating...' : 'Login'}
+                </button>
+              </div>
+            </form>
+          </div>
+          
+          <div className="mt-auto pt-8 flex justify-center gap-6 text-gray-400">
+             <div className="w-2 h-2 rounded-full bg-gray-200"></div>
+             <div className="w-2 h-2 rounded-full bg-gray-200"></div>
+             <div className="w-2 h-2 rounded-full bg-gray-200"></div>
           </div>
         </div>
       </div>

@@ -10,7 +10,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#003366', // UPSA dark blue
+        primary: '#004080', // UPSA primary blue
+        secondary: '#FFB800', // UPSA gold
         accent: '#B8860B', // UPSA gold
         body: '#333333', // Dark gray for body text
         border: '#C8C8C8', // Light gray for UI borders
