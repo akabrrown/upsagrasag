@@ -4,6 +4,6 @@ import { usePathname } from 'next/navigation';
 
 export default function ConditionalFooter() {
   const pathname = usePathname();
-  if (pathname?.startsWith('/admin')) return null;
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/signin')) return null;
   return <Footer />;
 }

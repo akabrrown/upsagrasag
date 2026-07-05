@@ -11,7 +11,7 @@ export default function NewsGrid({ news }: { news: NewsUpdate[] }) {
 
   const categories = useMemo(() => {
     const set = new Set<string>();
-    news.forEach((n) => set.add(n.category));
+    news.forEach((n) => { if (n.category) set.add(n.category); });
     return Array.from(set);
   }, [news]);
 

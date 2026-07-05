@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const response = NextResponse.next({
     request,
   });
@@ -26,14 +26,7 @@ export async function middleware(request: NextRequest) {
   const { data: { session } } = await supabase.auth.getSession();
   const { pathname } = request.nextUrl;
 
-  // Protect admin routes except sign‑in
-  if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/signin')) {
-    if (!session) {
-      const url = request.nextUrl.clone();
-      url.pathname = '/signin';
-      return NextResponse.redirect(url);
-    }
-  }
+  // Authentication disabled for admin routes
 
   return response;
 }

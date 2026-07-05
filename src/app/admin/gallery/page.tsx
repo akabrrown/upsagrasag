@@ -63,7 +63,7 @@ export default function AdminGalleryPage() {
         const res = await fetch(url, { method: 'POST', body: uploadData });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error?.message || 'Upload to Cloudinary failed');
-        
+
         uploadedUrls.push(data.secure_url);
       }
 

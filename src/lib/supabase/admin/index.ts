@@ -301,6 +301,9 @@ export class PastQuestionCrudService extends AdminCrudService<PastQuestion> {
         course_title: item.course_title,
         year: String(item.year ?? ''),
         title: item.title,
+        description: item.description,
+        type: item.type ?? 'exam',
+        exam_date: item.exam_date,
         file_url: item.file_path || '',
         created_at: item.created_at,
         updated_at: item.updated_at
@@ -328,6 +331,9 @@ export class PastQuestionCrudService extends AdminCrudService<PastQuestion> {
       course_title: data.course_title,
       year: String(data.year ?? ''),
       title: data.title,
+      description: data.description,
+      type: data.type ?? 'exam',
+      exam_date: data.exam_date,
       file_url: data.file_path || '',
       created_at: data.created_at,
       updated_at: data.updated_at
@@ -339,6 +345,9 @@ export class PastQuestionCrudService extends AdminCrudService<PastQuestion> {
     const dbPayload: any = {
       program_slug: (item as any).programSlug,
       title: item.title,
+      description: item.description,
+      type: item.type ?? 'exam',
+      exam_date: item.exam_date,
       course_code: item.course_code,
       course_title: item.course_title,
       year: item.year ? parseInt(item.year, 10) : null,
@@ -377,11 +386,13 @@ export class PastQuestionCrudService extends AdminCrudService<PastQuestion> {
     const dbPayload: any = {};
     if (item.programSlug !== undefined) dbPayload.program_slug = item.programSlug;
     if (item.title !== undefined) dbPayload.title = item.title;
+    if (item.description !== undefined) dbPayload.description = item.description;
+    if (item.type !== undefined) dbPayload.type = item.type;
+    if (item.exam_date !== undefined) dbPayload.exam_date = item.exam_date;
     if (item.course_code !== undefined) dbPayload.course_code = item.course_code;
     if (item.course_title !== undefined) dbPayload.course_title = item.course_title;
     if (item.year !== undefined) dbPayload.year = parseInt(item.year, 10);
     if (item.file_url !== undefined) dbPayload.file_path = item.file_url;
-    
     const filtered = await this.filterPayload(dbPayload);
     const { data, error } = await supabase
       .from('past_questions')

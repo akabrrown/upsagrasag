@@ -33,7 +33,7 @@ export const leadershipSchema = z.object({
   role: z.string().min(1, "Role is required"),
   email: z.string().email("Invalid email address").optional(),
   phone: z.string().optional(),
-  type: z.enum(["executive", "advisor", "authority"]).default("executive"),
+  type: z.enum(["executive","advisor","authority","patron"]).default("executive"),
   bio: z.string().optional(),
   image_url: z.union([z.literal(''), z.string().url()]).optional(),
   display_order: z.number().int().min(0).optional(),
@@ -79,6 +79,9 @@ export const pastQuestionSchema = z.object({
   course_title: z.string().min(1, "Course title is required"),
   year: z.string().min(1, "Year is required"),
   title: z.string().optional(),
+  description: z.string().optional(),
+  type: z.enum(["exam", "assignment"]).optional(),
+  exam_date: z.string().optional(),
   file_url: z.union([z.literal(''), z.string().url()]).optional(),
   created_at: z.string().optional()
 });
@@ -115,7 +118,7 @@ export const researchOpportunitySchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  sub_type: z.enum(["scholarships", "calls", "publications", "careers"]).default("scholarships"),
+  sub_type: z.enum(["scholarships", "calls", "publications", "careers"]).optional(),
   link_url: z.union([z.literal(''), z.string().url()]).optional(),
   deadline: z.string().optional()
 });
@@ -123,7 +126,7 @@ export const newsUpdateSchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string().min(1, "Title is required"),
   content: z.string().optional(),
-  category: z.enum(["news","articles","announcements","press"]).default("news"),
+  category: z.enum(["news","articles","announcements","press"]).optional(),
   slug: z.string().optional(),
   image_url: z.union([z.literal(''), z.string().url()]).optional(),
   published_at: z.string().optional(),

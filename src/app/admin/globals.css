@@ -1,0 +1,16 @@
+/* Global admin styles */
+
+@import url('https://fonts.googleapis.com/css2?family=Giga+Sans:wght@400;500;600;700&display=swap');
+
+html, body {
+  font-family: 'Giga Sans', sans-serif;
+  background-color: #f9fafb; /* light gray */
+  color: #1f2937; /* slate-800 */
+  margin: 0;
+  padding: 0;
+}
+
+/* Smooth transition for hover and interactions */
+* {
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}

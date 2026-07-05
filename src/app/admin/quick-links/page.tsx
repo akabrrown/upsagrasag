@@ -1,294 +1,136 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Pencil, Trash2, Plus, X, Search } from 'lucide-react';
+import React, { useState } from 'react';
+import useSWR from 'swr';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import CrudTable from '@/components/admin/CrudTable';
+import FormModal from '@/components/admin/FormModal';
+import { Plus } from 'lucide-react';
 
-type QuickLink = {
-  id: string;
-  title: string;
-  subtitle: string;
-  icon_name: string;
-  url: string;
-  display_order: number;
-};
+// Define schema for a quick link
+const quickLinkSchema = z.object({
+  id: z.string().uuid().optional(),
+  title: z.string().min(1, 'Title is required'),
+  url: z.string().url('Invalid URL').optional(),
+  description: z.string().optional()
+});
 
-export default function AdminQuickLinks() {
-  const [links, setLinks] = useState<QuickLink[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+type QuickLink = z.infer<typeof quickLinkSchema>;
+
+const fetcher = (url: string) => fetch(url).then(r => r.json());
+
+export default function AdminQuickLinksPage() {
+  const { data: records, error, isLoading, mutate } = useSWR<QuickLink[]>('/api/admin/quick-links', fetcher);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingLink, setEditingLink] = useState<QuickLink | null>(null);
-  const [formData, setFormData] = useState({
-    title: '',
-    subtitle: '',
-    icon_name: '',
-    url: '',
-    display_order: 0,
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<QuickLink>({
+    resolver: zodResolver(quickLinkSchema),
+    defaultValues: { title: '', url: '', description: '' }
   });
 
-  const fetchLinks = async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch('/api/quick-links');
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        setLinks(data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch links:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchLinks();
-  }, []);
-
-  const handleOpenModal = (link?: QuickLink) => {
-    if (link) {
-      setEditingLink(link);
-      setFormData({
-        title: link.title,
-        subtitle: link.subtitle || '',
-        icon_name: link.icon_name,
-        url: link.url,
-        display_order: link.display_order,
-      });
-    } else {
-      setEditingLink(null);
-      setFormData({
-        title: '',
-        subtitle: '',
-        icon_name: 'Link',
-        url: '#',
-        display_order: links.length > 0 ? Math.max(...links.map(l => l.display_order)) + 1 : 1,
-      });
-    }
+  const openCreate = () => {
+    reset({ title: '', url: '', description: '' });
+    setEditingId(null);
     setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingLink(null);
+  const openEdit = (item: QuickLink) => {
+    reset(item);
+    setEditingId(item.id!);
+    setIsModalOpen(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleDelete = async (item: QuickLink) => {
     try {
-      const method = editingLink ? 'PUT' : 'POST';
-      const body = editingLink ? { ...formData, id: editingLink.id } : formData;
+      const res = await fetch(`/api/admin/quick-links/${item.id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete');
+      mutate();
+    } catch (e:any) {
+      alert(e.message);
+    }
+  };
 
-      const res = await fetch('/api/quick-links', {
+  const onSubmit = async (data: QuickLink) => {
+    try {
+      const url = editingId ? `/api/admin/quick-links/${editingId}` : '/api/admin/quick-links';
+      const method = editingId ? 'PATCH' : 'POST';
+      const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify(data)
       });
-
-      if (res.ok) {
-        handleCloseModal();
-        fetchLinks();
-      } else {
-        alert('Failed to save link');
-      }
-    } catch (error) {
-      console.error('Error saving link:', error);
+      if (!res.ok) throw new Error('Failed to save');
+      setIsModalOpen(false);
+      mutate();
+    } catch (e:any) {
+      alert(e.message);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this link?')) {
-      try {
-        const res = await fetch(`/api/quick-links?id=${id}`, {
-          method: 'DELETE',
-        });
-        if (res.ok) {
-          fetchLinks();
-        } else {
-          alert('Failed to delete link');
-        }
-      } catch (error) {
-        console.error('Error deleting link:', error);
-      }
-    }
-  };
+  const columns = [
+    { header: 'Title', accessor: 'title' as keyof QuickLink },
+    { header: 'URL', accessor: (row: QuickLink) => row.url ? (
+        <a href={row.url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">{row.url}</a>
+      ) : '—' },
+    { header: 'Description', accessor: (row: QuickLink) => (
+        <span className="text-sm text-slate-500 line-clamp-2">{row.description}</span>
+      ) }
+  ];
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Homepage Quick Links</h1>
-          <p className="text-sm text-slate-500">Manage the quick action links displayed on the homepage.</p>
+          <h1 className="text-2xl font-bold text-slate-900">Quick Links</h1>
+          <p className="text-slate-500">Manage frequently used navigation shortcuts for admin users.</p>
         </div>
         <button
-          onClick={() => handleOpenModal()}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
+          onClick={openCreate}
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
         >
-          <Plus size={18} />
-          Add New Link
+          <Plus className="w-4 h-4" /> Add Link
         </button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-sm font-semibold text-slate-600">
-                <th className="p-4">Order</th>
-                <th className="p-4">Title</th>
-                <th className="p-4">Subtitle</th>
-                <th className="p-4">Icon Name</th>
-                <th className="p-4">URL Path</th>
-                <th className="p-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={6} className="p-8 text-center text-slate-500">
-                    Loading links...
-                  </td>
-                </tr>
-              ) : links.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="p-8 text-center text-slate-500">
-                    No links found. Add your first quick link.
-                  </td>
-                </tr>
-              ) : (
-                links.map((link) => (
-                  <tr key={link.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="p-4 text-slate-600 font-medium">{link.display_order}</td>
-                    <td className="p-4 font-semibold text-slate-800">{link.title}</td>
-                    <td className="p-4 text-slate-500 text-sm">{link.subtitle || '-'}</td>
-                    <td className="p-4 text-slate-500 text-sm">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 font-mono text-xs text-slate-600">
-                        {link.icon_name}
-                      </span>
-                    </td>
-                    <td className="p-4 text-slate-500 text-sm font-mono truncate max-w-[200px]">{link.url}</td>
-                    <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => handleOpenModal(link)}
-                          className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                          title="Edit"
-                        >
-                          <Pencil size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(link.id)}
-                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <CrudTable
+        data={records || []}
+        columns={columns}
+        isLoading={isLoading}
+        onEdit={openEdit}
+        onDelete={handleDelete}
+      />
 
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg my-8 relative flex flex-col max-h-[90vh]">
-            <div className="p-6 border-b border-slate-100 flex justify-between items-center shrink-0">
-              <h2 className="text-xl font-bold text-slate-800">
-                {editingLink ? 'Edit Link' : 'Add New Link'}
-              </h2>
-              <button
-                onClick={handleCloseModal}
-                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            
-            <div className="p-6 overflow-y-auto custom-scrollbar">
-              <form id="link-form" onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Title *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g. Volunteer with Us"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Subtitle (Optional)</label>
-                  <input
-                    type="text"
-                    value={formData.subtitle}
-                    onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g. Report A Case"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Icon Name *</label>
-                  <p className="text-xs text-slate-500 mb-2">Use a valid <a href="https://lucide.dev/icons" target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">Lucide React</a> icon name (e.g. Heart, Briefcase, FileText).</p>
-                  <input
-                    type="text"
-                    required
-                    value={formData.icon_name}
-                    onChange={(e) => setFormData({ ...formData, icon_name: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Target URL *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.url}
-                    onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="/volunteer"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Display Order</label>
-                  <input
-                    type="number"
-                    required
-                    min="0"
-                    value={formData.display_order}
-                    onChange={(e) => setFormData({ ...formData, display_order: parseInt(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </form>
-            </div>
-            
-            <div className="p-6 border-t border-slate-100 flex justify-end gap-3 shrink-0">
-              <button
-                type="button"
-                onClick={handleCloseModal}
-                className="px-4 py-2 font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                form="link-form"
-                className="px-4 py-2 font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
-              >
-                Save Link
-              </button>
-            </div>
+      <FormModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={editingId ? 'Edit Link' : 'Add Quick Link'}
+      >
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Title</label>
+            <input {...register('title')} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            {errors.title && <p className="text-sm text-red-600 mt-1">{errors.title.message as string}</p>}
           </div>
-        </div>
-      )}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">URL (Optional)</label>
+            <input {...register('url')} placeholder="https://..." className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            {errors.url && <p className="text-sm text-red-600 mt-1">{errors.url.message as string}</p>}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Description (Optional)</label>
+            <textarea {...register('description')} rows={2} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div className="pt-4 flex justify-end gap-3">
+            <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-md transition-colors">Cancel</button>
+            <button type="submit" disabled={isSubmitting} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50">
+              {isSubmitting ? 'Saving...' : 'Save'}
+            </button>
+          </div>
+        </form>
+      </FormModal>
     </div>
   );
 }

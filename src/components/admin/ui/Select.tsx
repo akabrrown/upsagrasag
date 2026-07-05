@@ -8,7 +8,7 @@ type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
 const Select: React.FC<SelectProps> = ({ className = '', options, ...rest }) => {
   return (
     <select
-      className={`w-full px-3 py-2 border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-primary/50 ${className}`}
+      className={`w-full px-3 py-2 border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors transform hover:shadow-sm ${className}`}
       {...rest}
     >
       {options.map((opt) => (

@@ -11,8 +11,11 @@ module.exports = {
     extend: {
       colors: {
         primary: '#004080', // UPSA primary blue
+        'primary-foreground': '#ffffff', // contrast foreground for primary
         secondary: '#FFB800', // UPSA gold
+        'secondary-foreground': '#1a1a1a', // dark text on gold for readability
         accent: '#B8860B', // UPSA gold
+        'accent-foreground': '#1a1a1a',
         body: '#333333', // Dark gray for body text
         border: '#C8C8C8', // Light gray for UI borders
         muted: '#6B7280', // Tailwind gray-500 for secondary text
@@ -24,6 +27,15 @@ module.exports = {
           lightGold: '#F5E6B3', // Light gold
         },
         neutral: {
+          100: '#F5F5F5',
+          200: '#E5E5E5',
+          300: '#D4D4D4',
+          400: '#A3A3A3',
+          500: '#737373',
+          600: '#525252',
+          700: '#404040',
+          800: '#262626',
+          900: '#171717',
           100: '#F5F5F5',
           200: '#E5E5E5',
           300: '#D4D4D4',
