@@ -182,7 +182,7 @@ export default function AdminResearchOpportunitiesPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-start gap-4">
                         <div className="w-10 h-10 rounded-lg bg-gray-50 border border-gray-200 overflow-hidden flex-shrink-0 flex items-center justify-center mt-1">
-                          {getTypeIcon(record.sub_type)}
+                          {getTypeIcon(record.sub_type ?? '')}
                         </div>
                         <div>
                           <p className="font-semibold text-gray-900 line-clamp-1">{record.title}</p>
@@ -191,8 +191,8 @@ export default function AdminResearchOpportunitiesPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium border capitalize ${getTypeStyle(record.sub_type)}`}>
-                        {record.sub_type.replace('_', ' ')}
+                      <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium border capitalize ${getTypeStyle(record.sub_type ?? '')}`}>
+                        {(record.sub_type ?? '').replace('_', ' ')}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -343,11 +343,11 @@ export default function AdminResearchOpportunitiesPage() {
         <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-gray-100">
            <div className="flex items-start gap-4 mb-6">
              <div className="w-14 h-14 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0">
-               {getTypeIcon(selectedRecord.sub_type)}
+               {getTypeIcon(selectedRecord.sub_type ?? '')}
              </div>
              <div>
-               <span className={`inline-block px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider mb-2 border ${getTypeStyle(selectedRecord.sub_type)}`}>
-                 {selectedRecord.sub_type.replace('_', ' ')}
+               <span className={`inline-block px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider mb-2 border ${getTypeStyle(selectedRecord.sub_type ?? '')}`}>
+                 {(selectedRecord.sub_type ?? '').replace('_', ' ')}
                </span>
                <h2 className="text-2xl font-bold text-gray-900 leading-tight">{selectedRecord.title}</h2>
              </div>
