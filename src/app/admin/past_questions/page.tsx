@@ -150,7 +150,7 @@ export default function AdminPastQuestionsPage() {
                       ) : <span className="text-xs text-gray-400">—</span>}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center justify-end gap-1">
                         <button onClick={() => handleOpenDetails(rec)} className="p-2 text-gray-400 hover:text-[#2563eb] hover:bg-blue-50 rounded-lg" title="Details"><Eye className="w-4 h-4" /></button>
                         <button onClick={() => handleOpenEdit(rec)} className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg" title="Edit"><Pencil className="w-4 h-4" /></button>
                         <button onClick={() => handleDelete(rec)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg" title="Delete"><Trash2 className="w-4 h-4" /></button>

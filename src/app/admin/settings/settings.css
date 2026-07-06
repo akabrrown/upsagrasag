@@ -1,0 +1,36 @@
+/* src/app/admin/settings/settings.css */
+
+/* Fade‑in animation for tab content */
+.settings-content {
+  animation: fadeIn 0.3s ease forwards;
+  opacity: 0;
+}
+
+/* Enhanced input styling */
+.settings-content input,
+.settings-content select,
+.settings-content textarea {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.settings-content input:focus,
+.settings-content select:focus,
+.settings-content textarea:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.1);
+}
+
+/* Button enhancements */
+.settings-content button {
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.settings-content button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}

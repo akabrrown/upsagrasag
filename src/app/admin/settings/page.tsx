@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { platformSettingsSchema, PlatformSettings } from '@/types/admin';
 import { Save, ShieldAlert, CheckCircle2, Globe, Settings as SettingsIcon, Lock, KeyRound, Construction, ChevronRight } from 'lucide-react';
 import { supabaseClient } from '@/lib/supabaseClient';
+import './settings.css';
 import { cn } from '@/lib/utils';
 
 const fetcher = (url: string) => fetch(url, { credentials: 'include' }).then(r => r.json());
