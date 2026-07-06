@@ -85,7 +85,7 @@ export default function ContactPage() {
         {/* Map */}
         <div className="w-full h-[400px] rounded-3xl overflow-hidden shadow-lg border border-neutral-100 relative z-10">
           <iframe
-            src="https://maps.google.com/maps?q=MR7M+32V,+Unnamed+Road,+Madina&hl=en&z=15&output=embed"
+            src="https://maps.google.com/maps?q=5.662664029029041,-0.16745846343664164&hl=en&z=15&output=embed"
             width="100%"
             height="100%"
             style={{ border: 0 }}
