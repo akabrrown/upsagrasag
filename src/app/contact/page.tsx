@@ -54,7 +54,7 @@ export default function ContactPage() {
 
   const contactInfo = [
     {
-      title: 'Head Quarter',
+      title: 'Office Location',
       details: 'University of Professional Studies Accra, First floor on the student centre',
       icon: MapPin,
       href: '#',
@@ -81,7 +81,7 @@ export default function ContactPage() {
           Stay Tuned
         </span>
         <h1 className="text-4xl font-extrabold text-primary sm:text-5xl leading-tight">
-          Lets <span className="text-accent">Meet</span> With Us
+          Connect With Us
         </h1>
         <p className="text-sm text-neutral-500 max-w-2xl mx-auto pb-8 pt-4">
           Have queries about membership registration, thesis support, welfare packages, or partnership opportunities? Reach out using the contact details or form below.
@@ -90,7 +90,7 @@ export default function ContactPage() {
         {/* Map */}
         <div className="w-full h-[400px] rounded-3xl overflow-hidden shadow-lg border border-neutral-100 relative z-10">
           <iframe
-            src="https://maps.google.com/maps?q=5.6626696586617795, -0.16745413348149168&hl=en&z=15&output=embed"
+            src="https://maps.google.com/maps?q=5.6626696586617795,-0.16745413348149168&hl=en&z=15&output=embed"
             width="100%"
             height="100%"
             style={{ border: 0 }}
