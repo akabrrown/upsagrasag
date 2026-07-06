@@ -2,12 +2,12 @@
 import { useEffect, useRef } from 'react';
 
 type InfiniteScrollWrapperProps = {
-  loadMore: () => void;
-  hasMore: boolean;
+  loadMore?: () => void;
+  hasMore?: boolean;
   children: React.ReactNode;
 };
 
-export default function InfiniteScrollWrapper({ loadMore, hasMore, children }: InfiniteScrollWrapperProps) {
+export default function InfiniteScrollWrapper({ loadMore = () => {}, hasMore = false, children }: InfiniteScrollWrapperProps) {
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
