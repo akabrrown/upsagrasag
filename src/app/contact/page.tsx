@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Mail, Phone, MapPin, Loader2 } from 'lucide-react';
+import { Mail, Phone, MapPin, Loader2, MessageSquare } from 'lucide-react';
 
 export default function ContactPage() {
   const [firstName, setFirstName] = useState('');
@@ -74,23 +74,18 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 space-y-20 bg-background text-foreground">
-      {/* Top Section */}
-      <div className="text-center max-w-4xl mx-auto space-y-4 pt-8">
-        <span className="text-accent font-medium tracking-wide text-sm uppercase">
-          Stay Tuned
-        </span>
-        <h1 className="text-4xl font-extrabold text-primary sm:text-5xl leading-tight">
-          Connect With Us
-        </h1>
+    <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 space-y-12 bg-background text-foreground">
+      {/* Top Header */}
+      <div className="text-center max-w-3xl mx-auto space-y-4">
+        <span className="badge-accent">STAY TUNED</span>
+        <h1 className="text-4xl font-extrabold text-primary sm:text-5xl leading-tight">Connect With Us</h1>
         <p className="text-sm text-neutral-500 max-w-2xl mx-auto pb-8 pt-4">
           Have queries about membership registration, thesis support, welfare packages, or partnership opportunities? Reach out using the contact details or form below.
         </p>
-
         {/* Map */}
         <div className="w-full h-[400px] rounded-3xl overflow-hidden shadow-lg border border-neutral-100 relative z-10">
           <iframe
-            src="https://maps.google.com/maps?q=5.6626696586617795,-0.16745413348149168&hl=en&z=15&output=embed"
+            src="https://maps.google.com/maps?q=MR7M+32V,+Unnamed+Road,+Madina&hl=en&z=15&output=embed"
             width="100%"
             height="100%"
             style={{ border: 0 }}
@@ -105,43 +100,28 @@ export default function ContactPage() {
         {/* Left Column: Contact Details */}
         <div className="lg:col-span-5 space-y-8">
           <div className="space-y-2">
-            <span className="text-accent font-medium tracking-wide text-sm uppercase">
-              Keep Connected
-            </span>
-            <h2 className="text-3xl font-extrabold text-primary">
-              Stay <span className="text-accent">In Touch</span> With Us
-            </h2>
+            <span className="text-accent font-medium tracking-wide text-sm uppercase">Keep Connected</span>
+            <h2 className="text-3xl font-extrabold text-primary">Stay <span className="text-accent">In Touch</span> With Us</h2>
             <p className="text-sm text-neutral-500 pt-2 pb-6 leading-relaxed">
               We are here to assist you with any inquiries or support you may need during your time at UPSA.
             </p>
           </div>
-
           <div className="space-y-4">
             {contactInfo.map((info) => {
               const Icon = info.icon;
               return (
-                <div
-                  key={info.title}
-                  className="flex items-center gap-6 p-6 rounded-2xl bg-neutral-50 border border-neutral-100 transition-all hover:shadow-md"
-                >
+                <div key={info.title} className="flex items-center gap-6 p-6 rounded-2xl bg-neutral-50 border border-neutral-100 transition-all hover:shadow-md">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
                     <Icon className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-primary text-base">
-                      {info.title}
-                    </h3>
+                    <h3 className="font-bold text-primary text-base">{info.title}</h3>
                     {info.href ? (
-                      <a
-                        href={info.href}
-                        className="mt-1 block text-sm text-neutral-500 hover:text-primary leading-relaxed transition-colors"
-                      >
+                      <a href={info.href} className="mt-1 block text-sm text-neutral-500 hover:text-primary leading-relaxed transition-colors">
                         {info.details}
                       </a>
                     ) : (
-                      <p className="mt-1 text-sm text-neutral-500 leading-relaxed">
-                        {info.details}
-                      </p>
+                      <p className="mt-1 text-sm text-neutral-500 leading-relaxed">{info.details}</p>
                     )}
                   </div>
                 </div>
@@ -155,34 +135,25 @@ export default function ContactPage() {
           <div className="bg-white rounded-3xl p-8 lg:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100 relative overflow-hidden h-full">
             {/* Decorative icon top right */}
             <div className="absolute top-6 right-6 opacity-20 hidden sm:block">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z" /><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1" /></svg>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z" /><path d="M18 9h2a2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1" /></svg>
             </div>
-
-            <h2 className="text-2xl font-bold text-primary mb-2">
-              Leave a Message For Us
+            <h2 className="text-xl font-bold text-accent flex items-center gap-2 mb-6">
+              <MessageSquare className="h-5 w-5 text-accent" /> Send an Email Message
             </h2>
-            <p className="text-sm text-neutral-500 mb-8">
-              Fill out the form below and we will get back to you as soon as possible.
-            </p>
-
+            <h2 className="text-2xl font-bold text-primary mb-2">Leave a Message For Us</h2>
+            <p className="text-sm text-neutral-500 mb-8">Fill out the form below and we will get back to you as soon as possible.</p>
             <form onSubmit={handleSubmit} className="space-y-6">
               {errorMsg && (
-                <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 text-xs font-medium text-rose-600">
-                  {errorMsg}
-                </div>
+                <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 text-xs font-medium text-rose-600">{errorMsg}</div>
               )}
               {successMsg && (
-                <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-4 text-xs font-medium text-emerald-600">
-                  {successMsg}
-                </div>
+                <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-4 text-xs font-medium text-emerald-600">{successMsg}</div>
               )}
 
               {/* Name Group */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-semibold text-primary">
-                    First Name
-                  </label>
+                  <label className="text-xs font-semibold text-primary">First Name</label>
                   <input
                     type="text"
                     placeholder="Firstname"
@@ -193,9 +164,7 @@ export default function ContactPage() {
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-semibold text-primary">
-                    Last Name
-                  </label>
+                  <label className="text-xs font-semibold text-primary">Last Name</label>
                   <input
                     type="text"
                     placeholder="Lastname"
@@ -210,9 +179,7 @@ export default function ContactPage() {
               {/* Email & Subject Group */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-semibold text-primary">
-                    Email
-                  </label>
+                  <label className="text-xs font-semibold text-primary">Email</label>
                   <input
                     type="email"
                     placeholder="Email address"
@@ -223,9 +190,7 @@ export default function ContactPage() {
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-semibold text-primary">
-                    Subject
-                  </label>
+                  <label className="text-xs font-semibold text-primary">Subject</label>
                   <input
                     type="text"
                     placeholder="Subject"
@@ -239,9 +204,7 @@ export default function ContactPage() {
 
               {/* Message */}
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-semibold text-primary">
-                  Message
-                </label>
+                <label className="text-xs font-semibold text-primary">Message</label>
                 <textarea
                   placeholder="Your message here..."
                   rows={5}
