@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Mail, Phone, MapPin, Clock, Send, Loader2, MessageSquare, ShieldCheck } from 'lucide-react';
+import { Mail, Phone, MapPin, Loader2 } from 'lucide-react';
 
 export default function ContactPage() {
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
@@ -14,7 +15,7 @@ export default function ContactPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !email || !subject || !message) {
+    if (!firstName || !lastName || !email || !subject || !message) {
       setErrorMsg('All fields are required.');
       return;
     }
@@ -29,7 +30,7 @@ export default function ContactPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email, subject, message }),
+        body: JSON.stringify({ name: `${firstName} ${lastName}`, email, subject, message }),
       });
 
       const data = await res.json();
@@ -39,7 +40,8 @@ export default function ContactPage() {
       }
 
       setSuccessMsg('Your message has been sent successfully! We will get back to you shortly.');
-      setName('');
+      setFirstName('');
+      setLastName('');
       setEmail('');
       setSubject('');
       setMessage('');
@@ -51,7 +53,12 @@ export default function ContactPage() {
   };
 
   const contactInfo = [
-
+    {
+      title: 'Head Quarter',
+      details: 'University of Professional Studies Accra, First floor on the student centre',
+      icon: MapPin,
+      href: '#',
+    },
     {
       title: 'Email Address',
       details: 'grasagpresident@upsamail.edu.gh',
@@ -59,61 +66,80 @@ export default function ContactPage() {
       href: 'mailto:grasagpresident@upsamail.edu.gh',
     },
     {
-      title: 'Phone Contact',
+      title: 'Telephone',
       details: '+233 (0) 55 860 1545',
       icon: Phone,
       href: 'tel:+233558601545',
     },
-    {
-      title: 'Location',
-      details: 'University of Professional Studies Accra, First floor on the student centre',
-      icon: MapPin,
-      href: '#',
-    },
   ];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 space-y-12 bg-background text-foreground">
-      {/* Top Header */}
-      <div className="text-center max-w-3xl mx-auto space-y-4">
-        <span className="badge-accent">
-          Get in Touch
+    <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 space-y-20 bg-background text-foreground">
+      {/* Top Section */}
+      <div className="text-center max-w-4xl mx-auto space-y-4 pt-8">
+        <span className="text-accent font-medium tracking-wide text-sm uppercase">
+          Stay Tuned
         </span>
         <h1 className="text-4xl font-extrabold text-primary sm:text-5xl leading-tight">
-          Contact the Executive Cabinet
+          Lets <span className="text-accent">Meet</span> With Us
         </h1>
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-neutral-500 max-w-2xl mx-auto pb-8 pt-4">
           Have queries about membership registration, thesis support, welfare packages, or partnership opportunities? Reach out using the contact details or form below.
         </p>
+
+        {/* Map */}
+        <div className="w-full h-[400px] rounded-3xl overflow-hidden shadow-lg border border-neutral-100 relative z-10">
+          <iframe
+            src="https://maps.google.com/maps?q=5.6626696586617795, -0.16745413348149168&hl=en&z=15&output=embed"
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            allowFullScreen={true}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-        {/* Left Column: Contact Cards */}
-        <div className="lg:col-span-5 space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pt-8">
+        {/* Left Column: Contact Details */}
+        <div className="lg:col-span-5 space-y-8">
+          <div className="space-y-2">
+            <span className="text-accent font-medium tracking-wide text-sm uppercase">
+              Keep Connected
+            </span>
+            <h2 className="text-3xl font-extrabold text-primary">
+              Stay <span className="text-accent">In Touch</span> With Us
+            </h2>
+            <p className="text-sm text-neutral-500 pt-2 pb-6 leading-relaxed">
+              We are here to assist you with any inquiries or support you may need during your time at UPSA.
+            </p>
+          </div>
+
+          <div className="space-y-4">
             {contactInfo.map((info) => {
               const Icon = info.icon;
               return (
                 <div
                   key={info.title}
-                  className="upsa-blue-card flex gap-4"
+                  className="flex items-center gap-6 p-6 rounded-2xl bg-neutral-50 border border-neutral-100 transition-all hover:shadow-md"
                 >
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <Icon className="h-6 w-6 text-accent" />
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
+                    <Icon className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-accent text-base">
+                    <h3 className="font-bold text-primary text-base">
                       {info.title}
                     </h3>
                     {info.href ? (
                       <a
                         href={info.href}
-                        className="mt-1 block text-sm text-accent hover:text-accent/80 leading-relaxed transition-colors"
+                        className="mt-1 block text-sm text-neutral-500 hover:text-primary leading-relaxed transition-colors"
                       >
                         {info.details}
                       </a>
                     ) : (
-                      <p className="mt-1 text-sm text-accent leading-relaxed">
+                      <p className="mt-1 text-sm text-neutral-500 leading-relaxed">
                         {info.details}
                       </p>
                     )}
@@ -122,26 +148,24 @@ export default function ContactPage() {
               );
             })}
           </div>
-
-          {/* Guidelines Box */}
-          <div className="rounded-2xl border border-accent/20 bg-accent/5 p-6 space-y-3">
-            <h3 className="font-bold text-sm text-accent flex items-center gap-2">
-              <ShieldCheck className="h-4.5 w-4.5" /> Advocacy & Welfare support
-            </h3>
-            <p className="text-xs text-neutral-600 leading-relaxed">
-              If your request concerns an academic grievance, hostel dispute, or emergency loan allocation, you can submit an official request. Our executive cabinet prioritizes welfare requests within 24 hours.
-            </p>
-          </div>
         </div>
 
         {/* Right Column: Contact Form */}
         <div className="lg:col-span-7">
-              <div className="upsa-blue-card p-8">
-            <h2 className="text-xl font-bold text-accent flex items-center gap-2 mb-6">
-              <MessageSquare className="h-5 w-5 text-accent" /> Send an Email Message
-            </h2>
+          <div className="bg-white rounded-3xl p-8 lg:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100 relative overflow-hidden h-full">
+            {/* Decorative icon top right */}
+            <div className="absolute top-6 right-6 opacity-20 hidden sm:block">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z" /><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1" /></svg>
+            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <h2 className="text-2xl font-bold text-primary mb-2">
+              Leave a Message For Us
+            </h2>
+            <p className="text-sm text-neutral-500 mb-8">
+              Fill out the form below and we will get back to you as soon as possible.
+            </p>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
               {errorMsg && (
                 <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 text-xs font-medium text-rose-600">
                   {errorMsg}
@@ -153,63 +177,78 @@ export default function ContactPage() {
                 </div>
               )}
 
-              {/* Name & Email Group */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Name Group */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-accent">
-                    Full Name <span className="text-rose-500">*</span>
+                  <label className="text-xs font-semibold text-primary">
+                    First Name
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. John Mahama"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Firstname"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
                     required
-                    className="form-input"
+                    className="w-full rounded-xl border border-neutral-200 px-4 py-3 text-sm focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all bg-neutral-50/50"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-accent">
-                    Email Address <span className="text-rose-500">*</span>
+                  <label className="text-xs font-semibold text-primary">
+                    Last Name
                   </label>
                   <input
-                    type="email"
-                    placeholder="e.g. student@gmail.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    type="text"
+                    placeholder="Lastname"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
                     required
-                    className="form-input"
+                    className="w-full rounded-xl border border-neutral-200 px-4 py-3 text-sm focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all bg-neutral-50/50"
                   />
                 </div>
               </div>
 
-              {/* Subject */}
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-accent">
-                  Subject / Topic <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Welfare Loan Request Inquiry"
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  required
-                  className="form-input"
+              {/* Email & Subject Group */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-primary">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="Email address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="w-full rounded-xl border border-neutral-200 px-4 py-3 text-sm focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all bg-neutral-50/50"
                   />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-primary">
+                    Subject
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Subject"
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    required
+                    className="w-full rounded-xl border border-neutral-200 px-4 py-3 text-sm focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all bg-neutral-50/50"
+                  />
+                </div>
               </div>
 
               {/* Message */}
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-accent">
-                  Message Details <span className="text-rose-500">*</span>
+                <label className="text-xs font-semibold text-primary">
+                  Message
                 </label>
                 <textarea
-                  placeholder="Write your detailed query or feedback here..."
+                  placeholder="Your message here..."
                   rows={5}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   required
-                  className="form-input"
+                  className="w-full rounded-xl border border-neutral-200 px-4 py-3 text-sm focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all bg-neutral-50/50 resize-y"
                 />
               </div>
 
@@ -217,16 +256,14 @@ export default function ContactPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="btn-accent w-full text-sm"
+                className="w-full rounded-xl bg-accent px-8 py-4 text-sm font-semibold text-accent-foreground hover:bg-accent/90 transition-colors flex items-center justify-center gap-2 shadow-sm mt-4"
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" /> Sending Message...
+                    <Loader2 className="h-4 w-4 animate-spin" /> Sending...
                   </>
                 ) : (
-                  <>
-                    Send Message <Send className="h-3.5 w-3.5" />
-                  </>
+                  'Send Message'
                 )}
               </button>
             </form>
