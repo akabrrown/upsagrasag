@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     }
 
     const groqApiKey = process.env.GROQ_API_KEY;
-    const model = process.env.GROQ_MODEL || 'mixtral-8x7b-32768';
+    const model = process.env.GROQ_MODEL || 'llama3-70b-8192';
 
     // Get the latest user message for similarity search
     const userMessages = messages.filter((m: any) => m.role === 'user');
