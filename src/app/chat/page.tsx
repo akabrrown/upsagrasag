@@ -19,7 +19,7 @@ export default function ChatPage() {
     {
       id: 'welcome',
       role: 'assistant',
-      content: "👋 Hello! I'm Smart UPSA, your virtual assistant. I can help with admissions, programs, student life, and more at the University of Professional Studies, Accra. How can I assist you today?",
+      content: "👋 Hello! I'm your virtual assistant. I can help with admissions, programs, student life, and more at the University of Professional Studies, Accra. How can I assist you today?",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -150,7 +150,7 @@ export default function ChatPage() {
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#004080] text-[#FDB913]">
               <Sparkles className="h-4 w-4" />
             </div>
-            <h2 className="font-bold text-[#004080] text-lg tracking-tight">Smart UPSA</h2>
+            <h2 className="font-bold text-[#004080] text-lg tracking-tight">AI Assistant</h2>
           </div>
           <div className="flex items-center gap-2 bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-full text-xs font-semibold border border-emerald-100 shadow-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -225,7 +225,7 @@ export default function ChatPage() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Message Smart UPSA..."
+              placeholder="Type your message..."
               disabled={isLoading}
               className="w-full bg-transparent px-4 py-3.5 text-[15px] focus:outline-none disabled:opacity-50 text-gray-900 placeholder:text-gray-400"
             />

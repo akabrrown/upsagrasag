@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
       });
 
       const filteredMessages = cleanMessages.filter((m: any) => 
-        m.content !== "Hello! I am your GRASAG-UPSA AI Assistant. Ask me anything about postgraduate programmes, welfare packages, past questions, registration, or campus events." && 
+        m.content !== "👋 Hello! I'm your virtual assistant. I can help with admissions, programs, student life, and more at the University of Professional Studies, Accra. How can I assist you today?" && 
         m.content.indexOf("Smart UPSA") === -1
       );
 
@@ -144,7 +144,7 @@ export async function POST(req: NextRequest) {
         model,
         messages: [
           { role: 'system', content: systemContent },
-          ...cleanMessages.filter((m: any) => m.content !== "Hello! I am your GRASAG-UPSA AI Assistant. Ask me anything about postgraduate programmes, welfare packages, past questions, registration, or campus events." && m.content.indexOf("Smart UPSA") === -1)
+          ...cleanMessages.filter((m: any) => m.content !== "👋 Hello! I'm your virtual assistant. I can help with admissions, programs, student life, and more at the University of Professional Studies, Accra. How can I assist you today?" && m.content.indexOf("Smart UPSA") === -1)
         ],
         stream: true,
       }),
