@@ -18,10 +18,17 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
   // Initial load
   useEffect(() => {
     const fetchUsers = async () => {
-      const { data, error } = await supabaseClient
-        .from('admin_users')
-        .select('*');
-      if (!error && data) setAdminUsers(data as AdminUser[]);
+      try {
+        const response = await fetch('/api/admin/users');
+        if (response.ok) {
+          const data = await response.json();
+          setAdminUsers(data as AdminUser[]);
+        } else {
+          console.error('Failed to fetch admin users');
+        }
+      } catch (err) {
+        console.error('Error fetching admin users:', err);
+      }
     };
     fetchUsers();
   }, []);
@@ -34,7 +41,12 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
         const newRecord = payload.new as AdminUser;
         const oldRecord = payload.old as AdminUser;
         if (payload.eventType === 'INSERT') {
-          setAdminUsers(prev => [...prev, newRecord]);
+          setAdminUsers(prev => {
+            if (prev.some(u => u.id === newRecord.id)) return prev;
+            // Note: Real-time records won't have the 'email' field fetched from auth.users,
+            // but the page handles missing email gracefully now, or it will be populated on next full reload.
+            return [...prev, newRecord];
+          });
         } else if (payload.eventType === 'UPDATE') {
           setAdminUsers(prev => prev.map(u => (u.id === newRecord.id ? newRecord : u)));
         } else if (payload.eventType === 'DELETE') {
