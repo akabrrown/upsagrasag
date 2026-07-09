@@ -67,7 +67,24 @@ export async function POST(req: NextRequest) {
 
     if (useGemini) {
       if (!process.env.GEMINI_API_KEY) {
-        return NextResponse.json({ error: 'Gemini API key is not configured' }, { status: 500 });
+        // Return a readable error directly in the chat UI
+        const errorMessage = "⚠️ **System Error**: I cannot connect to my brain. The `GEMINI_API_KEY` environment variable is missing from your Vercel project settings.\n\nPlease go to your Vercel Dashboard -> Project Settings -> Environment Variables, add your `GEMINI_API_KEY`, and redeploy.";
+        
+        const encoder = new TextEncoder();
+        const customStream = new ReadableStream({
+          start(controller) {
+            controller.enqueue(encoder.encode(errorMessage));
+            controller.close();
+          }
+        });
+        
+        return new Response(customStream, {
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            'Cache-Control': 'no-cache, no-transform',
+            'Connection': 'keep-alive',
+          },
+        });
       }
       const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
       const geminiModel = genAI.getGenerativeModel({
@@ -136,7 +153,23 @@ export async function POST(req: NextRequest) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Groq API Error:', response.status, errorText);
-      return NextResponse.json({ error: `Groq service error: ${errorText}` }, { status: response.status });
+      
+      const errorMessage = `⚠️ **System Error**: Groq service error - ${response.status}\n\n${errorText}`;
+      const encoder = new TextEncoder();
+      const customStream = new ReadableStream({
+        start(controller) {
+          controller.enqueue(encoder.encode(errorMessage));
+          controller.close();
+        }
+      });
+      
+      return new Response(customStream, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'no-cache, no-transform',
+          'Connection': 'keep-alive',
+        },
+      });
     }
 
     // Set up a ReadableStream to stream the response back to the client
@@ -195,6 +228,23 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: any) {
     console.error('Chat API Error:', error);
-    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
+    
+    // Instead of throwing 500, stream the error back so the user sees what went wrong in the chat window.
+    const errorMessage = `⚠️ **System Error**: ${error.message || 'Internal server error'}\n\nIf you are on Vercel, check your deployment logs or Environment Variables.`;
+    const encoder = new TextEncoder();
+    const customStream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode(errorMessage));
+        controller.close();
+      }
+    });
+    
+    return new Response(customStream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'no-cache, no-transform',
+        'Connection': 'keep-alive',
+      },
+    });
   }
 }
