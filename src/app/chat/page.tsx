@@ -142,7 +142,7 @@ export default function ChatPage() {
   }, [messages]);
 
   return (
-    <div className="flex-1 flex flex-col bg-white h-full w-full items-center">
+    <div className="flex-1 flex flex-col bg-white h-full w-full items-center overflow-x-hidden">
       {/* Header */}
       <div className="w-full border-b border-gray-100 bg-white/80 backdrop-blur-md px-5 py-4 shrink-0 flex justify-center z-10 sticky top-0">
         <div className="w-full max-w-3xl flex items-center justify-between">
@@ -160,7 +160,7 @@ export default function ChatPage() {
       </div>
 
       {/* Messages Body */}
-      <div className="w-full flex-1 overflow-y-auto bg-white flex justify-center scroll-smooth">
+      <div className="w-full flex-1 overflow-y-auto overflow-x-hidden bg-white flex justify-center scroll-smooth">
         <div className="w-full max-w-3xl px-4 py-8 space-y-8 flex flex-col">
           <AnimatePresence initial={false}>
           {messages.map((message) => {
@@ -179,14 +179,14 @@ export default function ChatPage() {
                 </div>
 
                 {/* Bubble */}
-                <div className={`flex flex-col gap-1 max-w-full ${isAI ? 'items-start' : 'items-end'}`}>
+                <div className={`flex flex-col gap-1 max-w-full min-w-0 ${isAI ? 'items-start' : 'items-end'}`}>
                   <div className={`px-5 py-3.5 text-[15px] leading-relaxed shadow-sm ${
                     isAI 
                       ? 'bg-white border border-gray-100 text-gray-800 rounded-2xl rounded-tl-sm' 
                       : 'bg-[#f3f4f6] text-gray-800 rounded-2xl rounded-tr-sm font-medium'
                   }`}>
                     {message.content ? (
-                      <div className={`[&>*:last-child]:mb-0 [&_p]:mb-3 [&_ul]:list-disc [&_ul]:ml-5 [&_ul]:mb-3 [&_ol]:list-decimal [&_ol]:ml-5 [&_ol]:mb-3 [&_li]:mb-1 [&_strong]:font-bold [&_a]:underline [&_a]:text-[#004080] [&_h1]:text-lg [&_h1]:font-bold [&_h1]:mb-2 [&_h2]:text-base [&_h2]:font-bold [&_h2]:mb-2 [&_h3]:font-semibold [&_h3]:mb-1 break-words`}>
+                      <div className={`[&>*:last-child]:mb-0 [&_p]:mb-3 [&_ul]:list-disc [&_ul]:ml-5 [&_ul]:mb-3 [&_ol]:list-decimal [&_ol]:ml-5 [&_ol]:mb-3 [&_li]:mb-1 [&_strong]:font-bold [&_a]:underline [&_a]:text-[#004080] [&_a]:break-all [&_h1]:text-lg [&_h1]:font-bold [&_h1]:mb-2 [&_h2]:text-base [&_h2]:font-bold [&_h2]:mb-2 [&_h3]:font-semibold [&_h3]:mb-1 [&_pre]:overflow-x-auto [&_pre]:bg-gray-50 [&_pre]:p-3 [&_pre]:rounded-lg [&_pre]:max-w-full break-words`}>
                         <ReactMarkdown>{message.content}</ReactMarkdown>
                       </div>
                     ) : (
