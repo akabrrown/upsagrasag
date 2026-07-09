@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, Loader2 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   id: string;
@@ -169,7 +170,11 @@ export default function ChatPage() {
               )}
               <div className={`flex flex-col gap-1 max-w-full ${isAI ? 'items-start' : 'items-end'}`}>
                 <div className={`rounded-2xl px-4 py-3 text-[15px] leading-relaxed shadow-sm ${isAI ? 'bg-[#0a1f44] text-[#FDB913] rounded-tl-sm' : 'bg-[#FDB913] text-[#0a1f44] rounded-tr-sm font-medium'}`}>
-                  {message.content || (
+                  {message.content ? (
+                    <div className="[&>*:last-child]:mb-0 [&_p]:mb-3 [&_ul]:list-disc [&_ul]:ml-5 [&_ul]:mb-3 [&_ol]:list-decimal [&_ol]:ml-5 [&_ol]:mb-3 [&_li]:mb-1 [&_strong]:font-bold [&_a]:underline [&_h1]:text-lg [&_h1]:font-bold [&_h1]:mb-2 [&_h2]:text-base [&_h2]:font-bold [&_h2]:mb-2 [&_h3]:font-semibold [&_h3]:mb-1 break-words">
+                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                    </div>
+                  ) : (
                     <span className="flex gap-1 items-center py-1">
                       <span className="h-1.5 w-1.5 bg-gray-400 rounded-full animate-bounce"></span>
                       <span className="h-1.5 w-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
