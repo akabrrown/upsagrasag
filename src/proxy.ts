@@ -26,8 +26,11 @@ export async function proxy(request: NextRequest) {
   const { data: { session } } = await supabase.auth.getSession();
   const { pathname } = request.nextUrl;
 
-  // Authentication disabled for admin routes
-
+  if (pathname.startsWith('/admin') && !session) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/signin';
+    return NextResponse.redirect(url);
+  }
   return response;
 }
 
