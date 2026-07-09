@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
       systemContent += `\n\n--- CONTEXT FROM UPSA WEBSITE ---\n${contextText}\n----------------------------------`;
     }
 
-    const useGemini = !groqApiKey || groqApiKey === 'REDACTED';
+    const useGemini = false; // Switched to Groq per user request
 
     if (useGemini) {
       if (!process.env.GEMINI_API_KEY) {
@@ -125,6 +125,26 @@ export async function POST(req: NextRequest) {
         }
       });
 
+      return new Response(customStream, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'no-cache, no-transform',
+          'Connection': 'keep-alive',
+        },
+      });
+    }
+
+    if (!groqApiKey || groqApiKey === 'REDACTED') {
+      const errorMessage = "⚠️ **System Error**: I cannot connect to my brain. The `GROQ_API_KEY` environment variable is missing from your Vercel project settings.\n\nPlease go to your Vercel Dashboard -> Project Settings -> Environment Variables, add your `GROQ_API_KEY`, and redeploy.";
+      
+      const encoder = new TextEncoder();
+      const customStream = new ReadableStream({
+        start(controller) {
+          controller.enqueue(encoder.encode(errorMessage));
+          controller.close();
+        }
+      });
+      
       return new Response(customStream, {
         headers: {
           'Content-Type': 'text/plain; charset=utf-8',
