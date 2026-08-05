@@ -66,7 +66,7 @@ export default function AdminUsersPage() {
 
   const tabs = ['All Users', 'Administrators', 'Editors'];
   
-  const filteredRecords = (adminUsers || []).filter(r => {
+  const filteredRecords = (Array.isArray(adminUsers) ? adminUsers : []).filter(r => {
     if (activeTab === 'All Users') return true;
     if (activeTab === 'Administrators') return r.role === 'admin';
     if (activeTab === 'Editors') return r.role === 'editor';

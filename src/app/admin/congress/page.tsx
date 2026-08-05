@@ -30,7 +30,7 @@ export default function AdminCongressPage() {
 
   const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(congressSchema),
-    defaultValues: { title: '', description: '', event_date: '', location: '', image_url: '', url: '' }
+    defaultValues: { title: '', description: '', event_date: '', location: '', image_url: '', url: '', theme: '' }
   });
 
   const imageUrl = useWatch({ control, name: 'image_url' });
@@ -45,7 +45,7 @@ export default function AdminCongressPage() {
   };
 
   const handleOpenAdd = () => {
-    reset({ title: '', description: '', event_date: '', location: '', image_url: '', is_featured: false, url: '' });
+    reset({ title: '', description: '', event_date: '', location: '', image_url: '', is_featured: false, url: '', theme: '' });
     setSelectedEvent(null);
     setSubEvents([]);
     setView('add');
@@ -109,7 +109,7 @@ export default function AdminCongressPage() {
 
   const tabs = ['All Events', 'Upcoming', 'Past'];
   
-  const recordsArray = records ?? [];
+  const recordsArray = Array.isArray(records) ? records : [];
   
   const filteredRecords = recordsArray.filter((record: CongressEvent) => {
     if (activeTab === 'Upcoming') return new Date(record.event_date) >= new Date();
@@ -301,6 +301,15 @@ export default function AdminCongressPage() {
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb]" 
                 />
                 {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title.message as string}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Theme / Subtitle</label>
+                <input 
+                  {...register('theme')} 
+                  placeholder="Enter congress theme..."
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb]" 
+                />
               </div>
 
               <div>

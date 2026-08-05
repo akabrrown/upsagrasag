@@ -98,6 +98,7 @@ export const eventProgrammeSchema = z.object({
   location: z.string().optional(),
   image_url: z.union([z.literal(''), z.string().url()]).optional(),
   url: z.union([z.literal(''), z.string().url()]).optional(),
+  theme: z.string().optional(),
   is_featured: z.boolean().optional().default(false)
 });
 
@@ -168,6 +169,7 @@ export const congressSchema = z.object({
   image_url: z.union([z.literal(''), z.string().url()]).optional(),
   url: z.union([z.literal(''), z.string().url()]).optional(),
   is_featured: z.boolean().default(false),
+  theme: z.string().optional(),
   created_at: z.string().optional()
 });
 export type CongressEvent = z.infer<typeof congressSchema>;
@@ -179,4 +181,30 @@ export const platformSettingsSchema = z.object({
 });
 export type PlatformSettings = z.infer<typeof platformSettingsSchema>;
 
+export const academicCalendarSchema = z.object({
+  id: z.string().uuid().optional(),
+  title: z.string().min(1, "Title is required"),
+  date: z.string().min(1, "Date is required"),
+  description: z.string().optional()
+});
+export type AcademicCalendarEvent = z.infer<typeof academicCalendarSchema>;
 
+export const quickLinkSchema = z.object({
+  id: z.string().uuid().optional(),
+  title: z.string().min(1, "Title is required"),
+  url: z.string().min(1, "URL is required"),
+  icon_name: z.string().min(1, "Icon name is required"),
+  display_order: z.number().int().optional()
+});
+export type QuickLink = z.infer<typeof quickLinkSchema>;
+
+export const pageContentSchema = z.object({
+  id: z.string().uuid().optional(),
+  slug: z.string().min(1, "Slug is required"),
+  title: z.string().optional(),
+  body: z.string().optional(),
+  cta_text: z.string().optional(),
+  cta_link: z.string().optional(),
+  image_url: z.union([z.literal(''), z.string().url()]).optional()
+});
+export type PageContent = z.infer<typeof pageContentSchema>;

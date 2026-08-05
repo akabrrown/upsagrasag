@@ -78,7 +78,7 @@ export default function AdminExecutivesPage() {
 
   const tabs = ['All Executives'];
   
-  const recordsArray = records ?? [];
+  const recordsArray = Array.isArray(records) ? records : [];
 const sortedRecords = recordsArray.sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
 
   // --- Views ---

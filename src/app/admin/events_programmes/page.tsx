@@ -39,7 +39,7 @@ export default function EventsManagement() {
   // --- Handlers ---
   
   const handleOpenAdd = () => {
-    reset({ title: '', description: '', event_date: '', location: '', image_url: '', url: '', is_featured: false });
+    reset({ title: '', description: '', event_date: '', location: '', image_url: '', url: '', theme: '', is_featured: false });
     setSelectedEvent(null);
     setView('add');
   };
@@ -101,7 +101,7 @@ export default function EventsManagement() {
 
   const tabs = ['All Events', 'Upcoming', 'Ongoing', 'Past', 'Draft'];
   
-  const filteredRecords = records?.filter(r => {
+  const filteredRecords = (Array.isArray(records) ? records : []).filter(r => {
     if (activeTab === 'All Events') return true;
     const status = getStatus(r.event_date);
     if (activeTab === status) return true;
@@ -290,6 +290,15 @@ export default function EventsManagement() {
                 className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
               />
               {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title.message as string}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Theme / Subtitle</label>
+              <input 
+                {...register('theme')} 
+                placeholder="Enter event theme..."
+                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+              />
             </div>
 
             <div>

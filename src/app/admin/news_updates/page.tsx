@@ -96,7 +96,7 @@ export default function AdminNewsPage() {
 
   const tabs = ['All Articles', 'Published', 'Drafts', 'News', 'Announcements'];
   
-  const filteredRecords = records?.filter(r => {
+  const filteredRecords = (Array.isArray(records) ? records : []).filter(r => {
     if (activeTab === 'All Articles') return true;
     if (activeTab === 'Published') return isPublished(r.published_at);
     if (activeTab === 'Drafts') return !isPublished(r.published_at);
@@ -292,7 +292,7 @@ export default function AdminNewsPage() {
                       theme="snow"
                       value={field.value || ''}
                       onChange={field.onChange}
-                      modules={{ toolbar: [['bold', 'italic', 'underline'], [{ 'header': [1, 2, 3, false] }], [{ 'list': 'ordered' }, { 'list': 'bullet' }], ['link', 'blockquote']] }}
+                      modules={{ toolbar: [['bold', 'italic', 'underline'], [{ 'header': [1, 2, 3, false] }], [{ 'list': 'ordered' }, { 'list': 'bullet' }], ['link', 'image', 'blockquote']] }}
                       className="bg-white border-none min-h-[400px]"
                     />
                   )}

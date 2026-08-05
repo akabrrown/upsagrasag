@@ -166,7 +166,10 @@ import type {
   EventProgrammeRecord,
   ResearchOpportunity, 
   NewsUpdate, 
-  PlatformSettings 
+  PlatformSettings,
+  QuickLink,
+  AcademicCalendarEvent,
+  PageContent
 } from '@/types/admin';
 
 // Custom subclasses to handle database mismatches
@@ -627,7 +630,40 @@ class EventProgrammeCrudService extends AdminCrudService<EventProgrammeRecord> {
 
 export const eventProgrammeService = new EventProgrammeCrudService();
 export const researchOpportunityService = new AdminCrudService<ResearchOpportunity>('research_opportunities');
-export const newsUpdateService = new AdminCrudService<NewsUpdate>('news_updates');
+
+class NewsUpdateCrudService extends AdminCrudService<NewsUpdate> {
+  constructor() {
+    super('news_updates');
+  }
+
+  private generateSlug(title: string): string {
+    return title
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9\-]/g, '')
+      .replace(/\-+/g, '-');
+  }
+
+  async create(item: Partial<NewsUpdate>): Promise<NewsUpdate> {
+    if (!item.slug && item.title) {
+      item.slug = this.generateSlug(item.title);
+    }
+    return super.create(item);
+  }
+
+  async update(id: string, item: Partial<NewsUpdate>): Promise<NewsUpdate> {
+    if (item.title && (item.slug === undefined || item.slug === '')) {
+      item.slug = this.generateSlug(item.title);
+    }
+    return super.update(id, item);
+  }
+}
+
+export const newsUpdateService = new NewsUpdateCrudService();
+export const quickLinkService = new AdminCrudService<QuickLink>('quick_links');
+export const academicCalendarService = new AdminCrudService<AcademicCalendarEvent>('academic_calendar');
+export const pageContentService = new AdminCrudService<PageContent>('page_contents');
 
 // PlatformSettings is special, only 1 row
 export const platformSettingsService = {
@@ -668,6 +704,9 @@ export const serviceMap: Record<string, AdminCrudService<any>> = {
   'events_programmes': eventProgrammeService,
   'research_opportunities': researchOpportunityService,
   'news_updates': newsUpdateService,
+  'quick-links': quickLinkService,
+  'academic_calendar': academicCalendarService,
+  'page_contents': pageContentService,
 };
 
 // Utility to normalize records with image URLs across different tables
@@ -690,7 +729,10 @@ import {
   tutorialSchema,
   eventProgrammeSchema,
   researchOpportunitySchema,
-  newsUpdateSchema
+  newsUpdateSchema,
+  quickLinkSchema,
+  academicCalendarSchema,
+  pageContentSchema
 } from '@/types/admin';
 
 export const schemaMap: Record<string, any> = {
@@ -708,4 +750,7 @@ export const schemaMap: Record<string, any> = {
   'events_programmes': eventProgrammeSchema,
   'research_opportunities': researchOpportunitySchema,
   'news_updates': newsUpdateSchema,
+  'quick-links': quickLinkSchema,
+  'academic_calendar': academicCalendarSchema,
+  'page_contents': pageContentSchema,
 };

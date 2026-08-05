@@ -76,7 +76,7 @@ export default function AdminResourcesPage() {
 
   const tabs = ['All Resources', 'Documents', 'External Links'];
   
-  const filteredRecords = (records || []).filter(r => {
+  const filteredRecords = (Array.isArray(records) ? records : []).filter(r => {
     if (activeTab === 'All Resources') return true;
     if (activeTab === 'Documents') return !!r.file_url;
     if (activeTab === 'External Links') return !!r.link_url && !r.file_url;

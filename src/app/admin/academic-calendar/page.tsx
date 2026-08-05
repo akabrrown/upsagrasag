@@ -21,7 +21,7 @@ export default function AdminAcademicCalendarPage() {
   const fetchEvents = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/academic-calendar');
+      const res = await fetch('/api/admin/academic_calendar');
       const data = await res.json();
       setEvents(data);
     } catch (e) {
@@ -68,14 +68,13 @@ export default function AdminAcademicCalendarPage() {
       if (view === 'edit' && selectedEvent) {
          // Current API might not support PUT/PATCH, but we'll try or recreate
          // For now let's just delete and recreate to simulate edit if PATCH fails
-         await fetch('/api/academic-calendar', {
+         await fetch('/api/admin/academic_calendar/' + selectedEvent.id, {
            method: 'DELETE',
-           headers: { 'Content-Type': 'application/json' },
-           body: JSON.stringify({ id: selectedEvent.id })
+           headers: { 'Content-Type': 'application/json' }
          });
       }
       
-      const res = await fetch('/api/academic-calendar', {
+      const res = await fetch('/api/admin/academic_calendar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, date, description })
@@ -94,10 +93,9 @@ export default function AdminAcademicCalendarPage() {
   const handleDelete = async (id: number) => {
     if(!confirm('Are you sure you want to delete this event?')) return;
     try {
-      const res = await fetch('/api/academic-calendar', {
+      const res = await fetch('/api/admin/academic_calendar/' + id, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
+        headers: { 'Content-Type': 'application/json' }
       });
       if (!res.ok) throw new Error('Delete failed');
       fetchEvents();
@@ -117,7 +115,7 @@ export default function AdminAcademicCalendarPage() {
 
   const tabs = ['All Semesters', 'Upcoming', 'Past'];
   
-  const filteredRecords = events.filter(r => {
+  const filteredRecords = (Array.isArray(events) ? events : []).filter(r => {
     if (activeTab === 'All Semesters') return true;
     const status = getStatus(r.date);
     if (activeTab === 'Upcoming') return status === 'Upcoming' || status === 'Today';

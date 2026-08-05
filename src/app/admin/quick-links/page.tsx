@@ -76,7 +76,7 @@ export default function AdminQuickLinksPage() {
   };
 
   const tabs = ['All Links'];
-  const recordsArray = records ?? [];
+  const recordsArray = Array.isArray(records) ? records : [];
   
   const ListView = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">

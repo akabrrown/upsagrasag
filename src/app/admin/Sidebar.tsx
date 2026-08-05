@@ -42,6 +42,7 @@ const navGroups = [
       { name: 'Resources', href: '/admin/resources', icon: Folder },
       { name: 'Tutorials', href: '/admin/tutorials', icon: Book },
       { name: 'Quick Links', href: '/admin/quick-links', icon: LinkIcon },
+      { name: 'Page Contents', href: '/admin/page_contents', icon: FileText },
     ],
   },
   {

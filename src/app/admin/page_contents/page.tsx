@@ -4,10 +4,10 @@ import React, { useState } from 'react';
 import useSWR from 'swr';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { presidentSchema, President } from '@/types/admin';
+import { pageContentSchema, PageContent } from '@/types/admin';
 import { 
   Plus, Search, Filter, Pencil, Trash2, 
-  ArrowLeft, User
+  ArrowLeft, FileText
 } from 'lucide-react';
 import CloudinaryUpload from '@/components/CloudinaryUpload';
 
@@ -15,36 +15,36 @@ const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 type ViewState = 'list' | 'add' | 'edit';
 
-export default function AdminPresidentPage() {
-  const { data: records, isLoading, mutate } = useSWR<President[]>('/api/admin/president', fetcher);
+export default function AdminPageContentsPage() {
+  const { data: records, isLoading, mutate } = useSWR<PageContent[]>('/api/admin/page_contents', fetcher);
   
   const [view, setView] = useState<ViewState>('list');
-  const [activeTab, setActiveTab] = useState('All Profiles');
-  const [selectedPresident, setSelectedPresident] = useState<President | null>(null);
+  const [activeTab, setActiveTab] = useState('All Content Blocks');
+  const [selectedRecord, setSelectedRecord] = useState<PageContent | null>(null);
 
-  const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<President>({
-    resolver: zodResolver(presidentSchema),
-    defaultValues: { name: '', speech: '', image_url: '' }
+  const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<PageContent>({
+    resolver: zodResolver(pageContentSchema),
+    defaultValues: { slug: '', title: '', body: '', cta_text: '', cta_link: '', image_url: '' }
   });
 
-  const imageUrl = useWatch<President>({ control, name: 'image_url' });
+  const imageUrl = useWatch<PageContent>({ control, name: 'image_url' });
 
   const handleOpenAdd = () => {
-    reset({ name: '', speech: '', image_url: '' });
-    setSelectedPresident(null);
+    reset({ slug: '', title: '', body: '', cta_text: '', cta_link: '', image_url: '' });
+    setSelectedRecord(null);
     setView('add');
   };
 
-  const handleOpenEdit = (item: President) => {
+  const handleOpenEdit = (item: PageContent) => {
     reset(item);
-    setSelectedPresident(item);
+    setSelectedRecord(item);
     setView('edit');
   };
 
-  const handleDelete = async (item: President) => {
-    if(!confirm(`Are you sure you want to delete "${item.name}"?`)) return;
+  const handleDelete = async (item: PageContent) => {
+    if(!confirm(`Are you sure you want to delete content block "${item.slug}"?`)) return;
     try {
-      const res = await fetch(`/api/admin/president/${item.id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin/page_contents/${item.id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete');
       mutate();
       setView('list');
@@ -53,10 +53,10 @@ export default function AdminPresidentPage() {
     }
   };
 
-  const onSubmit = async (data: President) => {
+  const onSubmit = async (data: PageContent) => {
     try {
-      const isEditing = view === 'edit' && selectedPresident;
-      const url = isEditing ? `/api/admin/president/${selectedPresident.id}` : '/api/admin/president';
+      const isEditing = view === 'edit' && selectedRecord;
+      const url = isEditing ? `/api/admin/page_contents/${selectedRecord.id}` : '/api/admin/page_contents';
       const method = isEditing ? 'PATCH' : 'POST';
       
       const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
@@ -69,22 +69,22 @@ export default function AdminPresidentPage() {
     }
   };
 
-  const tabs = ['All Profiles'];
+  const tabs = ['All Content Blocks'];
   const recordsArray = Array.isArray(records) ? records : [];
   
   const ListView = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Homepage President</h1>
-          <p className="text-sm text-gray-500 mt-1">Dashboard &gt; President Profile</p>
+          <h1 className="text-2xl font-bold text-gray-900">Page Contents</h1>
+          <p className="text-sm text-gray-500 mt-1">Dashboard &gt; Page Contents</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input 
               type="text" 
-              placeholder="Search profiles..." 
+              placeholder="Search content..." 
               className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] w-64"
             />
           </div>
@@ -95,7 +95,7 @@ export default function AdminPresidentPage() {
             onClick={handleOpenAdd}
             className="flex items-center gap-2 px-4 py-2 bg-[#2563eb] text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm shadow-blue-500/30"
           >
-            <Plus className="w-4 h-4" /> Add Profile
+            <Plus className="w-4 h-4" /> Add Content Block
           </button>
         </div>
       </div>
@@ -121,48 +121,52 @@ export default function AdminPresidentPage() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50/50 border-b border-gray-100">
-                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Profile</th>
-                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Speech Excerpt</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Slug / Identifier</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Title</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Body Excerpt</th>
                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {isLoading ? (
                 <tr>
-                  <td colSpan={3} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
                     <div className="flex items-center justify-center gap-2">
                       <div className="w-4 h-4 border-2 border-[#2563eb] border-t-transparent rounded-full animate-spin"></div>
-                      Loading profiles...
+                      Loading contents...
                     </div>
                   </td>
                 </tr>
               ) : recordsArray.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
                     <div className="flex flex-col items-center gap-2">
-                      <User className="w-8 h-8 text-gray-300" />
-                      <p>No president profiles found</p>
+                      <FileText className="w-8 h-8 text-gray-300" />
+                      <p>No content blocks found</p>
                     </div>
                   </td>
                 </tr>
               ) : (
-                recordsArray.map((record: President) => (
+                recordsArray.map((record: PageContent) => (
                   <tr key={record.id} className="hover:bg-gray-50/50 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
                         {record.image_url ? (
-                          <img src={record.image_url} alt={record.name} className="w-12 h-12 rounded-full object-cover bg-gray-100 border border-gray-200" />
+                          <img src={record.image_url} alt={record.slug} className="w-12 h-12 rounded-lg object-cover bg-gray-100 border border-gray-200" />
                         ) : (
-                          <div className="w-12 h-12 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center">
-                            <User className="w-5 h-5 text-gray-400" />
+                          <div className="w-12 h-12 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center">
+                            <FileText className="w-5 h-5 text-gray-400" />
                           </div>
                         )}
-                        <div className="font-medium text-gray-900">{record.name}</div>
+                        <div className="font-medium text-gray-900 bg-gray-100 px-2 py-1 rounded-md text-xs font-mono">{record.slug}</div>
                       </div>
                     </td>
+                    <td className="px-6 py-4 font-medium text-gray-900">
+                      {record.title || <span className="text-gray-400 italic">None</span>}
+                    </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm text-gray-600 line-clamp-2 max-w-lg">
-                        {record.speech || <span className="text-gray-400 italic">No speech provided</span>}
+                      <div className="text-sm text-gray-600 line-clamp-2 max-w-sm">
+                        {record.body || <span className="text-gray-400 italic">No body provided</span>}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -193,8 +197,8 @@ export default function AdminPresidentPage() {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{view === 'edit' ? 'Edit Profile' : 'Add New Profile'}</h1>
-            <p className="text-sm text-gray-500 mt-1">Dashboard &gt; President &gt; {view === 'edit' ? 'Edit' : 'Add'}</p>
+            <h1 className="text-2xl font-bold text-gray-900">{view === 'edit' ? 'Edit Content Block' : 'Add New Content Block'}</h1>
+            <p className="text-sm text-gray-500 mt-1">Dashboard &gt; Page Contents &gt; {view === 'edit' ? 'Edit' : 'Add'}</p>
           </div>
         </div>
         <div className="flex gap-3">
@@ -206,7 +210,7 @@ export default function AdminPresidentPage() {
             disabled={isSubmitting}
             className="px-4 py-2 bg-[#2563eb] text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm shadow-blue-500/30 disabled:opacity-50"
           >
-            {isSubmitting ? 'Saving...' : (view === 'edit' ? 'Update Profile' : 'Publish Profile')}
+            {isSubmitting ? 'Saving...' : (view === 'edit' ? 'Update Content' : 'Publish Content')}
           </button>
         </div>
       </div>
@@ -214,34 +218,54 @@ export default function AdminPresidentPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">Profile Information</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">Content Information</h2>
             
             <div className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">President Name *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Slug / Identifier *</label>
                 <input 
-                  {...register('name')} 
-                  placeholder="Enter full name"
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb]" 
+                  {...register('slug')} 
+                  placeholder="e.g., home-hero"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] font-mono text-sm bg-gray-50" 
                 />
-                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message as string}</p>}
+                <p className="text-xs text-gray-500 mt-1">This must exactly match what the frontend expects (e.g., home-hero).</p>
+                {errors.slug && <p className="text-red-500 text-xs mt-1">{errors.slug.message as string}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Welcome Speech</label>
-                <div className="border border-gray-200 rounded-lg overflow-hidden focus-within:border-[#2563eb] focus-within:ring-1 focus-within:ring-[#2563eb]">
-                  <div className="bg-gray-50 px-3 py-2 border-b border-gray-200 flex items-center gap-2 text-gray-500">
-                    <span className="text-xs font-medium px-2 py-1 bg-white border border-gray-200 rounded shadow-sm">Paragraph</span>
-                    <div className="w-px h-4 bg-gray-300 mx-1"></div>
-                    <span className="font-bold cursor-pointer hover:text-gray-800">B</span>
-                    <span className="italic cursor-pointer hover:text-gray-800">I</span>
-                    <span className="underline cursor-pointer hover:text-gray-800">U</span>
-                  </div>
-                  <textarea 
-                    {...register('speech')} 
-                    placeholder="Write the president's welcome address here..."
-                    rows={12}
-                    className="w-full px-4 py-3 border-none focus:ring-0 resize-y" 
+                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                <input 
+                  {...register('title')} 
+                  placeholder="Enter title"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb]" 
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Body Text</label>
+                <textarea 
+                  {...register('body')} 
+                  placeholder="Write the main content here..."
+                  rows={8}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] resize-y" 
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">CTA Text (Button Label)</label>
+                  <input 
+                    {...register('cta_text')} 
+                    placeholder="e.g., Learn More"
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb]" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">CTA Link (URL)</label>
+                  <input 
+                    {...register('cta_link')} 
+                    placeholder="e.g., /about"
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb]" 
                   />
                 </div>
               </div>
@@ -251,11 +275,11 @@ export default function AdminPresidentPage() {
 
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">Official Portrait</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">Featured Image / Banner</h2>
             <div className="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:bg-gray-50 transition-colors">
               <CloudinaryUpload onUpload={(url) => setValue('image_url', url, { shouldValidate: true })} />
               {imageUrl ? (
-                <div className="mt-4 relative rounded-lg overflow-hidden border border-gray-200 group aspect-[3/4]">
+                <div className="mt-4 relative rounded-lg overflow-hidden border border-gray-200 group aspect-video">
                   <img src={imageUrl} alt="preview" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <span className="text-white text-sm font-medium">Click above to replace</span>

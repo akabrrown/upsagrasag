@@ -87,7 +87,7 @@ export default function AdminResearchOpportunitiesPage() {
 
   const tabs = ['All Records', 'Scholarships', 'Calls for Papers', 'Publications'];
   
-  const filteredRecords = (records || []).filter(r => {
+  const filteredRecords = (Array.isArray(records) ? records : []).filter(r => {
     if (activeTab === 'All Records') return true;
     if (activeTab === 'Scholarships') return r.sub_type === 'scholarships';
     if (activeTab === 'Calls for Papers') return r.sub_type === 'calls';

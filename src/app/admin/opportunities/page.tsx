@@ -79,7 +79,7 @@ export default function AdminOpportunitiesPage() {
 
   const tabs = ['All Opportunities', 'Full-time', 'Internships', 'Contract'];
   
-  const filteredRecords = (records || []).filter(r => {
+  const filteredRecords = (Array.isArray(records) ? records : []).filter(r => {
     if (activeTab === 'All Opportunities') return true;
     if (activeTab === 'Full-time') return r.type === 'Full-time';
     if (activeTab === 'Internships') return r.type === 'Internship';

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Calendar, MapPin, Clock } from 'lucide-react';
 import { supabase } from '@/lib/supabase/browser';
 import type { EventProgrammeRecord } from '@/types/admin';
+import Image from 'next/image';
 
 export default function EventsPage() {
   const [selectedEvent, setSelectedEvent] = useState<EventProgrammeRecord | null>(null);
@@ -54,14 +55,15 @@ export default function EventsPage() {
                 {/* Event item logged for debugging */}
                 {/* Image Section */}
                 <div className="w-full md:w-1/3 h-56 md:h-auto relative overflow-hidden rounded-2xl bg-neutral-100 shrink-0">
-                  {e.is_featured && (
+                  {e.is_featured && new Date(e.event_date) >= new Date(new Date().setHours(0,0,0,0)) && (
                     <span className="absolute top-2 left-2 bg-accent text-white text-xs px-2 py-1 rounded">Featured</span>
                   )}
                   {e.image_url ? (
-                    <img 
+                    <Image 
                       src={e.image_url} 
-                      alt={e.title} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                      alt={e.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500" 
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-primary/5">
@@ -76,7 +78,10 @@ export default function EventsPage() {
                     <h3 className="font-extrabold text-2xl text-primary leading-tight group-hover:text-accent transition-colors duration-200">
                       {e.title}
                     </h3>
-                    <p className="text-neutral-600 leading-relaxed text-sm whitespace-pre-wrap">
+                    {e.theme && (
+                      <p className="text-accent font-medium italic text-sm mt-1">{e.theme}</p>
+                    )}
+                    <p className="text-neutral-600 leading-relaxed text-sm whitespace-pre-wrap mt-2">
                       {e.description || 'No description provided.'}
                     </p>
                   </div>
@@ -125,9 +130,14 @@ export default function EventsPage() {
               &times;
             </button>
             {selectedEvent.image_url && (
-              <img src={selectedEvent.image_url} alt={selectedEvent.title} className="w-full h-48 object-cover rounded-md mb-4" />
+            <div className="relative w-full h-48 mb-4">
+              <Image src={selectedEvent.image_url} alt={selectedEvent.title} fill className="object-cover rounded-md" />
+            </div>
             )}
-            <h2 className="text-2xl font-bold mb-2">{selectedEvent.title}</h2>
+            <h2 className="text-2xl font-bold mb-1">{selectedEvent.title}</h2>
+            {selectedEvent.theme && (
+              <p className="text-accent font-medium italic mb-3">{selectedEvent.theme}</p>
+            )}
             <p className="text-sm text-gray-600 mb-2">
               {new Date(selectedEvent.event_date).toLocaleString()}
             </p>

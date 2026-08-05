@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
-import supabaseAdmin from '@/lib/supabaseAdmin';
+import supabaseAdmin from '../../../../lib/supabaseAdmin';
+import { ratelimit, strictRatelimit } from '../../../../lib/redis';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1';
+    const { success } = await ratelimit.limit(`admin_users_get_${ip}`);
+    if (!success) return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     // Fetch all admin_users from the public schema
     let { data: adminUsers, error: adminError } = await supabaseAdmin
       .from('admin_users')
@@ -56,6 +60,9 @@ export async function GET() {
 
 export async function DELETE(request: Request) {
   try {
+    const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1';
+    const { success } = await strictRatelimit.limit(`admin_users_delete_${ip}`);
+    if (!success) return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
     const auth_uid = searchParams.get('auth_uid');

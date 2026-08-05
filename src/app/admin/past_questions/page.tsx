@@ -79,7 +79,7 @@ export default function AdminPastQuestionsPage() {
   };
 
   const tabs = ['All Questions', 'Exams', 'Assignments'];
-  const filtered = (records || []).filter(r => {
+  const filtered = (Array.isArray(records) ? records : []).filter(r => {
     if (activeTab === 'All Questions') return true;
     if (activeTab === 'Exams') return r.type === 'exam';
     if (activeTab === 'Assignments') return r.type === 'assignment';
