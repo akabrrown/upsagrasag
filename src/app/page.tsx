@@ -612,7 +612,7 @@ export default function HomePage() {
 
       {/* Featured Upcoming Events Banner Section */}
       {events.length > 0 && (
-        <section className="w-full relative overflow-hidden bg-slate-950 h-[405px] sm:h-[486px] flex flex-col justify-end">
+        <section className="w-full relative overflow-hidden bg-slate-950 min-h-[405px] sm:min-h-[486px] flex flex-col justify-center">
           <div className="absolute inset-0">
             {events.map((event, idx) => (
               <div
@@ -626,7 +626,7 @@ export default function HomePage() {
           </div>
 
           {/* Content overlay positioned to stay visible */}
-          <div className="absolute inset-0 z-20 flex flex-col justify-center p-6 sm:p-12 max-w-7xl mx-auto text-left">
+          <div className="relative z-20 flex flex-col justify-center p-6 sm:p-12 max-w-7xl w-full mx-auto text-left flex-1">
             <div>
               <span className="inline-block rounded-full bg-[#B8860B]/20 px-4 py-1 text-xs sm:text-sm font-semibold text-[#B8860B] uppercase tracking-widest border border-[#B8860B]/30">
                 Featured Event
@@ -634,18 +634,37 @@ export default function HomePage() {
             </div>
 
             <div className="mt-8 flex flex-col md:flex-row md:items-end justify-between gap-8">
-              <div className="max-w-2xl space-y-4">
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
-                  {currentEvent?.title}
-                </h2>
-                {currentEvent?.location && (
-                  <h3 className="text-base sm:text-lg font-bold text-[#B8860B]">
-                    Location: {currentEvent.location}
-                  </h3>
+              <div className="max-w-2xl space-y-6">
+                <div className="space-y-4">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
+                    {currentEvent?.title}
+                  </h2>
+                  {currentEvent?.location && (
+                    <h3 className="text-base sm:text-lg font-bold text-[#B8860B]">
+                      Location: {currentEvent.location}
+                    </h3>
+                  )}
+                  <p className="text-sm sm:text-base text-white/80 leading-relaxed font-medium">
+                    {currentEvent?.description}
+                  </p>
+                </div>
+                
+                {currentEvent?.event_date && (
+                  <div className="flex flex-wrap gap-4 items-center justify-start">
+                    {[
+                      { label: 'Days', value: timeLeft.days },
+                      { label: 'Hours', value: timeLeft.hours },
+                      { label: 'Min', value: timeLeft.minutes },
+                      { label: 'Sec', value: timeLeft.seconds }
+                    ].map(item => (
+                      <div key={item.label} className="min-w-[65px] rounded-2xl bg-white/10 backdrop-blur-md px-3 py-2.5 border border-white/10 text-center shadow-lg">
+                        <div className="text-xl sm:text-2xl font-black text-white">{item.value}</div>
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-white/60">{item.label}</div>
+                      </div>
+                    ))}
+                  </div>
                 )}
-                <p className="text-sm sm:text-base text-white/80 leading-relaxed font-medium">
-                  {currentEvent?.description}
-                </p>
+
                 <div className="pt-2">
                   <Link
                     href="/events"
@@ -655,22 +674,6 @@ export default function HomePage() {
                   </Link>
                 </div>
               </div>
-
-              {currentEvent?.event_date && (
-                <div className="flex flex-wrap gap-4 items-center justify-start md:justify-end">
-                  {[
-                    { label: 'Days', value: timeLeft.days },
-                    { label: 'Hours', value: timeLeft.hours },
-                    { label: 'Min', value: timeLeft.minutes },
-                    { label: 'Sec', value: timeLeft.seconds }
-                  ].map(item => (
-                    <div key={item.label} className="min-w-[65px] rounded-2xl bg-white/10 backdrop-blur-md px-3 py-2.5 border border-white/10 text-center shadow-lg">
-                      <div className="text-xl sm:text-2xl font-black text-white">{item.value}</div>
-                      <div className="text-[10px] font-bold uppercase tracking-wider text-white/60">{item.label}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
 
             {events.length > 1 && (
