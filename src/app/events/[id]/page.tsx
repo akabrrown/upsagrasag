@@ -47,11 +47,14 @@ export default async function EventDetailPage({ params }: { params: { id: string
           <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-neutral-100">
             <div className="flex items-center gap-2 text-sm font-semibold text-primary bg-primary/5 px-3 py-1.5 rounded-lg">
               <Calendar className="h-4 w-4 text-accent" />
-              <span suppressHydrationWarning>{new Date(event.event_date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              <span suppressHydrationWarning>
+                {new Date(event.start_date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' })}
+                {event.end_date && ` - ${new Date(event.end_date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' })}`}
+              </span>
             </div>
             <div className="flex items-center gap-2 text-sm text-neutral-600 bg-neutral-50 px-3 py-1.5 rounded-lg border border-neutral-100">
               <Clock className="h-4 w-4 text-neutral-400" />
-              <span suppressHydrationWarning>{new Date(event.event_date).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span>
+              <span suppressHydrationWarning>{new Date(event.start_date).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span>
             </div>
             {event.location && (
               <div className="flex items-center gap-2 text-sm text-neutral-600 bg-neutral-50 px-3 py-1.5 rounded-lg border border-neutral-100">

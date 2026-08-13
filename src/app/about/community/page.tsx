@@ -534,20 +534,32 @@ export default function CommunityPage() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B8860B]"></div>
             </div>
           ) : images.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {images.map((img) => (
-                <div key={img.url} className="group bg-white border border-neutral-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
-                  <div className="relative h-64 w-full bg-neutral-100 overflow-hidden">
-                    <Image src={img.url} alt={img.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+            <div className="columns-1 sm:columns-2 md:columns-3 gap-6 space-y-6">
+              {images.map((img, idx) => {
+                const hasTitle = img.title && img.title.trim().toLowerCase() !== 'untitled';
+                return (
+                  <div 
+                    key={img.url + idx} 
+                    className="group relative rounded-2xl overflow-hidden bg-neutral-100 break-inside-avoid cursor-pointer shadow-sm"
+                  >
+                    <Image 
+                      src={img.url} 
+                      alt={hasTitle ? img.title : 'Community moment'} 
+                      width={600}
+                      height={800}
+                      className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-[1.02]" 
+                      unoptimized
+                    />
+                    
+                    {/* Subtle hover state - only show title if it's not untitled */}
+                    {hasTitle && (
+                      <div className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <h3 className="font-bold text-white text-lg leading-tight drop-shadow-md">{img.title}</h3>
+                      </div>
+                    )}
                   </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-[#001a54] truncate">{img.title}</h3>
-                    <p className="text-xs font-medium text-neutral-500 mt-1 uppercase tracking-wide">
-                      {new Date(img.uploaded_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-12 text-neutral-500 bg-neutral-50 rounded-2xl border border-neutral-100">

@@ -37,7 +37,8 @@ export default function AdminLeadershipPage() {
     setView('add');
   };
 
-  const handleOpenEdit = (item: Leadership) => {
+  const handleOpenEdit = (raw_item: Leadership) => {
+    const item = Object.fromEntries(Object.entries(raw_item).map(([k, v]) => [k, v === null ? '' : v])) as any;
     reset({ ...item });
     setSelectedLeader(item);
     setView('edit');

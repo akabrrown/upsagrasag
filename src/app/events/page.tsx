@@ -11,7 +11,7 @@ export default async function EventsPage() {
       .from('events_programmes')
       .select('*')
       .eq('display_on_page', true)
-      .order('event_date', { ascending: true });
+      .order('start_date', { ascending: true });
     if (data) dbEvents = data;
   } catch (error) {
     console.error("Failed to load events from DB:", error);

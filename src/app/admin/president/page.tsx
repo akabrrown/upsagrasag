@@ -35,7 +35,8 @@ export default function AdminPresidentPage() {
     setView('add');
   };
 
-  const handleOpenEdit = (item: President) => {
+  const handleOpenEdit = (raw_item: President) => {
+    const item = Object.fromEntries(Object.entries(raw_item).map(([k, v]) => [k, v === null ? '' : v])) as any;
     reset(item);
     setSelectedPresident(item);
     setView('edit');

@@ -38,7 +38,8 @@ export default function AdminOpportunitiesPage() {
     setView('add');
   };
 
-  const handleOpenEdit = (item: Opportunity) => {
+  const handleOpenEdit = (raw_item: Opportunity) => {
+    const item = Object.fromEntries(Object.entries(raw_item).map(([k, v]) => [k, v === null ? '' : v])) as any;
     reset(item);
     setSelectedOpp(item);
     setView('edit');

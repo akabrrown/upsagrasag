@@ -30,7 +30,8 @@ export default function AdminUsersPage() {
     setView('add');
   };
 
-  const handleOpenEdit = (user: AdminUser) => {
+  const handleOpenEdit = (raw_user: AdminUser) => {
+    const user = Object.fromEntries(Object.entries(raw_user).map(([k, v]) => [k, v === null ? '' : v])) as any;
     reset(user);
     setSelectedUser(user);
     setView('edit');

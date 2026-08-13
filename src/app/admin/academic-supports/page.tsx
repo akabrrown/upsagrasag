@@ -33,7 +33,8 @@ export default function AdminAcademicSupportsPage() {
     setView('add');
   };
 
-  const handleOpenEdit = (item: AcademicSupport) => {
+  const handleOpenEdit = (raw_item: AcademicSupport) => {
+    const item = Object.fromEntries(Object.entries(raw_item).map(([k, v]) => [k, v === null ? '' : v])) as any;
     reset(item);
     setSelectedRecord(item);
     setView('edit');

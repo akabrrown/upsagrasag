@@ -43,7 +43,8 @@ export default function AdminAcademicCalendarPage() {
     setView('add');
   };
 
-  const handleOpenEdit = (ev: any) => {
+  const handleOpenEdit = (raw_ev: any) => {
+    const ev = Object.fromEntries(Object.entries(raw_ev).map(([k, v]) => [k, v === null ? '' : v])) as any;
     setTitle(ev.title);
     if (ev.date) {
       const d = new Date(ev.date);

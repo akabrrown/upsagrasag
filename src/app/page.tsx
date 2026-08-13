@@ -117,10 +117,10 @@ export default function HomePage() {
       const today = new Date().toISOString().split('T')[0];
       const { data, error } = await supabaseClient
         .from('events_programmes')
-        .select('id, title, description, event_date, image_url, location, is_featured, type')
+        .select('id, title, description, start_date, end_date, image_url, location, is_featured, type')
         .eq('is_featured', true)
-        .gte('event_date', today)
-        .order('event_date', { ascending: true })
+        .gte('start_date', today)
+        .order('start_date', { ascending: true })
         .limit(5);
 
       if (!error && data) {
@@ -141,19 +141,19 @@ export default function HomePage() {
 
   // Consolidated countdown timer – parses date safely and updates every second
   useEffect(() => {
-    if (!currentEvent?.event_date) {
+    if (!currentEvent?.start_date) {
       setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       return;
     }
     // Attempt to parse the date string directly; fallback to replace space with 'T' for Safari/iOS
-    let parsed = Date.parse(currentEvent.event_date);
+    let parsed = Date.parse(currentEvent.start_date);
     if (isNaN(parsed)) {
-      const safe = currentEvent.event_date.replace(' ', 'T');
+      const safe = currentEvent.start_date.replace(' ', 'T');
       parsed = Date.parse(safe);
     }
     const targetTime = parsed;
     if (isNaN(targetTime)) {
-      console.warn('Invalid event_date format:', currentEvent.event_date);
+      console.warn('Invalid start_date format:', currentEvent.start_date);
       setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       return;
     }
@@ -177,7 +177,7 @@ export default function HomePage() {
     update();
     timerId = setInterval(update, 1000);
     return () => clearInterval(timerId);
-  }, [currentEvent?.event_date]);
+  }, [currentEvent?.start_date]);
 
 
   // Hero section state
@@ -659,7 +659,7 @@ export default function HomePage() {
                     Learn More
                   </Link>
 
-                  {currentEvent?.event_date && (
+                  {currentEvent?.start_date && (
                     <div className="flex flex-wrap gap-2 items-center">
                       {[
                         { label: 'Days', value: timeLeft.days },
@@ -769,7 +769,8 @@ export default function HomePage() {
                   <div className="absolute bottom-0 left-0 w-full p-6 flex flex-col justify-end">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="bg-white/20 backdrop-blur-md text-white text-xs font-bold px-2.5 py-1 rounded-sm shadow-sm border border-white/10 uppercase">
-                        {new Date(ev.event_date).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                        {new Date(ev.start_date).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                        {ev.end_date && ` - ${new Date(ev.end_date).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}`}
                       </span>
                     </div>
                     <h3 className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight">

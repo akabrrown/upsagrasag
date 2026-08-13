@@ -37,7 +37,8 @@ export default function AdminExecutivesPage() {
     setView('add');
   };
 
-  const handleOpenEdit = (item: Executive) => {
+  const handleOpenEdit = (raw_item: Executive) => {
+    const item = Object.fromEntries(Object.entries(raw_item).map(([k, v]) => [k, v === null ? '' : v])) as any;
     reset(item);
     setSelectedExecutive(item);
     setView('edit');

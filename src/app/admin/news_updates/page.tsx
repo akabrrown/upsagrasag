@@ -40,7 +40,8 @@ export default function AdminNewsPage() {
     setView('add');
   };
 
-  const handleOpenEdit = (item: NewsUpdate) => {
+  const handleOpenEdit = (raw_item: NewsUpdate) => {
+    const item = Object.fromEntries(Object.entries(raw_item).map(([k, v]) => [k, v === null ? '' : v])) as any;
     const formattedItem = { ...item };
     if (formattedItem.published_at) {
       const d = new Date(formattedItem.published_at);

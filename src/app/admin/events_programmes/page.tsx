@@ -34,7 +34,7 @@ export default function EventsManagement() {
   } = useForm<EventProgramme>({
     resolver: zodResolver(eventProgrammeSchema) as any,
     defaultValues: {
-      title: '', slug: '', description: '', event_date: '', location: '', 
+      title: '', slug: '', description: '', start_date: '', end_date: '', location: '', 
       image_url: '', url: '', is_featured: false, type: 'Event', 
       display_on_page: true, theme: '', price: 'Free', discount_code: '', 
       discount_info: '', registration_deadline: '', speaker: ''
@@ -47,7 +47,7 @@ export default function EventsManagement() {
   
   const handleOpenAdd = () => {
     reset({ 
-      title: '', slug: '', description: '', event_date: '', location: '', 
+      title: '', slug: '', description: '', start_date: '', end_date: '', location: '', 
       image_url: '', url: '', is_featured: false, type: 'Event', 
       display_on_page: true, theme: '', price: 'Free', discount_code: '', 
       discount_info: '', registration_deadline: '', speaker: '' 
@@ -56,12 +56,17 @@ export default function EventsManagement() {
     setView('add');
   };
 
-  const handleOpenEdit = (item: EventProgrammeRecord) => {
+  const handleOpenEdit = (raw_item: EventProgrammeRecord) => {
+    const item = Object.fromEntries(Object.entries(raw_item).map(([k, v]) => [k, v === null ? '' : v])) as any;
     const { id, ...rest } = item;
     const formattedItem = { ...rest } as any;
-    if (formattedItem.event_date) {
-      const d = new Date(formattedItem.event_date);
-      formattedItem.event_date = d.toISOString().slice(0, 16);
+    if (formattedItem.start_date) {
+      const d = new Date(formattedItem.start_date);
+      formattedItem.start_date = d.toISOString().slice(0, 16);
+    }
+    if (formattedItem.end_date) {
+      const d = new Date(formattedItem.end_date);
+      formattedItem.end_date = d.toISOString().slice(0, 16);
     }
     reset(formattedItem);
     setSelectedEvent(item);
@@ -90,7 +95,11 @@ export default function EventsManagement() {
       const isEditing = view === 'edit' && selectedEvent;
       const url = isEditing ? `/api/admin/events_programmes/${selectedEvent.id}` : '/api/admin/events_programmes';
       const method = isEditing ? 'PATCH' : 'POST';
-      const payload = { ...data, event_date: new Date(data.event_date).toISOString() };
+      const payload = { 
+        ...data, 
+        start_date: new Date(data.start_date).toISOString(),
+        end_date: data.end_date ? new Date(data.end_date).toISOString() : null
+      };
       
       const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       if (!res.ok) throw new Error('Failed to save');
@@ -103,19 +112,26 @@ export default function EventsManagement() {
   };
 
   // --- Helpers ---
-  const getStatus = (dateStr: string) => {
-    const eventDate = new Date(dateStr);
+  const getStatus = (startStr: string, endStr?: string) => {
+    const startDate = new Date(startStr);
     const now = new Date();
-    if (eventDate > now) return 'Upcoming';
-    if (eventDate.toDateString() === now.toDateString()) return 'Ongoing';
-    return 'Past';
+    if (endStr) {
+      const endDate = new Date(endStr);
+      if (now < startDate) return 'Upcoming';
+      if (now >= startDate && now <= endDate) return 'Ongoing';
+      return 'Past';
+    } else {
+      if (startDate > now) return 'Upcoming';
+      if (startDate.toDateString() === now.toDateString()) return 'Ongoing';
+      return 'Past';
+    }
   };
 
   const tabs = ['All Events', 'Upcoming', 'Ongoing', 'Past', 'Draft'];
   
   const filteredRecords = records?.filter(r => {
     if (activeTab === 'All Events') return true;
-    const status = getStatus(r.event_date);
+    const status = getStatus(r.start_date, r.end_date);
     if (activeTab === status) return true;
     if (activeTab === 'Draft' && !r.is_featured) return true; // Just a dummy filter for draft
     return false;
@@ -187,7 +203,7 @@ export default function EventsManagement() {
                 <tr><td colSpan={6} className="px-6 py-8 text-center text-gray-500">No events found.</td></tr>
               ) : (
                 filteredRecords.map(record => {
-                  const status = getStatus(record.event_date);
+                  const status = getStatus(record.start_date, record.end_date);
                   return (
                     <tr key={record.id} className="hover:bg-gray-50/50 transition-colors group">
                       <td className="px-6 py-4">
@@ -209,8 +225,14 @@ export default function EventsManagement() {
                         <div className="flex items-start gap-2 text-sm text-gray-600">
                           <Calendar className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
                           <div>
-                            <p className="font-medium text-gray-900">{new Date(record.event_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                            <p className="text-xs text-gray-500">{new Date(record.event_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</p>
+                            <p className="font-medium text-gray-900">
+                              {new Date(record.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                              {record.end_date && ` - ${new Date(record.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {new Date(record.start_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                              {record.end_date && ` to ${new Date(record.end_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`}
+                            </p>
                           </div>
                         </div>
                       </td>
@@ -418,17 +440,31 @@ export default function EventsManagement() {
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-5">
             <h2 className="font-semibold text-gray-900 text-lg">Event Schedule</h2>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Date & Time <span className="text-red-500">*</span></label>
-              <div className="relative">
-                <input 
-                  type="datetime-local" 
-                  {...register('event_date')} 
-                  className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
-                />
-                <Calendar className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Start Date & Time <span className="text-red-500">*</span></label>
+                <div className="relative">
+                  <input 
+                    type="datetime-local" 
+                    {...register('start_date')} 
+                    className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                  />
+                  <Calendar className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                </div>
+                {errors.start_date && <p className="text-xs text-red-500 mt-1">{errors.start_date.message as string}</p>}
               </div>
-              {errors.event_date && <p className="text-xs text-red-500 mt-1">{errors.event_date.message as string}</p>}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">End Date & Time (Optional)</label>
+                <div className="relative">
+                  <input 
+                    type="datetime-local" 
+                    {...register('end_date')} 
+                    className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                  />
+                  <Calendar className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                </div>
+              </div>
             </div>
 
             <div>
@@ -469,7 +505,7 @@ export default function EventsManagement() {
 
   const DetailsView = () => {
     if (!selectedEvent) return null;
-    const status = getStatus(selectedEvent.event_date);
+    const status = getStatus(selectedEvent.start_date, selectedEvent.end_date);
     
     return (
       <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -506,11 +542,17 @@ export default function EventsManagement() {
                <div className="grid grid-cols-2 gap-y-4 text-sm">
                  <div>
                    <p className="text-gray-500 flex items-center gap-2 mb-1"><Calendar className="w-4 h-4"/> Date</p>
-                   <p className="font-medium text-gray-900">{new Date(selectedEvent.event_date).toLocaleDateString()}</p>
+                   <p className="font-medium text-gray-900">
+                     {new Date(selectedEvent.start_date).toLocaleDateString()}
+                     {selectedEvent.end_date && ` - ${new Date(selectedEvent.end_date).toLocaleDateString()}`}
+                   </p>
                  </div>
                  <div>
                    <p className="text-gray-500 flex items-center gap-2 mb-1"><Calendar className="w-4 h-4"/> Time</p>
-                   <p className="font-medium text-gray-900">{new Date(selectedEvent.event_date).toLocaleTimeString()}</p>
+                   <p className="font-medium text-gray-900">
+                     {new Date(selectedEvent.start_date).toLocaleTimeString()}
+                     {selectedEvent.end_date && ` to ${new Date(selectedEvent.end_date).toLocaleTimeString()}`}
+                   </p>
                  </div>
                  <div>
                    <p className="text-gray-500 flex items-center gap-2 mb-1"><MapPin className="w-4 h-4"/> Venue</p>

@@ -28,7 +28,8 @@ interface EventItem {
   category: string;
   summary: string;
   full_description?: string;
-  event_date: string; // e.g. "2026-07-03T20:00:00"
+  start_date: string; // e.g. "2026-07-03T20:00:00"
+  end_date?: string;
   time_label: string; // e.g. "8:00 PM"
   location: string;
   price: string; // e.g. "GHS 350" or "Free"
@@ -67,14 +68,15 @@ export default function EventsClient({ initialEvents = [] }: { initialEvents?: a
       category: (e as any).type || 'Event',
       summary: e.description ? e.description.slice(0, 140) + '...' : 'Official GRASAG-UPSA graduate event.',
       full_description: e.description,
-      event_date: e.event_date || '2026-08-30T10:00:00',
-      time_label: new Date(e.event_date || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      start_date: e.start_date || '2026-08-30T10:00:00',
+      end_date: e.end_date,
+      time_label: new Date(e.start_date || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       location: e.location || 'UPSA Campus',
       price: (e as any).price || 'Free',
       image_url: e.image_url,
       url: e.url || '#',
       is_featured: e.is_featured,
-      status: (new Date(e.event_date).getTime() < Date.now()) ? 'Past Event' : 'Registration open',
+      status: (new Date(e.end_date || e.start_date).getTime() < Date.now()) ? 'Past Event' : 'Registration open',
       theme: e.theme
     }));
 
@@ -90,7 +92,7 @@ export default function EventsClient({ initialEvents = [] }: { initialEvents?: a
   const filteredEvents = useMemo(() => {
     return allEvents.filter(e => {
       // Tab filter
-      const eventTime = new Date(e.event_date).getTime();
+      const eventTime = new Date(e.end_date || e.start_date).getTime();
       const isPast = e.status === 'Past Event' || eventTime < Date.now();
       
       if (activeTab === 'Upcoming' && isPast) return false;
@@ -109,7 +111,7 @@ export default function EventsClient({ initialEvents = [] }: { initialEvents?: a
       // Month filter
       let matchesMonth = true;
       if (selectedMonth !== 'All') {
-        const monthName = new Date(e.event_date).toLocaleString('default', { month: 'long' });
+        const monthName = new Date(e.start_date).toLocaleString('default', { month: 'long' });
         matchesMonth = monthName.toLowerCase() === selectedMonth.toLowerCase();
       }
 
@@ -408,7 +410,11 @@ export default function EventsClient({ initialEvents = [] }: { initialEvents?: a
                         <div className="space-y-1.5 text-xs text-neutral-500 font-medium pt-1">
                           <div className="flex items-center gap-1.5">
                             <Calendar className="w-3.5 h-3.5 text-[#B8860B]" />
-                            <span>{new Date(item.event_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })} • {item.time_label}</span>
+                            <span>
+                              {new Date(item.start_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })} 
+                              {item.end_date && ` - ${new Date(item.end_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}`} 
+                              • {item.time_label}
+                            </span>
                           </div>
                           <div className="flex items-center gap-1.5">
                             <MapPin className="w-3.5 h-3.5 text-[#B8860B]" />
@@ -491,7 +497,11 @@ export default function EventsClient({ initialEvents = [] }: { initialEvents?: a
                   <Calendar className="w-4 h-4 text-[#B8860B]" />
                   <div>
                     <span className="text-[10px] font-bold text-neutral-400 block uppercase">Date & Time</span>
-                    <span>{new Date(selectedEventModal.event_date).toLocaleDateString()} • {selectedEventModal.time_label}</span>
+                    <span>
+                      {new Date(selectedEventModal.start_date).toLocaleDateString()} 
+                      {selectedEventModal.end_date && ` - ${new Date(selectedEventModal.end_date).toLocaleDateString()}`} 
+                      • {selectedEventModal.time_label}
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">

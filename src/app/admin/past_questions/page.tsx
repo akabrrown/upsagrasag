@@ -34,7 +34,8 @@ export default function AdminPastQuestionsPage() {
     setView('add');
   };
 
-  const handleOpenEdit = (item: PastQuestion) => {
+  const handleOpenEdit = (raw_item: PastQuestion) => {
+    const item = Object.fromEntries(Object.entries(raw_item).map(([k, v]) => [k, v === null ? '' : v])) as any;
     const formatted = { ...item };
     if (formatted.exam_date) {
       const d = new Date(formatted.exam_date);

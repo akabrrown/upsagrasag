@@ -35,7 +35,8 @@ export default function AdminTutorialsPage() {
     setView('add');
   };
 
-  const handleOpenEdit = (item: Tutorial) => {
+  const handleOpenEdit = (raw_item: Tutorial) => {
+    const item = Object.fromEntries(Object.entries(raw_item).map(([k, v]) => [k, v === null ? '' : v])) as any;
     reset(item);
     setSelectedTutorial(item);
     setView('edit');

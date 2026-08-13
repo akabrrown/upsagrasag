@@ -35,7 +35,8 @@ export default function AdminPageContentsPage() {
     setView('add');
   };
 
-  const handleOpenEdit = (item: PageContent) => {
+  const handleOpenEdit = (raw_item: PageContent) => {
+    const item = Object.fromEntries(Object.entries(raw_item).map(([k, v]) => [k, v === null ? '' : v])) as any;
     reset(item);
     setSelectedRecord(item);
     setView('edit');
