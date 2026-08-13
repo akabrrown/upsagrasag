@@ -615,83 +615,99 @@ export default function HomePage() {
 
       {/* Featured Upcoming Events Banner Section */}
       {events.length > 0 && (
-        <section className="w-full relative overflow-hidden bg-slate-950 min-h-[400px] sm:min-h-[450px] flex flex-col justify-center">
-          <div className="absolute inset-0">
-            {events.map((event, idx) => (
-              <div
-                key={idx}
-                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${currentEventIndex === idx ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
-              >
-                <Image src={optimizeCloudinaryUrl(event.image_url) || '/bkg-grasag.jpg'} alt={event.title} fill className="absolute right-0 top-0 w-full md:w-1/2 h-full object-contain object-right md:object-center opacity-40 md:opacity-90" />
-                <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-transparent md:bg-gradient-to-r md:from-slate-950 md:via-slate-950/80 md:to-transparent" />
-              </div>
-            ))}
-          </div>
+        <section className="w-full relative bg-slate-950 py-12 md:py-20 flex flex-col justify-center overflow-hidden">
+          {/* Subtle background glow */}
+          <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#B8860B]/20 rounded-full blur-[120px] pointer-events-none" />
 
-          {/* Content overlay positioned to stay visible */}
-          <div className="relative z-20 flex flex-col justify-center px-6 py-8 sm:px-12 max-w-7xl w-full mx-auto text-left">
-            <div className="mb-4">
-              <span className="inline-block rounded-full bg-[#B8860B]/20 px-3 py-1 text-[10px] sm:text-xs font-semibold text-[#B8860B] uppercase tracking-widest border border-[#B8860B]/30">
-                Featured Event
-              </span>
-            </div>
-
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-              <div className="max-w-2xl space-y-4">
-                <div className="space-y-2">
-                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white leading-tight line-clamp-2">
+          <div className="relative z-20 px-6 sm:px-12 max-w-7xl w-full mx-auto">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16">
+              
+              {/* Left Column: Content */}
+              <div className="w-full lg:w-1/2 text-left space-y-6">
+                <div>
+                  <span className="inline-block rounded-full bg-[#B8860B]/20 px-3 py-1 text-[10px] sm:text-xs font-semibold text-[#B8860B] uppercase tracking-widest border border-[#B8860B]/30 mb-4">
+                    Featured Event
+                  </span>
+                  
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight line-clamp-3">
                     {currentEvent?.title}
                   </h2>
-                  {currentEvent?.location && (
-                    <h3 className="text-sm sm:text-base font-bold text-[#B8860B]">
-                      Location: {currentEvent.location}
-                    </h3>
-                  )}
-                  <p className="text-xs sm:text-sm text-white/80 leading-relaxed font-medium line-clamp-3">
-                    {currentEvent?.description}
-                  </p>
                 </div>
+
+                {currentEvent?.location && (
+                  <div className="flex items-center gap-2 text-[#B8860B] font-semibold text-sm sm:text-base">
+                    <MapPin className="w-5 h-5 shrink-0" />
+                    <span>{currentEvent.location}</span>
+                  </div>
+                )}
+
+                <p className="text-sm sm:text-base text-white/80 leading-relaxed font-medium line-clamp-4">
+                  {currentEvent?.description}
+                </p>
                 
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 pt-2">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 pt-4">
                   <Link
                     href="/events"
-                    className="inline-block bg-[#B8860B] hover:bg-[#9A7C1C] text-white font-bold px-6 py-3 rounded-lg transition shadow-lg hover:scale-[1.02] transform duration-200 uppercase text-[10px] tracking-wider shrink-0"
+                    className="inline-block bg-[#B8860B] hover:bg-[#9A7C1C] text-white font-bold px-8 py-4 rounded-xl transition-all shadow-lg shadow-[#B8860B]/20 hover:shadow-[#B8860B]/40 hover:-translate-y-1 transform duration-300 uppercase text-xs tracking-wider shrink-0"
                   >
                     Learn More
                   </Link>
 
                   {currentEvent?.start_date && (
-                    <div className="flex flex-wrap gap-2 items-center">
+                    <div className="flex gap-3 items-center">
                       {[
                         { label: 'Days', value: timeLeft.days },
                         { label: 'Hours', value: timeLeft.hours },
                         { label: 'Min', value: timeLeft.minutes },
                         { label: 'Sec', value: timeLeft.seconds }
                       ].map(item => (
-                        <div key={item.label} className="min-w-[50px] rounded-xl bg-white/10 backdrop-blur-md px-2 py-1.5 border border-white/10 text-center shadow-lg">
-                          <div className="text-base sm:text-lg font-black text-white leading-none">{item.value}</div>
-                          <div className="text-[8px] font-bold uppercase tracking-wider text-white/60 mt-0.5">{item.label}</div>
+                        <div key={item.label} className="min-w-[56px] rounded-xl bg-white/5 border border-white/10 backdrop-blur-md px-2 py-2 text-center shadow-inner">
+                          <div className="text-lg sm:text-xl font-black text-white leading-none">{item.value.toString().padStart(2, '0')}</div>
+                          <div className="text-[9px] font-bold uppercase tracking-wider text-white/50 mt-1">{item.label}</div>
                         </div>
                       ))}
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
 
-            {events.length > 1 && (
-              <div className="flex gap-2.5 mt-8 justify-start">
-                {events.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setCurrentEventIndex(idx)}
-                    className={`h-2 rounded-full transition-all duration-300 ${currentEventIndex === idx ? 'w-8 bg-[#B8860B]' : 'w-2 bg-white/40 hover:bg-white/70'
-                      }`}
-                    aria-label={`Go to slide ${idx + 1}`}
-                  />
-                ))}
+                {events.length > 1 && (
+                  <div className="flex gap-2.5 pt-8 justify-start">
+                    {events.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setCurrentEventIndex(idx)}
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          currentEventIndex === idx ? 'w-8 bg-[#B8860B]' : 'w-2 bg-white/20 hover:bg-white/40'
+                        }`}
+                        aria-label={`Go to slide ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+
+              {/* Right Column: Visuals (The Poster) */}
+              <div className="w-full lg:w-1/2 flex justify-center lg:justify-end">
+                <div className="relative w-full max-w-[450px] aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10 group transform transition-transform duration-500 hover:rotate-1">
+                  {/* We map through events to keep the fade transition for the image as well */}
+                  {events.map((event, idx) => (
+                    <Image
+                      key={idx}
+                      src={optimizeCloudinaryUrl(event.image_url) || '/bkg-grasag.jpg'}
+                      alt={event.title}
+                      fill
+                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
+                        currentEventIndex === idx ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                      }`}
+                    />
+                  ))}
+                  
+                  {/* Subtle inner shadow overlay for premium feel */}
+                  <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-white/10 z-20 pointer-events-none" />
+                </div>
+              </div>
+
+            </div>
           </div>
         </section>
       )}
