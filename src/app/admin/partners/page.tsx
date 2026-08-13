@@ -148,7 +148,7 @@ export default function AdminPartnersPage() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {isLoading ? (
-                <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">Loading partners...</td></tr>
+                <AdminTableSkeleton columns={4} />
               ) : sortedRecords.length === 0 ? (
                 <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">No partners found.</td></tr>
               ) : (

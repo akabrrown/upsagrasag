@@ -167,7 +167,7 @@ export default function AdminOpportunitiesPage() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {isLoading ? (
-                <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">Loading opportunities...</td></tr>
+                <AdminTableSkeleton columns={4} />
               ) : filteredRecords.length === 0 ? (
                 <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">No opportunities found.</td></tr>
               ) : (

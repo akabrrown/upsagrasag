@@ -127,7 +127,7 @@ export default function AdminPastQuestionsPage() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {isLoading ? (
-                <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">Loading…</td></tr>
+                <AdminTableSkeleton columns={4} />
               ) : filtered.length === 0 ? (
                 <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">No records found.</td></tr>
               ) : (

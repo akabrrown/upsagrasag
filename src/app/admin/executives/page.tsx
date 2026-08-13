@@ -140,7 +140,7 @@ const sortedRecords = recordsArray.sort((a, b) => (a.display_order ?? 0) - (b.di
             </thead>
             <tbody className="divide-y divide-gray-50">
               {isLoading ? (
-                <tr><td colSpan={3} className="px-6 py-8 text-center text-gray-500">Loading executives...</td></tr>
+                <AdminTableSkeleton columns={3} />
               ) : sortedRecords.length === 0 ? (
                 <tr><td colSpan={3} className="px-6 py-8 text-center text-gray-500">No executives found.</td></tr>
               ) : (

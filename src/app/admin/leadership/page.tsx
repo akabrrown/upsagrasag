@@ -146,7 +146,7 @@ export default function AdminLeadershipPage() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {isLoading ? (
-                <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">Loading leaders...</td></tr>
+                <AdminTableSkeleton columns={5} />
               ) : filteredRecords.length === 0 ? (
                 <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">No leaders found.</td></tr>
               ) : (

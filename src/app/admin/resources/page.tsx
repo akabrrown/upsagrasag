@@ -143,7 +143,7 @@ export default function AdminResourcesPage() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {isLoading ? (
-                <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">Loading resources...</td></tr>
+                <AdminTableSkeleton columns={4} />
               ) : filteredRecords.length === 0 ? (
                 <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">No resources found.</td></tr>
               ) : (

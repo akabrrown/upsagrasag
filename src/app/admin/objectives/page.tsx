@@ -106,7 +106,7 @@ export default function AdminObjectivesPage() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {isLoading ? (
-                <tr><td colSpan={3} className="px-6 py-8 text-center text-gray-500">Loading records...</td></tr>
+                <AdminTableSkeleton columns={3} />
               ) : filteredRecords.length === 0 ? (
                 <tr><td colSpan={3} className="px-6 py-8 text-center text-gray-500">No objectives found.</td></tr>
               ) : (

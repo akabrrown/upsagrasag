@@ -209,7 +209,7 @@ export default function EventsManagement() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {isLoading ? (
-                <tr><td colSpan={6} className="px-6 py-8 text-center text-gray-500">Loading events...</td></tr>
+                <AdminTableSkeleton columns={6} />
               ) : filteredRecords.length === 0 ? (
                 <tr><td colSpan={6} className="px-6 py-8 text-center text-gray-500">No events found.</td></tr>
               ) : (
