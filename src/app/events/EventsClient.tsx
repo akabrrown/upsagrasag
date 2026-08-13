@@ -20,6 +20,7 @@ import {
   Mail,
   User
 } from 'lucide-react';
+import { optimizeCloudinaryUrl } from '@/lib/optimizeImage';
 
 interface EventItem {
   id: string;
@@ -269,7 +270,7 @@ export default function EventsClient({ initialEvents = [] }: { initialEvents?: a
               {/* Image Section */}
               <div className="md:col-span-5 relative w-full h-[240px] sm:h-[280px] rounded-2xl overflow-hidden bg-neutral-100 shrink-0">
                 <img 
-                  src={featuredEvent.image_url || '/opportunities-hero.png'} 
+                  src={optimizeCloudinaryUrl(featuredEvent.image_url) || '/opportunities-hero.png'} 
                   alt={featuredEvent.title}
                   className="w-full h-full object-cover"
                 />
@@ -374,7 +375,7 @@ export default function EventsClient({ initialEvents = [] }: { initialEvents?: a
                       {/* Image Header */}
                       <div className="relative w-full h-44 bg-neutral-100 overflow-hidden">
                         {item.image_url ? (
-                          <img src={item.image_url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          <img src={optimizeCloudinaryUrl(item.image_url, { width: 600 })} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-[#001a54] to-[#0b2b73] flex items-center justify-center text-white/50">
                             <Calendar className="w-10 h-10" />
@@ -456,7 +457,7 @@ export default function EventsClient({ initialEvents = [] }: { initialEvents?: a
           <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col text-left">
             <div className="relative w-full h-56 bg-neutral-900 shrink-0">
               <img 
-                src={selectedEventModal.image_url || '/opportunities-hero.png'} 
+                src={optimizeCloudinaryUrl(selectedEventModal.image_url) || '/opportunities-hero.png'} 
                 alt={selectedEventModal.title} 
                 className="w-full h-full object-cover" 
               />

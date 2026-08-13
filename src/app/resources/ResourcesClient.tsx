@@ -157,7 +157,7 @@ export default function ResourcesClient({ initialResources }: ResourcesClientPro
     if (!initialResources || initialResources.length === 0) return defaultCuratedResources;
     
     const convertedDB: CuratedResourceItem[] = initialResources.map(r => ({
-      id: r.id,
+      id: r.id || String(Math.random()),
       title: r.title,
       category: (r as any).category || (r.file_url ? 'Documents' : 'Student Services'),
       description: (r as any).description || 'Official student resource provided by GRASAG-UPSA.',

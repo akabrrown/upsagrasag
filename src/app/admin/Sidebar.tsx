@@ -62,13 +62,13 @@ const navGroups = [
     label: 'Academics',
     links: [
       { name: 'Academic Calendar', href: '/admin/academic-calendar', icon: Calendar },
+      { name: 'Academic Programs', href: '/admin/programs', icon: BookOpen },
       { name: 'Congress', href: '/admin/congress', icon: Landmark },
       { name: 'Events & Programmes', href: '/admin/events_programmes', icon: CalendarCheck },
       { name: 'Leadership', href: '/admin/leadership', icon: Users },
       { name: 'Past Questions', href: '/admin/past_questions', icon: FileText },
       { name: 'Academic Supports', href: '/admin/academic-supports', icon: BookOpen },
       { name: 'President', href: '/admin/president', icon: UserCircle },
-
     ],
   },
   {

@@ -49,6 +49,7 @@ export const executiveSchema = z.object({
   name: z.string().min(1, "Name is required"),
   title: z.string().min(1, "Title is required"),
   bio: z.string().optional(),
+  email: z.union([z.literal(''), z.string().email()]).optional(),
   photo_url: z.union([z.literal(''), z.string().url()]).optional(),
   display_order: z.number().int().default(0),
   slug: z.string().optional(),
@@ -60,7 +61,9 @@ export const opportunitySchema = z.object({
   type: z.string().optional().default("Full-time"),
   category: z.string().optional(),
   location: z.string().optional(),
-  deadline: z.string().optional(),
+  deadline: z.union([z.literal(''), z.string(), z.null()]).optional().transform(v => (v === '' ? null : v)),
+  start_date: z.union([z.literal(''), z.string(), z.null()]).optional().transform(v => (v === '' ? null : v)),
+  end_date: z.union([z.literal(''), z.string(), z.null()]).optional().transform(v => (v === '' ? null : v)),
   description: z.string().optional(),
   apply_url: z.union([z.literal(''), z.string().url()]).optional(),
   image_url: z.union([z.literal(''), z.string().url()]).optional()
@@ -100,6 +103,7 @@ export const tutorialSchema = z.object({
   video_url: z.union([z.literal(''), z.string().url()]).optional()
 });
 export const eventProgrammeSchema = z.object({
+  id: z.string().uuid().optional(),
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   event_date: z.string().min(1, "Event date is required"),
@@ -110,6 +114,11 @@ export const eventProgrammeSchema = z.object({
   type: z.enum(['Event', 'Programme', 'Congress']).optional().default('Event'),
   display_on_page: z.boolean().optional().default(true),
   theme: z.string().optional(),
+  price: z.string().optional(),
+  discount_code: z.string().optional(),
+  discount_info: z.string().optional(),
+  registration_deadline: z.string().optional(),
+  speaker: z.string().optional(),
   slug: z.string().optional()
 });
 
@@ -254,6 +263,9 @@ export type ConstitutionFile = z.infer<typeof constitutionSchema>;
 export const platformSettingsSchema = z.object({
   id: z.string().uuid().optional(),
   maintenance_mode: z.boolean().default(false),
+  contact_email: z.string().optional(),
+  contact_phone: z.string().optional(),
+  contact_address: z.string().optional(),
   created_at: z.string().optional(),
 });
 export type PlatformSettings = z.infer<typeof platformSettingsSchema>;

@@ -33,6 +33,12 @@ export default function EventsManagement() {
     formState: { errors, isSubmitting },
   } = useForm<EventProgramme>({
     resolver: zodResolver(eventProgrammeSchema) as any,
+    defaultValues: {
+      title: '', slug: '', description: '', event_date: '', location: '', 
+      image_url: '', url: '', is_featured: false, type: 'Event', 
+      display_on_page: true, theme: '', price: 'Free', discount_code: '', 
+      discount_info: '', registration_deadline: '', speaker: ''
+    }
   });
 
   const imageUrl = useWatch({ control, name: 'image_url' });
@@ -40,7 +46,12 @@ export default function EventsManagement() {
   // --- Handlers ---
   
   const handleOpenAdd = () => {
-    reset({ title: '', slug: '', description: '', event_date: '', location: '', image_url: '', url: '', is_featured: false, type: 'Event', display_on_page: true, theme: '' });
+    reset({ 
+      title: '', slug: '', description: '', event_date: '', location: '', 
+      image_url: '', url: '', is_featured: false, type: 'Event', 
+      display_on_page: true, theme: '', price: 'Free', discount_code: '', 
+      discount_info: '', registration_deadline: '', speaker: '' 
+    });
     setSelectedEvent(null);
     setView('add');
   };
@@ -328,13 +339,61 @@ export default function EventsManagement() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Theme (Optional)</label>
-              <input 
-                {...register('theme')} 
-                placeholder="Event theme..."
-                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Theme (Optional)</label>
+                <input 
+                  {...register('theme')} 
+                  placeholder="Event theme..."
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Speaker / Host (Optional)</label>
+                <input 
+                  {...register('speaker')} 
+                  placeholder="e.g. Prof. John Doe"
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                />
+              </div>
+            </div>
+            
+            <div className="border-t border-gray-100 pt-5 mt-5">
+              <h3 className="font-medium text-gray-900 mb-4">Ticketing & Registration</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
+                  <input 
+                    {...register('price')} 
+                    placeholder="e.g. Free, GHS 50"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Registration Deadline (Optional)</label>
+                  <input 
+                    {...register('registration_deadline')} 
+                    type="date"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Discount Info (Optional)</label>
+                  <input 
+                    {...register('discount_info')} 
+                    placeholder="e.g. 50% off for Early Birds"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Discount Code (Optional)</label>
+                  <input 
+                    {...register('discount_code')} 
+                    placeholder="e.g. EARLY2026"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -370,6 +429,19 @@ export default function EventsManagement() {
                 <Calendar className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
               </div>
               {errors.event_date && <p className="text-xs text-red-500 mt-1">{errors.event_date.message as string}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+              <div className="relative">
+                <input 
+                  type="text" 
+                  {...register('location')} 
+                  placeholder="e.g. LBC Auditorium, UPSA"
+                  className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                />
+                <MapPin className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              </div>
             </div>
 
             <div className="pt-4 border-t border-gray-100 space-y-4">
@@ -448,7 +520,37 @@ export default function EventsManagement() {
                    <p className="text-gray-500 flex items-center gap-2 mb-1"><CheckCircle2 className="w-4 h-4"/> Status</p>
                    <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${status === 'Upcoming' ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}>{status}</span>
                  </div>
+                 {selectedEvent.speaker && (
+                   <div>
+                     <p className="text-gray-500 flex items-center gap-2 mb-1">Speaker</p>
+                     <p className="font-medium text-gray-900">{selectedEvent.speaker}</p>
+                   </div>
+                 )}
+                 <div>
+                   <p className="text-gray-500 flex items-center gap-2 mb-1">Price</p>
+                   <p className="font-medium text-gray-900">{selectedEvent.price || 'Free'}</p>
+                 </div>
                </div>
+               
+               {(selectedEvent.discount_code || selectedEvent.registration_deadline) && (
+                 <div className="mt-4 p-4 bg-amber-50 border border-amber-100 rounded-xl">
+                   <h4 className="text-sm font-semibold text-amber-900 mb-2">Ticketing Info</h4>
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                     {selectedEvent.registration_deadline && (
+                       <div>
+                         <p className="text-amber-700/80 mb-0.5 text-xs uppercase tracking-wider">Deadline</p>
+                         <p className="font-medium text-amber-900">{selectedEvent.registration_deadline}</p>
+                       </div>
+                     )}
+                     {selectedEvent.discount_code && (
+                       <div>
+                         <p className="text-amber-700/80 mb-0.5 text-xs uppercase tracking-wider">Discount Code</p>
+                         <p className="font-medium text-amber-900">{selectedEvent.discount_code} {selectedEvent.discount_info && `(${selectedEvent.discount_info})`}</p>
+                       </div>
+                     )}
+                   </div>
+                 </div>
+               )}
             </div>
           </div>
 

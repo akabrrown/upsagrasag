@@ -25,7 +25,7 @@ export default function AdminOpportunitiesPage() {
 
   const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<Opportunity>({
     resolver: zodResolver(opportunitySchema) as any,
-    defaultValues: { title: '', company: '', type: 'Full-time', category: '', image_url: '', apply_url: '' }
+    defaultValues: { title: '', company: '', type: 'Full-time', category: '', image_url: '', apply_url: '', location: '', deadline: '', description: '' }
   });
 
   const imageUrl = useWatch({ control, name: 'image_url' });
@@ -33,7 +33,7 @@ export default function AdminOpportunitiesPage() {
   // --- Handlers ---
   
   const handleOpenAdd = () => {
-    reset({ title: '', company: '', type: 'Full-time', category: '', image_url: '', apply_url: '' });
+    reset({ title: '', company: '', type: 'Full-time', category: '', image_url: '', apply_url: '', location: '', deadline: '', description: '' });
     setSelectedOpp(null);
     setView('add');
   };
@@ -277,7 +277,7 @@ export default function AdminOpportunitiesPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Employment / Funding Type</label>
                 <input 
                   {...register('type')} 
-                  placeholder="e.g. Full-time, Fully Funded, Partial"
+                  placeholder="e.g. Full-time, Fully Funded, Volunteer"
                   className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
                 />
               </div>
@@ -286,7 +286,7 @@ export default function AdminOpportunitiesPage() {
                 <input 
                   {...register('category')} 
                   list="category-options"
-                  placeholder="e.g. Scholarships, Research Grants"
+                  placeholder="e.g. Scholarships, Research Grants, Volunteers"
                   className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
                 />
                 <datalist id="category-options">
@@ -297,8 +297,57 @@ export default function AdminOpportunitiesPage() {
                   <option value="Calls for Papers" />
                   <option value="Conferences" />
                   <option value="Publication Opportunities" />
+                  <option value="Volunteers" />
                 </datalist>
               </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                <input 
+                  {...register('location')} 
+                  placeholder="e.g. Accra, Ghana or Remote"
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Deadline</label>
+                <input 
+                  {...register('deadline')} 
+                  type="date"
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                <input 
+                  {...register('start_date')} 
+                  type="date"
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                <input 
+                  {...register('end_date')} 
+                  type="date"
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <textarea 
+                {...register('description')} 
+                rows={4}
+                placeholder="Details about the opportunity..."
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm resize-none"
+              />
             </div>
 
             <div>
@@ -379,9 +428,31 @@ export default function AdminOpportunitiesPage() {
                  <p className="text-lg font-bold text-[#004080]">{selectedOpp.company}</p>
                </div>
                
-               <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-sm text-gray-600 pt-2">
-                 <div className="flex items-center gap-2"><Tag className="w-4 h-4 text-gray-400"/> {selectedOpp.category || 'General'}</div>
+               <div className="flex flex-col gap-2 pt-2 text-sm text-gray-600">
+                 <div className="flex items-center gap-2">
+                   <Tag className="w-4 h-4 text-gray-400"/> 
+                   <span className="font-medium">{selectedOpp.category || 'General'}</span>
+                 </div>
+                 {selectedOpp.location && (
+                   <div className="flex items-center gap-2">
+                     <MapPin className="w-4 h-4 text-gray-400"/> 
+                     <span>{selectedOpp.location}</span>
+                   </div>
+                 )}
+                 {selectedOpp.deadline && (
+                   <div className="flex items-center gap-2">
+                     <span className="text-gray-400 font-bold text-xs uppercase tracking-wider">Deadline:</span>
+                     <span>{new Date(selectedOpp.deadline).toLocaleDateString()}</span>
+                   </div>
+                 )}
                </div>
+               
+               {selectedOpp.description && (
+                 <div className="pt-4 border-t border-gray-100">
+                   <h3 className="font-semibold text-gray-900 mb-2">Description</h3>
+                   <p className="text-gray-600 leading-relaxed text-sm whitespace-pre-wrap">{selectedOpp.description}</p>
+                 </div>
+               )}
             </div>
           </div>
 

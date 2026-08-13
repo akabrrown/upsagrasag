@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin, Loader2, MessageSquare } from 'lucide-react';
+import { supabaseClient } from '@/lib/supabaseClient';
 
 export default function ContactPage() {
   const [firstName, setFirstName] = useState('');
@@ -12,6 +13,25 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [contactData, setContactData] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchContactData = async () => {
+      try {
+        const { data, error } = await supabaseClient
+          .from('platform_settings')
+          .select('contact_email, contact_phone, contact_address')
+          .limit(1)
+          .single();
+        if (!error && data) {
+          setContactData(data);
+        }
+      } catch (err) {
+        console.warn('Could not load dynamic contact info', err);
+      }
+    };
+    fetchContactData();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,21 +75,21 @@ export default function ContactPage() {
   const contactInfo = [
     {
       title: 'Office Location',
-      details: 'University of Professional Studies Accra, First floor on the student centre',
+      details: contactData?.contact_address || 'University of Professional Studies Accra, First floor on the student centre',
       icon: MapPin,
       href: '#',
     },
     {
       title: 'Email Address',
-      details: 'grasagpresident@upsamail.edu.gh',
+      details: contactData?.contact_email || 'grasagpresident@upsamail.edu.gh',
       icon: Mail,
-      href: 'mailto:grasagpresident@upsamail.edu.gh',
+      href: contactData?.contact_email ? `mailto:${contactData.contact_email}` : 'mailto:grasagpresident@upsamail.edu.gh',
     },
     {
       title: 'Telephone',
-      details: '+233 (0) 55 860 1545',
+      details: contactData?.contact_phone || '+233 (0) 55 860 1545',
       icon: Phone,
-      href: 'tel:+233558601545',
+      href: contactData?.contact_phone ? `tel:${contactData.contact_phone.replace(/\s/g, '')}` : 'tel:+233558601545',
     },
   ];
 

@@ -24,7 +24,7 @@ export default function AdminExecutivesPage() {
 
   const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<Executive>({
     resolver: zodResolver(executiveSchema) as any,
-    defaultValues: { name: '', title: '', bio: '', photo_url: '', display_order: 0 }
+    defaultValues: { name: '', title: '', bio: '', photo_url: '', display_order: 0, email: '' }
   });
 
   const photoUrl = useWatch({ control, name: 'photo_url' });
@@ -32,7 +32,7 @@ export default function AdminExecutivesPage() {
   // --- Handlers ---
   
   const handleOpenAdd = () => {
-    reset({ name: '', title: '', bio: '', photo_url: '', display_order: 0 });
+    reset({ name: '', title: '', bio: '', photo_url: '', display_order: 0, email: '' });
     setSelectedExecutive(null);
     setView('add');
   };
@@ -237,6 +237,16 @@ const sortedRecords = recordsArray.sort((a, b) => (a.display_order ?? 0) - (b.di
                 {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title.message as string}</p>}
               </div>
             </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+              <input 
+                {...register('email')} 
+                type="email"
+                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+              />
+              {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message as string}</p>}
+            </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Biography / Description</label>
@@ -315,6 +325,11 @@ const sortedRecords = recordsArray.sort((a, b) => (a.display_order ?? 0) - (b.di
                  <span className="inline-block px-2.5 py-1 bg-gray-100 text-gray-600 rounded text-xs font-bold uppercase tracking-wider mb-2">Executive</span>
                  <h2 className="text-3xl font-bold text-gray-900 leading-tight">{selectedExecutive.name}</h2>
                  <p className="text-lg font-bold text-[#004080]">{selectedExecutive.title}</p>
+                 {selectedExecutive.email && (
+                   <p className="text-sm font-medium text-gray-500 mt-2 flex items-center gap-2">
+                     <Mail className="w-4 h-4" /> {selectedExecutive.email}
+                   </p>
+                 )}
                </div>
                
                <div className="pt-4 border-t border-gray-100">

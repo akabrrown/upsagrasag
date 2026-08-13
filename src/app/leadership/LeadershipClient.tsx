@@ -5,6 +5,7 @@ import { ProfileCard } from "./ProfileCard";
 import { ModalOverlay } from "./ui";
 import { ArrowRight, Award, GraduationCap, Calendar, Users } from "lucide-react";
 import { motion, useInView } from "framer-motion";
+import { optimizeCloudinaryUrl } from "@/lib/optimizeImage";
 
 interface Leader {
   id: string;
@@ -123,7 +124,7 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives }
           {/* Left: Grayscale Portrait with exact bleed fit */}
           <div className="relative w-full md:w-[35%] min-h-[300px] md:min-h-full overflow-hidden bg-neutral-100">
             <img 
-              src={president.image_url ?? "/default-avatar.png"} 
+              src={optimizeCloudinaryUrl(president.image_url) ?? "/default-avatar.png"} 
               alt={president.name} 
               className="absolute inset-0 w-full h-full object-cover object-top grayscale transition-transform duration-750 hover:scale-[1.03]"
             />
@@ -178,7 +179,7 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives }
         <ModalOverlay onClose={() => setShowPresidentModal(false)}>
           <div className="flex flex-col md:flex-row w-full h-full max-w-4xl bg-white text-neutral-800">
             <div className="relative w-full md:w-2/5 min-h-[300px] md:min-h-full">
-              <img src={president.image_url ?? "/default-avatar.png"} alt={president.name} className="absolute inset-0 w-full h-full object-cover object-top" />
+              <img src={optimizeCloudinaryUrl(president.image_url) ?? "/default-avatar.png"} alt={president.name} className="absolute inset-0 w-full h-full object-cover object-top" />
               <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/20 to-transparent" />
               <div className="absolute bottom-6 left-6 right-6">
                 <span className="inline-block rounded-full bg-accent px-3 py-1 text-xs font-bold uppercase tracking-wider text-neutral-950 mb-2">
@@ -253,7 +254,7 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives }
                     <div className="relative overflow-hidden rounded-2xl bg-white border border-neutral-200 p-5 shadow-md transition-all duration-300 hover:border-primary/30">
                       <div className="flex items-center gap-4">
                         <img 
-                          src={leader.image_url ?? "/default-avatar.png"} 
+                          src={optimizeCloudinaryUrl(leader.image_url, { width: 400 }) ?? "/default-avatar.png"} 
                           alt={leader.name} 
                           className="w-16 h-16 rounded-full object-cover object-top border-2 border-accent/20"
                         />

@@ -204,17 +204,25 @@ export default function OpportunitiesClient({ initialOpportunities }: Opportunit
   const visibleGrid = useMemo(() => gridOpportunities.slice(0, visibleCount), [gridOpportunities, visibleCount]);
 
   const handleSave = (id: string) => {
-    setSavedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+    if (!savedIds.includes(id)) {
+      setSavedIds([...savedIds, id]);
+    } else {
+      setSavedIds(savedIds.filter(saved => saved !== id));
+    }
   };
 
-  const handleCopyLink = (opp: Opportunity) => {
-    const url = `${window.location.origin}/opportunities/${opp.id}`;
-    navigator.clipboard.writeText(url);
-    setCopiedShareId(opp.id || null);
-    setTimeout(() => setCopiedShareId(null), 2500);
+  const handleShare = async (opp: Opportunity) => {
+    if (!opp.id) return;
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/opportunities?id=${opp.id}`);
+      setCopiedShareId(opp.id);
+      setTimeout(() => setCopiedShareId(null), 2000);
+    } catch (err) {
+      console.warn('Failed to copy', err);
+    }
   };
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
     setSubscribed(true);
@@ -481,7 +489,7 @@ export default function OpportunitiesClient({ initialOpportunities }: Opportunit
                             {archived ? 'Closed' : isUrgent ? 'Urgent' : 'Open'}
                           </span>
                           <button
-                            onClick={e => { e.stopPropagation(); handleSave(opp.id); }}
+                            onClick={e => { e.stopPropagation(); if (opp.id) handleSave(opp.id); }}
                             className="text-neutral-300 hover:text-[#B8860B] transition-colors cursor-pointer"
                             title={isSaved ? 'Remove bookmark' : 'Save opportunity'}
                           >
@@ -666,7 +674,7 @@ export default function OpportunitiesClient({ initialOpportunities }: Opportunit
                   {copiedShareId === activeOpportunity.id ? <CheckCircle className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
                 </button>
                 <button
-                  onClick={() => setReportId(activeOpportunity.id)}
+                  onClick={() => setReportId(activeOpportunity.id || null)}
                   title="Report expired listing"
                   className="w-8 h-8 rounded-full bg-white/80 hover:bg-red-50 text-neutral-400 hover:text-red-500 border border-neutral-200 flex items-center justify-center transition-colors cursor-pointer"
                 >
@@ -688,8 +696,9 @@ export default function OpportunitiesClient({ initialOpportunities }: Opportunit
                 {[
                   { icon: MapPin, label: 'Location', value: activeOpportunity.location || 'Accra' },
                   { icon: DollarSign, label: 'Funding / Type', value: activeOpportunity.type || 'See details' },
-                  { icon: GraduationCap, label: 'Eligibility', value: 'Graduate students & recent graduates' },
+                  { icon: Calendar, label: 'Start Date', value: (activeOpportunity as any).start_date ? new Date((activeOpportunity as any).start_date).toLocaleDateString() : 'Immediate / Open' },
                   { icon: Calendar, label: 'Deadline', value: getDaysLeftLabel((activeOpportunity as any).deadline) },
+                  ...((activeOpportunity as any).end_date ? [{ icon: Calendar, label: 'End Date', value: new Date((activeOpportunity as any).end_date).toLocaleDateString() }] : []),
                 ].map(({ icon: Icon, label, value }) => (
                   <div key={label} className="flex items-start gap-2">
                     <Icon className="w-4 h-4 text-[#B8860B] mt-0.5 shrink-0" />
@@ -759,7 +768,7 @@ export default function OpportunitiesClient({ initialOpportunities }: Opportunit
             <div className="p-5 border-t border-neutral-100 flex flex-wrap justify-between items-center gap-3 bg-neutral-50/60">
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => { setReportId(activeOpportunity.id); }}
+                  onClick={() => { setReportId(activeOpportunity.id || null); }}
                   className="text-xs text-neutral-400 hover:text-red-500 flex items-center gap-1 transition-colors cursor-pointer"
                 >
                   <Flag className="w-3.5 h-3.5" /> Report expired listing

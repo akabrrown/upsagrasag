@@ -153,18 +153,17 @@ export class AdminCrudService<T extends { id?: string | number }> {
 import type { 
   AdminUser, 
   President, 
-  CongressEvent, 
   Partner, 
   ConstitutionFile, 
   Leadership, 
   Executive, 
   Opportunity, 
   Resource, 
+  Program, 
   PastQuestion, 
   Tutorial, 
   EventProgramme, 
   EventProgrammeRecord,
-  ResearchOpportunity, 
   NewsUpdate, 
   PlatformSettings,
   MembershipBenefit,
@@ -605,6 +604,7 @@ export const leadershipService = new AdminCrudService<Leadership>('leadership');
 export const executiveService = new ExecutiveCrudService();
 export const opportunityService = new AdminCrudService<Opportunity>('opportunities');
 export const resourceService = new AdminCrudService<Resource>('resources');
+export const programService = new AdminCrudService<Program>('programs');
 export const pastQuestionService = new PastQuestionCrudService();
 export const tutorialService = new AdminCrudService<Tutorial>('tutorials');
 export const membershipBenefitService = new AdminCrudService<MembershipBenefit>('membership_benefits');
@@ -667,6 +667,7 @@ export const serviceMap: Record<string, AdminCrudService<any>> = {
   'executives': executiveService,
   'opportunities': opportunityService,
   'resources': resourceService,
+  'programs': programService,
   'past_questions': pastQuestionService,
   'tutorials': tutorialService,
   'events_programmes': eventProgrammeService,
@@ -691,6 +692,7 @@ import {
   executiveSchema,
   opportunitySchema,
   resourceSchema,
+  programSchema,
   pastQuestionSchema,
   tutorialSchema,
   eventProgrammeSchema,
@@ -709,6 +711,7 @@ export const schemaMap: Record<string, any> = {
   'executives': executiveSchema,
   'opportunities': opportunitySchema,
   'resources': resourceSchema,
+  'programs': programSchema,
   'past_questions': pastQuestionSchema,
   'tutorials': tutorialSchema,
   'events_programmes': eventProgrammeSchema,

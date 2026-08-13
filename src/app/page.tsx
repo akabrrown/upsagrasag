@@ -10,6 +10,7 @@ import PartnerCarousel from '@/components/PartnerCarousel';
 import { supabaseClient } from '@/lib/supabaseClient';
 import Image from 'next/image';
 import { EventProgrammeRecord } from '@/types/admin';
+import { optimizeCloudinaryUrl } from '@/lib/optimizeImage';
 
 
 export default function HomePage() {
@@ -121,7 +122,7 @@ export default function HomePage() {
         .limit(5);
 
       if (!error && data) {
-        setEvents(data);
+        setEvents(data as any);
       }
     };
     fetchCongress();
@@ -618,7 +619,7 @@ export default function HomePage() {
                 key={idx}
                 className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${currentEventIndex === idx ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
               >
-                <img src={event.image_url || '/bkg-grasag.jpg'} alt={event.title} className="absolute right-0 top-0 w-full md:w-1/2 h-full object-contain object-right md:object-center opacity-40 md:opacity-90" />
+                <img src={optimizeCloudinaryUrl(event.image_url) || '/bkg-grasag.jpg'} alt={event.title} className="absolute right-0 top-0 w-full md:w-1/2 h-full object-contain object-right md:object-center opacity-40 md:opacity-90" />
                 <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-transparent md:bg-gradient-to-r md:from-slate-950 md:via-slate-950/80 md:to-transparent" />
               </div>
             ))}
