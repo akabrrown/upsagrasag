@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireAdmin } from '@/lib/auth';
+import { requireAdmin } from '@/lib/authHelpers';
 import { academicProgrammeService } from '@/lib/supabase/admin/academicProgrammeService';
 import { academicProgrammeSchema } from '@/types/admin';
 
