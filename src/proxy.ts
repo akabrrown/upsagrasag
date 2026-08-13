@@ -2,13 +2,14 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { rateLimit } from '@/lib/rate-limit';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Only rate limit mutation API routes (POST, PATCH, DELETE)
   if (
     request.nextUrl.pathname.startsWith('/api/') &&
     ['POST', 'PATCH', 'DELETE'].includes(request.method)
   ) {
-    const ip = request.ip ?? '127.0.0.1';
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    const ip = forwardedFor ? forwardedFor.split(',')[0] : '127.0.0.1';
     const { success } = await rateLimit.limit(ip);
     
     if (!success) {
