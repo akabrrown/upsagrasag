@@ -209,6 +209,24 @@ export type WelfareService = {
   updated_at?: string;
 };
 
+export interface PresidentRecord {
+  id: string;
+  name: string;
+  image_url: string;
+  term: string;
+  order_index?: number;
+  created_at?: string;
+  is_active?: boolean;
+}
+
+export interface AcademicCalendarRecord {
+  id: string;
+  title: string;
+  date: string;
+  description?: string;
+  created_at?: string;
+};
+
 export const welfareStepSchema = z.object({
   id: z.string().uuid().optional(),
   step_number: z.number().int(),

@@ -22,7 +22,7 @@ export default function AdminAcademicCalendarPage() {
   const fetchEvents = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/academic-calendar');
+      const res = await fetch('/api/admin/academic-calendar');
       const data = await res.json();
       setEvents(data);
     } catch (e) {
@@ -70,14 +70,14 @@ export default function AdminAcademicCalendarPage() {
       if (view === 'edit' && selectedEvent) {
          // Current API might not support PUT/PATCH, but we'll try or recreate
          // For now let's just delete and recreate to simulate edit if PATCH fails
-         await fetch('/api/academic-calendar', {
+         await fetch('/api/admin/academic-calendar', {
            method: 'DELETE',
            headers: { 'Content-Type': 'application/json' },
            body: JSON.stringify({ id: selectedEvent.id })
          });
       }
       
-      const res = await fetch('/api/academic-calendar', {
+      const res = await fetch('/api/admin/academic-calendar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, date, description })
@@ -96,7 +96,7 @@ export default function AdminAcademicCalendarPage() {
   const handleDelete = async (id: number) => {
     if(!confirm('Are you sure you want to delete this event?')) return;
     try {
-      const res = await fetch('/api/academic-calendar', {
+      const res = await fetch('/api/admin/academic-calendar', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id })

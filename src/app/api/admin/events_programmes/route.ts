@@ -4,8 +4,21 @@ import { eventProgrammeSchema } from '@/types/admin';
 
 // GET all event programmes or filter by event_id
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
+  const url = new URL(request.url);
+  const { searchParams, pathname } = url;
   const eventId = searchParams.get('event_id');
+  const pathParts = pathname.split('/').filter(Boolean);
+  const possibleId = pathParts[pathParts.length - 1];
+  // If an explicit ID is present in the path (and not the base route) and no query param, fetch single record
+  if (possibleId && possibleId !== 'events_programmes' && !eventId) {
+    const { data, error } = await supabase
+      .from('events_programmes')
+      .select('*')
+      .eq('id', possibleId)
+      .single();
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(data);
+  }
   let query = supabase.from('events_programmes').select('*');
   if (eventId) {
     query = query.eq('event_id', eventId);
@@ -13,7 +26,6 @@ export async function GET(request: Request) {
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data);
-}
 
 // CREATE a new event programme
 export async function POST(request: Request) {
