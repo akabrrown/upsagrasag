@@ -9,6 +9,7 @@ import {
   Plus, Search, Filter, Pencil, Trash2, 
   ArrowLeft, Link as LinkIcon, ExternalLink
 } from 'lucide-react';
+import { AdminTableSkeleton } from '@/components/admin/AdminTableSkeleton';
 
 const quickLinkSchema = z.object({
   id: z.string().uuid().optional(),
@@ -135,14 +136,7 @@ export default function AdminQuickLinksPage() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {isLoading ? (
-                <tr>
-                  <td colSpan={3} className="px-6 py-8 text-center text-gray-500">
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-[#2563eb] border-t-transparent rounded-full animate-spin"></div>
-                      Loading links...
-                    </div>
-                  </td>
-                </tr>
+                <AdminTableSkeleton columns={3} />
               ) : recordsArray.length === 0 ? (
                 <tr>
                   <td colSpan={3} className="px-6 py-12 text-center text-gray-500">

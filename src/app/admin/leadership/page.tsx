@@ -10,6 +10,7 @@ import {
   ArrowLeft, Copy, User, Mail, Phone
 } from 'lucide-react';
 import CloudinaryUpload from '@/components/CloudinaryUpload';
+import { AdminTableSkeleton } from '@/components/admin/AdminTableSkeleton';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 

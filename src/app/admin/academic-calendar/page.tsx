@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Calendar as CalendarIcon, Plus, Search, Filter, Trash2, ArrowLeft, Eye, Pencil, CheckCircle2 } from 'lucide-react';
+import { AdminTableSkeleton } from '@/components/admin/AdminTableSkeleton';
 
 type ViewState = 'list' | 'add' | 'edit' | 'details';
 
@@ -183,7 +184,7 @@ export default function AdminAcademicCalendarPage() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {loading ? (
-                <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">Loading calendar...</td></tr>
+                <AdminTableSkeleton columns={4} />
               ) : filteredRecords.length === 0 ? (
                 <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">No events found.</td></tr>
               ) : (

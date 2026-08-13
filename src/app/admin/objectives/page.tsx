@@ -9,6 +9,7 @@ import {
   Plus, Search, Eye, Pencil, Trash2, 
   ArrowLeft, Target
 } from 'lucide-react';
+import { AdminTableSkeleton } from '@/components/admin/AdminTableSkeleton';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 

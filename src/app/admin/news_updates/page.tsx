@@ -12,6 +12,7 @@ import {
 import CloudinaryUpload from '@/components/CloudinaryUpload';
 import dynamic from 'next/dynamic';
 import 'react-quill-new/dist/quill.snow.css';
+import { AdminTableSkeleton } from '@/components/admin/AdminTableSkeleton';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
 const fetcher = (url: string) => fetch(url).then(r => r.json());

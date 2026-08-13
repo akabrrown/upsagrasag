@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import useSWR from 'swr';
 import { AcademicProgramme } from '@/types/admin';
 import { Plus, Edit2, Trash2, ArrowLeft, BookOpen } from 'lucide-react';
+import { AdminTableSkeleton } from '@/components/admin/AdminTableSkeleton';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -102,10 +103,7 @@ export default function AcademicProgrammesAdmin() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-6">
           {isLoading ? (
-            <div className="flex items-center justify-center py-12 gap-2 text-gray-500">
-              <div className="w-4 h-4 border-2 border-[#2563eb] border-t-transparent rounded-full animate-spin"></div>
-              Loading programmes...
-            </div>
+            <AdminTableSkeleton columns={4} />
           ) : !programmes || programmes.length === 0 ? (
             <div className="text-center py-12">
               <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
