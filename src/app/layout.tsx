@@ -32,6 +32,7 @@ export const metadata: Metadata = {
     title: "GRASAG-UPSA",
     description: "The official digital platform for UPSA graduate students.",
   },
+  icons: { icon: '/favicon.png' },
 };
 
 import { AxiomWebVitals } from 'next-axiom';
