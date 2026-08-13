@@ -160,7 +160,7 @@ export default function AdminPartnersPage() {
                       <div className="flex items-center gap-4">
                         <div className="w-14 h-14 rounded-lg bg-white border border-gray-200 overflow-hidden flex-shrink-0 flex items-center justify-center p-2">
                           {record.logo_url ? (
-                            <Image src={record.logo_url} alt="" fill className="w-full h-full object-contain" />
+                            <Image src={record.logo_url} alt="" width={800} height={800} className="w-full h-full object-contain" />
                           ) : (
                             <Building2 className="w-6 h-6 text-gray-400" />
                           )}
@@ -294,7 +294,7 @@ export default function AdminPartnersPage() {
         <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center text-center">
            <div className="w-32 h-32 rounded-2xl bg-white border border-gray-200 shadow-sm flex flex-col items-center justify-center p-4 mb-6">
              {selectedPartner.logo_url ? (
-                <Image src={selectedPartner.logo_url} alt={selectedPartner.name} fill className="w-full h-full object-contain" />
+                <Image src={selectedPartner.logo_url} alt={selectedPartner.name} width={800} height={800} className="w-full h-full object-contain" />
              ) : (
                 <Building2 className="w-12 h-12 text-gray-400" />
              )}

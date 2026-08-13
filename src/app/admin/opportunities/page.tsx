@@ -179,7 +179,7 @@ export default function AdminOpportunitiesPage() {
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-lg bg-gray-50 border border-gray-200 overflow-hidden flex-shrink-0 flex items-center justify-center">
                           {record.image_url ? (
-                            <Image src={record.image_url} alt="" fill className="w-full h-full object-cover" />
+                            <Image src={record.image_url} alt="" width={800} height={800} className="w-full h-full object-cover" />
                           ) : (
                             <Briefcase className="w-5 h-5 text-gray-400" />
                           )}
@@ -374,7 +374,7 @@ export default function AdminOpportunitiesPage() {
               <CloudinaryUpload onUpload={(url: string) => setValue('image_url', url, { shouldValidate: true })} />
               {imageUrl && (
                 <div className="mt-4 w-32 h-32 rounded-xl overflow-hidden border-4 border-white shadow-md mx-auto bg-white">
-                  <Image src={imageUrl} alt="Preview" fill className="w-full h-full object-contain p-2" />
+                  <Image src={imageUrl} alt="Preview" width={800} height={800} className="w-full h-full object-contain p-2" />
                 </div>
               )}
             </div>
@@ -416,7 +416,7 @@ export default function AdminOpportunitiesPage() {
             {/* Logo */}
             <div className="w-32 h-32 sm:w-40 sm:h-40 bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm flex-shrink-0 mx-auto sm:mx-0 flex items-center justify-center p-4">
               {selectedOpp.image_url ? (
-                 <Image src={selectedOpp.image_url} alt={selectedOpp.company} fill className="w-full h-full object-contain" />
+                 <Image src={selectedOpp.image_url} alt={selectedOpp.company} width={800} height={800} className="w-full h-full object-contain" />
               ) : (
                 <Building2 className="w-12 h-12 text-gray-300" />
               )}

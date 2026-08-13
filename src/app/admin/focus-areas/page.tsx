@@ -248,7 +248,7 @@ export default function AdminFocusAreasPage() {
               <CloudinaryUpload onUpload={(url: string) => setValue('image_url', url, { shouldValidate: true })} />
               {imageUrl && (
                 <div className="mt-4 w-full aspect-video rounded-xl overflow-hidden border border-gray-200 shadow-sm mx-auto bg-white">
-                  <Image src={imageUrl} alt="Preview" fill className="w-full h-full object-cover" />
+                  <Image src={imageUrl} alt="Preview" width={800} height={800} className="w-full h-full object-cover" />
                 </div>
               )}
             </div>

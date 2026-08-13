@@ -285,7 +285,7 @@ export default function AdminGalleryPage() {
                 <div className="grid grid-cols-2 gap-2">
                   {uploadedUrls.map((url, idx) => (
                     <div key={idx} className="relative group rounded-md overflow-hidden border border-gray-200 aspect-square">
-                      <Image src={url} alt="Staged upload" fill className="object-cover" />
+                      <Image src={url} alt="Staged upload" width={800} height={800} className="object-cover" />
                       <button 
                         type="button"
                         onClick={() => handleRemoveUrl(url)}

@@ -221,9 +221,9 @@ export default function EventsManagement() {
                     <tr key={record.id} className="hover:bg-gray-50/50 transition-colors group">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-4">
-                          <div className="w-16 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
+                          <div className="relative w-16 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
                             {record.image_url ? (
-                              <Image src={record.image_url} alt="" fill className="w-full h-full object-cover" />
+                              <Image src={record.image_url} alt="" width={800} height={800} className="w-full h-full object-cover" />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center text-gray-400"><Calendar className="w-5 h-5"/></div>
                             )}
@@ -441,7 +441,7 @@ export default function EventsManagement() {
               <CloudinaryUpload onUpload={(url: string) => setValue('image_url', url, { shouldValidate: true })} />
               {imageUrl && (
                 <div className="mt-4 w-full aspect-video rounded-lg overflow-hidden border border-gray-200 relative">
-                  <Image src={imageUrl} alt="Preview" fill className="w-full h-full object-cover" />
+                  <Image src={imageUrl} alt="Preview" width={800} height={800} className="w-full h-full object-cover" />
                   <button type="button" onClick={() => setValue('image_url', '')} className="absolute top-2 right-2 p-1 bg-white/90 rounded-full text-red-500 hover:bg-white shadow-sm">
                     <X className="w-4 h-4" />
                   </button>
@@ -555,9 +555,9 @@ export default function EventsManagement() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 flex flex-col sm:flex-row gap-6 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             {/* Poster */}
-            <div className="w-full sm:w-1/3 aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0">
+            <div className="relative w-full sm:w-1/3 aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0">
               {selectedEvent.image_url ? (
-                 <Image src={selectedEvent.image_url} alt={selectedEvent.title} fill className="w-full h-full object-cover" />
+                 <Image src={selectedEvent.image_url} alt={selectedEvent.title} width={800} height={800} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400"><Calendar className="w-12 h-12" /></div>
               )}

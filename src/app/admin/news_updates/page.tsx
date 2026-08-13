@@ -178,9 +178,9 @@ export default function AdminNewsPage() {
                     <tr key={record.id} className="hover:bg-gray-50/50 transition-colors group">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-4">
-                          <div className="w-16 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
+                          <div className="relative w-16 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
                             {record.image_url ? (
-                              <Image src={record.image_url} alt="" fill className="w-full h-full object-cover" />
+                              <Image src={record.image_url} alt="" width={800} height={800} className="w-full h-full object-cover" />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center text-gray-400"><ImageIcon className="w-5 h-5"/></div>
                             )}
@@ -322,7 +322,7 @@ export default function AdminNewsPage() {
               <CloudinaryUpload onUpload={(url: string) => setValue('image_url', url, { shouldValidate: true })} />
               {imageUrl && (
                 <div className="mt-4 w-full aspect-video rounded-lg overflow-hidden border border-gray-200 relative">
-                  <Image src={imageUrl} alt="Preview" fill className="w-full h-full object-cover" />
+                  <Image src={imageUrl} alt="Preview" width={800} height={800} className="w-full h-full object-cover" />
                   <button type="button" onClick={() => setValue('image_url', '')} className="absolute top-2 right-2 p-1 bg-white/90 rounded-full text-red-500 hover:bg-white shadow-sm">
                     <X className="w-4 h-4" />
                   </button>
@@ -389,7 +389,7 @@ export default function AdminNewsPage() {
             {/* Poster */}
             {selectedArticle.image_url && (
               <div className="w-full aspect-video bg-gray-100 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0">
-                 <Image src={selectedArticle.image_url} alt={selectedArticle.title} fill className="w-full h-full object-cover" />
+                 <Image src={selectedArticle.image_url} alt={selectedArticle.title} width={800} height={800} className="w-full h-full object-cover" />
               </div>
             )}
 

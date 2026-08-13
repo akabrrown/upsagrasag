@@ -152,7 +152,7 @@ const sortedRecords = recordsArray.sort((a, b) => (a.display_order ?? 0) - (b.di
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-full bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
                           {record.photo_url ? (
-                            <Image src={record.photo_url} alt="" fill className="w-full h-full object-cover" />
+                            <Image src={record.photo_url} alt="" width={800} height={800} className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-gray-400"><User className="w-5 h-5"/></div>
                           )}
@@ -270,7 +270,7 @@ const sortedRecords = recordsArray.sort((a, b) => (a.display_order ?? 0) - (b.di
               <CloudinaryUpload onUpload={(url: string) => setValue('photo_url', url, { shouldValidate: true })} />
               {photoUrl && (
                 <div className="mt-4 w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-md mx-auto">
-                  <Image src={photoUrl} alt="Preview" fill className="w-full h-full object-cover" />
+                  <Image src={photoUrl} alt="Preview" width={800} height={800} className="w-full h-full object-cover" />
                 </div>
               )}
             </div>
@@ -316,7 +316,7 @@ const sortedRecords = recordsArray.sort((a, b) => (a.display_order ?? 0) - (b.di
             {/* Photo */}
             <div className="w-32 h-32 sm:w-40 sm:h-40 bg-gray-100 rounded-full overflow-hidden border-4 border-white shadow-lg flex-shrink-0 mx-auto sm:mx-0">
               {selectedExecutive.photo_url ? (
-                 <Image src={selectedExecutive.photo_url} alt={selectedExecutive.name} fill className="w-full h-full object-cover" />
+                 <Image src={selectedExecutive.photo_url} alt={selectedExecutive.name} width={800} height={800} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400"><User className="w-12 h-12" /></div>
               )}
