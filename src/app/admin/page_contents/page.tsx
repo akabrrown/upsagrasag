@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import CloudinaryUpload from '@/components/CloudinaryUpload';
 import { AdminTableSkeleton } from '@/components/admin/AdminTableSkeleton';
+import Image from 'next/image';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -147,7 +148,7 @@ export default function AdminPageContentsPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
                         {record.image_url ? (
-                          <img src={record.image_url} alt={record.slug} className="w-12 h-12 rounded-lg object-cover bg-gray-100 border border-gray-200" />
+                          <Image src={record.image_url} alt={record.slug} width={400} height={400} className="w-12 h-12 rounded-lg object-cover bg-gray-100 border border-gray-200" />
                         ) : (
                           <div className="w-12 h-12 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center">
                             <FileText className="w-5 h-5 text-gray-400" />
@@ -275,7 +276,7 @@ export default function AdminPageContentsPage() {
               <CloudinaryUpload onUpload={(url) => setValue('image_url', url, { shouldValidate: true })} />
               {imageUrl ? (
                 <div className="mt-4 relative rounded-lg overflow-hidden border border-gray-200 group aspect-video">
-                  <img src={imageUrl} alt="preview" className="w-full h-full object-cover" />
+                  <Image src={imageUrl} alt="preview" fill className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <span className="text-white text-sm font-medium">Click above to replace</span>
                   </div>

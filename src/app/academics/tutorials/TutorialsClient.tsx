@@ -333,9 +333,10 @@ export default function TutorialsClient({ dbTutorials = [] }: { dbTutorials?: an
                     {/* 16:9 Aspect Ratio Video Thumbnail */}
                     <div className="relative w-full aspect-video bg-neutral-900 flex items-center justify-center overflow-hidden">
                       {thumbnail ? (
-                        <img 
+                        <Image 
                           src={thumbnail} 
                           alt={item.title} 
+                          fill
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                         />
                       ) : (

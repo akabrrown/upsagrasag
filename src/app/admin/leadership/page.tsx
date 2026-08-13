@@ -5,6 +5,7 @@ import useSWR from 'swr';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { leadershipSchema, Leadership } from '@/types/admin';
+import Image from 'next/image';
 import { 
   Plus, Search, Filter, Eye, Pencil, Trash2, 
   ArrowLeft, Copy, User, Mail, Phone
@@ -157,7 +158,7 @@ export default function AdminLeadershipPage() {
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-full bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
                           {record.image_url ? (
-                            <img src={record.image_url} alt="" className="w-full h-full object-cover" />
+                            <Image src={record.image_url} alt="" fill className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-gray-400"><User className="w-5 h-5"/></div>
                           )}
@@ -302,7 +303,7 @@ export default function AdminLeadershipPage() {
               <CloudinaryUpload onUpload={(url: string) => setValue('image_url', url, { shouldValidate: true })} />
               {imageUrl && (
                 <div className="mt-4 w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-md mx-auto">
-                  <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                  <Image src={imageUrl} alt="Preview" fill className="w-full h-full object-cover" />
                 </div>
               )}
             </div>
@@ -359,7 +360,7 @@ export default function AdminLeadershipPage() {
             {/* Photo */}
             <div className="w-32 h-32 sm:w-40 sm:h-40 bg-gray-100 rounded-full overflow-hidden border-4 border-white shadow-lg flex-shrink-0 mx-auto sm:mx-0">
               {selectedLeader.image_url ? (
-                 <img src={selectedLeader.image_url} alt={selectedLeader.name} className="w-full h-full object-cover" />
+                 <Image src={selectedLeader.image_url} alt={selectedLeader.name} fill className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400"><User className="w-12 h-12" /></div>
               )}

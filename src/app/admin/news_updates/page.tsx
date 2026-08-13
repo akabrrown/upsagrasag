@@ -5,6 +5,7 @@ import useSWR from 'swr';
 import { useForm, useWatch, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { newsUpdateSchema, NewsUpdate } from '@/types/admin';
+import Image from 'next/image';
 import { 
   Plus, Search, Filter, Calendar, Eye, Pencil, Trash2, 
   ArrowLeft, Copy, CheckCircle2, Image as ImageIcon, X
@@ -179,7 +180,7 @@ export default function AdminNewsPage() {
                         <div className="flex items-center gap-4">
                           <div className="w-16 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
                             {record.image_url ? (
-                              <img src={record.image_url} alt="" className="w-full h-full object-cover" />
+                              <Image src={record.image_url} alt="" fill className="w-full h-full object-cover" />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center text-gray-400"><ImageIcon className="w-5 h-5"/></div>
                             )}
@@ -321,7 +322,7 @@ export default function AdminNewsPage() {
               <CloudinaryUpload onUpload={(url: string) => setValue('image_url', url, { shouldValidate: true })} />
               {imageUrl && (
                 <div className="mt-4 w-full aspect-video rounded-lg overflow-hidden border border-gray-200 relative">
-                  <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                  <Image src={imageUrl} alt="Preview" fill className="w-full h-full object-cover" />
                   <button type="button" onClick={() => setValue('image_url', '')} className="absolute top-2 right-2 p-1 bg-white/90 rounded-full text-red-500 hover:bg-white shadow-sm">
                     <X className="w-4 h-4" />
                   </button>
@@ -388,7 +389,7 @@ export default function AdminNewsPage() {
             {/* Poster */}
             {selectedArticle.image_url && (
               <div className="w-full aspect-video bg-gray-100 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0">
-                 <img src={selectedArticle.image_url} alt={selectedArticle.title} className="w-full h-full object-cover" />
+                 <Image src={selectedArticle.image_url} alt={selectedArticle.title} fill className="w-full h-full object-cover" />
               </div>
             )}
 

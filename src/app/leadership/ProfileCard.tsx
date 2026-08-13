@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { ModalOverlay } from "./ui";
+import Image from "next/image";
 import { ArrowRight, Mail } from "lucide-react";
 import { optimizeCloudinaryUrl } from "@/lib/optimizeImage";
 
@@ -24,9 +25,10 @@ export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email, 
       >
         {/* Large Portrait Image */}
         <div className="absolute inset-0 z-0 h-full w-full overflow-hidden">
-          <img 
+          <Image 
             src={optimizeCloudinaryUrl(image, { width: 400 })} 
             alt={name} 
+            fill
             className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-110 grayscale-[30%] group-hover:grayscale-0"
           />
           {/* Magazine overlay gradients */}
@@ -66,7 +68,7 @@ export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email, 
           <div className="flex flex-col md:flex-row w-full h-full max-w-4xl bg-white border border-neutral-200 rounded-2xl shadow-2xl overflow-hidden">
             {/* Left Side: Large Portrait & Basic Info */}
             <div className="relative w-full md:w-2/5 min-h-[350px] md:min-h-full">
-              <img src={optimizeCloudinaryUrl(image)} alt={name} className="absolute inset-0 w-full h-full object-cover object-top" />
+              <Image src={optimizeCloudinaryUrl(image)} alt={name} fill className="absolute inset-0 w-full h-full object-cover object-top" />
               <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/20 to-transparent" />
               <div className="absolute bottom-6 left-6 right-6">
                 <span className="inline-block rounded-full bg-accent px-3 py-1 text-xs font-bold uppercase tracking-wider text-neutral-950 mb-2">

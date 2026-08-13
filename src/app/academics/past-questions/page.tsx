@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { BookOpen, FileText, Layers } from 'lucide-react';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase';
 
 export default function PastQuestionsPage() {
@@ -60,7 +61,7 @@ export default function PastQuestionsPage() {
               <h3 className="text-lg font-bold text-accent">{item.title}</h3>
               <p className="text-sm text-neutral-600" dangerouslySetInnerHTML={{ __html: item.body }} />
               {item.image_url && (
-                <img src={item.image_url} alt={item.title} className="mt-2 rounded" />
+                <Image src={item.image_url} alt={item.title} width={600} height={400} className="mt-2 rounded w-full h-auto object-cover" />
               )}
             </div>
           ))}

@@ -6,6 +6,7 @@ import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { eventProgrammeSchema, EventProgramme, EventProgrammeRecord } from '@/types/admin';
+import Image from 'next/image';
 import { 
   Plus, Search, Filter, MapPin, Calendar, Eye, Pencil, Trash2, 
   ArrowLeft, Copy, CheckCircle2, X
@@ -222,7 +223,7 @@ export default function EventsManagement() {
                         <div className="flex items-center gap-4">
                           <div className="w-16 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
                             {record.image_url ? (
-                              <img src={record.image_url} alt="" className="w-full h-full object-cover" />
+                              <Image src={record.image_url} alt="" fill className="w-full h-full object-cover" />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center text-gray-400"><Calendar className="w-5 h-5"/></div>
                             )}
@@ -440,7 +441,7 @@ export default function EventsManagement() {
               <CloudinaryUpload onUpload={(url: string) => setValue('image_url', url, { shouldValidate: true })} />
               {imageUrl && (
                 <div className="mt-4 w-full aspect-video rounded-lg overflow-hidden border border-gray-200 relative">
-                  <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                  <Image src={imageUrl} alt="Preview" fill className="w-full h-full object-cover" />
                   <button type="button" onClick={() => setValue('image_url', '')} className="absolute top-2 right-2 p-1 bg-white/90 rounded-full text-red-500 hover:bg-white shadow-sm">
                     <X className="w-4 h-4" />
                   </button>
@@ -556,7 +557,7 @@ export default function EventsManagement() {
             {/* Poster */}
             <div className="w-full sm:w-1/3 aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0">
               {selectedEvent.image_url ? (
-                 <img src={selectedEvent.image_url} alt={selectedEvent.title} className="w-full h-full object-cover" />
+                 <Image src={selectedEvent.image_url} alt={selectedEvent.title} fill className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400"><Calendar className="w-12 h-12" /></div>
               )}

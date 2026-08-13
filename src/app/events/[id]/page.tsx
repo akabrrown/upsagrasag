@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { Calendar, MapPin, Clock } from 'lucide-react';
 import { eventProgrammeService } from '@/lib/supabase/admin/index';
@@ -33,7 +34,7 @@ export default async function EventDetailPage({ params }: { params: { id: string
         {/* Image */}
         <div className="w-full md:w-1/3 h-48 md:h-auto relative overflow-hidden rounded-2xl bg-neutral-100 shrink-0">
           {event.image_url ? (
-            <img src={event.image_url} alt={event.title} className="w-full h-full object-cover" />
+            <Image src={event.image_url} alt={event.title} fill className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-primary/5">
               <Calendar className="w-12 h-12 text-primary/20" />

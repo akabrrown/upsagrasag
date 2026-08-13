@@ -5,6 +5,7 @@ import useSWR from 'swr';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { heroSlideSchema, HeroSlide } from '@/types/admin';
+import Image from 'next/image';
 import { 
   Plus, Search, Filter, Eye, Pencil, Trash2, 
   ArrowLeft, Copy, Image as ImageIcon, SlidersHorizontal
@@ -120,7 +121,7 @@ export default function AdminHeroSlidesPage() {
                     <td className="px-6 py-4 w-32">
                       <div className="w-24 h-16 rounded overflow-hidden border border-gray-200 flex-shrink-0 flex items-center justify-center bg-gray-100">
                         {record.image_url ? (
-                          <img src={record.image_url} alt="" className="w-full h-full object-cover" />
+                          <Image src={record.image_url} alt="" fill className="w-full h-full object-cover" />
                         ) : (
                           <ImageIcon className="w-5 h-5 text-gray-400" />
                         )}
@@ -242,7 +243,7 @@ export default function AdminHeroSlidesPage() {
               <CloudinaryUpload onUpload={(url: string) => setValue('image_url', url, { shouldValidate: true })} />
               {imageUrl && (
                 <div className="mt-4 w-full aspect-video rounded-xl overflow-hidden border border-gray-200 shadow-sm mx-auto bg-white">
-                  <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                  <Image src={imageUrl} alt="Preview" fill className="w-full h-full object-cover" />
                 </div>
               )}
             </div>
@@ -272,7 +273,7 @@ export default function AdminHeroSlidesPage() {
           <div className="lg:col-span-2 flex flex-col gap-8 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
             <div className="w-full aspect-video bg-gray-100 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0">
               {selectedRecord.image_url ? (
-                 <img src={selectedRecord.image_url} alt={selectedRecord.title} className="w-full h-full object-cover" />
+                 <Image src={selectedRecord.image_url} alt={selectedRecord.title} fill className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400"><ImageIcon className="w-12 h-12" /></div>
               )}

@@ -5,6 +5,7 @@ import useSWR from 'swr';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { focusAreaSchema, FocusArea } from '@/types/admin';
+import Image from 'next/image';
 import { 
   Plus, Search, Filter, Eye, Pencil, Trash2, 
   ArrowLeft, Copy, Layers, Image as ImageIcon
@@ -136,7 +137,7 @@ export default function AdminFocusAreasPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         {record.image_url ? (
-                            <img src={record.image_url} alt="icon" className="w-8 h-8 rounded-full object-cover" />
+                            <Image src={record.image_url} alt="icon" width={400} height={400} className="w-8 h-8 rounded-full object-cover" />
                         ) : (
                             <Layers className="w-5 h-5 text-gray-400" />
                         )}
@@ -247,7 +248,7 @@ export default function AdminFocusAreasPage() {
               <CloudinaryUpload onUpload={(url: string) => setValue('image_url', url, { shouldValidate: true })} />
               {imageUrl && (
                 <div className="mt-4 w-full aspect-video rounded-xl overflow-hidden border border-gray-200 shadow-sm mx-auto bg-white">
-                  <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                  <Image src={imageUrl} alt="Preview" fill className="w-full h-full object-cover" />
                 </div>
               )}
             </div>
