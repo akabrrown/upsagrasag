@@ -167,9 +167,8 @@ import type {
   ResearchOpportunity, 
   NewsUpdate, 
   PlatformSettings,
-  QuickLink,
-  AcademicCalendarEvent,
-  PageContent
+  MembershipBenefit,
+  AcademicSupport
 } from '@/types/admin';
 
 // Custom subclasses to handle database mismatches
@@ -599,7 +598,7 @@ export class AdminUserCrudService extends AdminCrudService<AdminUser> {
 
 export const adminUserService = new AdminUserCrudService();
 export const presidentService = new AdminCrudService<President>('homepage_president');
-export const congressService = new AdminCrudService<CongressEvent>('congress_events');
+
 export const partnerService = new AdminCrudService<Partner>('partners');
 export const constitutionService = new AdminCrudService<ConstitutionFile>('constitution_files');
 export const leadershipService = new AdminCrudService<Leadership>('leadership');
@@ -608,6 +607,8 @@ export const opportunityService = new AdminCrudService<Opportunity>('opportuniti
 export const resourceService = new AdminCrudService<Resource>('resources');
 export const pastQuestionService = new PastQuestionCrudService();
 export const tutorialService = new AdminCrudService<Tutorial>('tutorials');
+export const membershipBenefitService = new AdminCrudService<MembershipBenefit>('membership_benefits');
+export const academicSupportService = new AdminCrudService<AcademicSupport>('academic_supports');
 /* Custom service for events_programmes to safely handle optional fields */
 class EventProgrammeCrudService extends AdminCrudService<EventProgrammeRecord> {
   constructor() {
@@ -629,41 +630,8 @@ class EventProgrammeCrudService extends AdminCrudService<EventProgrammeRecord> {
 }
 
 export const eventProgrammeService = new EventProgrammeCrudService();
-export const researchOpportunityService = new AdminCrudService<ResearchOpportunity>('research_opportunities');
 
-class NewsUpdateCrudService extends AdminCrudService<NewsUpdate> {
-  constructor() {
-    super('news_updates');
-  }
-
-  private generateSlug(title: string): string {
-    return title
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9\-]/g, '')
-      .replace(/\-+/g, '-');
-  }
-
-  async create(item: Partial<NewsUpdate>): Promise<NewsUpdate> {
-    if (!item.slug && item.title) {
-      item.slug = this.generateSlug(item.title);
-    }
-    return super.create(item);
-  }
-
-  async update(id: string, item: Partial<NewsUpdate>): Promise<NewsUpdate> {
-    if (item.title && (item.slug === undefined || item.slug === '')) {
-      item.slug = this.generateSlug(item.title);
-    }
-    return super.update(id, item);
-  }
-}
-
-export const newsUpdateService = new NewsUpdateCrudService();
-export const quickLinkService = new AdminCrudService<QuickLink>('quick_links');
-export const academicCalendarService = new AdminCrudService<AcademicCalendarEvent>('academic_calendar');
-export const pageContentService = new AdminCrudService<PageContent>('page_contents');
+export const newsUpdateService = new AdminCrudService<NewsUpdate>('news_updates');
 
 // PlatformSettings is special, only 1 row
 export const platformSettingsService = {
@@ -692,7 +660,7 @@ export const platformSettingsService = {
 export const serviceMap: Record<string, AdminCrudService<any>> = {
   'users': adminUserService,
   'president': presidentService,
-  'congress': congressService,
+
   'partners': partnerService,
   'constitution': constitutionService,
   'leadership': leadershipService,
@@ -702,11 +670,10 @@ export const serviceMap: Record<string, AdminCrudService<any>> = {
   'past_questions': pastQuestionService,
   'tutorials': tutorialService,
   'events_programmes': eventProgrammeService,
-  'research_opportunities': researchOpportunityService,
+  'membership_benefits': membershipBenefitService,
+  'academic_supports': academicSupportService,
+
   'news_updates': newsUpdateService,
-  'quick-links': quickLinkService,
-  'academic_calendar': academicCalendarService,
-  'page_contents': pageContentService,
 };
 
 // Utility to normalize records with image URLs across different tables
@@ -718,7 +685,6 @@ export const normalizeRecord = (record: any) => ({
 import { adminUserSchema } from '@/types/page';
 import {
   presidentSchema,
-  congressSchema,
   partnerSchema,
   constitutionSchema,
   leadershipSchema,
@@ -728,17 +694,15 @@ import {
   pastQuestionSchema,
   tutorialSchema,
   eventProgrammeSchema,
-  researchOpportunitySchema,
   newsUpdateSchema,
-  quickLinkSchema,
-  academicCalendarSchema,
-  pageContentSchema
+  membershipBenefitSchema,
+  academicSupportSchema
 } from '@/types/admin';
 
 export const schemaMap: Record<string, any> = {
   'users': adminUserSchema,
   'president': presidentSchema,
-  'congress': congressSchema,
+
   'partners': partnerSchema,
   'constitution': constitutionSchema,
   'leadership': leadershipSchema,
@@ -748,9 +712,8 @@ export const schemaMap: Record<string, any> = {
   'past_questions': pastQuestionSchema,
   'tutorials': tutorialSchema,
   'events_programmes': eventProgrammeSchema,
-  'research_opportunities': researchOpportunitySchema,
+  'membership_benefits': membershipBenefitSchema,
+  'academic_supports': academicSupportSchema,
+
   'news_updates': newsUpdateSchema,
-  'quick-links': quickLinkSchema,
-  'academic_calendar': academicCalendarSchema,
-  'page_contents': pageContentSchema,
 };

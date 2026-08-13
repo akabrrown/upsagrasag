@@ -20,7 +20,7 @@ export default function AdminOpportunitiesPage() {
   const { data: records, isLoading, mutate } = useSWR<Opportunity[]>('/api/admin/opportunities', fetcher);
   
   const [view, setView] = useState<ViewState>('list');
-  const [activeTab, setActiveTab] = useState('All Opportunities');
+  const [activeTab, setActiveTab] = useState('All');
   const [selectedOpp, setSelectedOpp] = useState<Opportunity | null>(null);
 
   const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<Opportunity>({
@@ -77,14 +77,23 @@ export default function AdminOpportunitiesPage() {
     }
   };
 
-  const tabs = ['All Opportunities', 'Full-time', 'Internships', 'Contract'];
+  const tabs = ['All', 'Jobs & Internships', 'Scholarships', 'Research Grants', 'Fellowships', 'Calls for Papers', 'Conferences'];
   
-  const filteredRecords = (Array.isArray(records) ? records : []).filter(r => {
-    if (activeTab === 'All Opportunities') return true;
-    if (activeTab === 'Full-time') return r.type === 'Full-time';
-    if (activeTab === 'Internships') return r.type === 'Internship';
-    if (activeTab === 'Contract') return r.type === 'Contract' || r.type === 'Part-time';
-    return false;
+  const filteredRecords = (records || []).filter(r => {
+    if (activeTab === 'All') return true;
+    
+    // Simple matching logic similar to the frontend, or exact match if they typed it
+    const cat = (r.category || '').toLowerCase();
+    const tab = activeTab.toLowerCase();
+    
+    if (tab === 'jobs & internships' && (cat.includes('job') || cat.includes('intern'))) return true;
+    if (tab === 'scholarships' && cat.includes('scholar')) return true;
+    if (tab === 'research grants' && (cat.includes('grant') || cat.includes('research'))) return true;
+    if (tab === 'fellowships' && cat.includes('fellow')) return true;
+    if (tab === 'calls for papers' && (cat.includes('call') || cat.includes('paper'))) return true;
+    if (tab === 'conferences' && cat.includes('conf')) return true;
+    
+    return r.category === activeTab;
   });
 
   const getTypeStyle = (type: string) => {
@@ -265,24 +274,30 @@ export default function AdminOpportunitiesPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Employment Type</label>
-                <select 
-                  {...register('type')} 
-                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
-                >
-                  <option value="Full-time">Full-time</option>
-                  <option value="Part-time">Part-time</option>
-                  <option value="Internship">Internship</option>
-                  <option value="Contract">Contract</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category / Industry</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Employment / Funding Type</label>
                 <input 
-                  {...register('category')} 
-                  placeholder="e.g. Technology, Finance"
+                  {...register('type')} 
+                  placeholder="e.g. Full-time, Fully Funded, Partial"
                   className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Category <span className="text-red-500">*</span></label>
+                <input 
+                  {...register('category')} 
+                  list="category-options"
+                  placeholder="e.g. Scholarships, Research Grants"
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                />
+                <datalist id="category-options">
+                  <option value="Jobs & Internships" />
+                  <option value="Scholarships" />
+                  <option value="Research Grants" />
+                  <option value="Fellowships" />
+                  <option value="Calls for Papers" />
+                  <option value="Conferences" />
+                  <option value="Publication Opportunities" />
+                </datalist>
               </div>
             </div>
 

@@ -23,7 +23,7 @@ export default function Sidebar({
     { name: 'Dashboard', href: '/admin', icon: Home },
     { name: 'Homepage Content', href: '/admin/president', icon: Globe },
     { name: 'Quick Links', href: '/admin/quick-links', icon: LinkIcon },
-    { name: 'Events', href: '/admin/events_programmes', icon: Calendar }, // Assuming /admin/events_programmes matches the sample better
+    { name: 'Events & Programmes', href: '/admin/events_programmes', icon: Calendar },
     { name: 'Academic Calendar', href: '/admin/academic-calendar', icon: Calendar },
     { name: 'Partners', href: '/admin/partners', icon: Users },
     { name: 'Leadership & Patrons', href: '/admin/leadership', icon: Award },
@@ -31,7 +31,7 @@ export default function Sidebar({
     { name: 'Resources', href: '/admin/resources', icon: FolderOpen },
     { name: 'Past Questions', href: '/admin/past_questions', icon: BookOpen },
     { name: 'Tutorials', href: '/admin/tutorials', icon: Video },
-    { name: 'Research & Grants', href: '/admin/research_opportunities', icon: Award },
+
     { name: 'News & Updates', href: '/admin/news_updates', icon: Newspaper },
     { name: 'Admin Users', href: '/admin/users', icon: Users },
     { name: 'Gallery', href: '/admin/gallery', icon: Image },

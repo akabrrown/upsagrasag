@@ -20,9 +20,13 @@ const socials = [
   },
 ];
 
-export default function Tooltip() {
+interface TooltipProps {
+  align?: 'left' | 'center';
+}
+
+export default function Tooltip({ align = 'center' }: TooltipProps) {
   return (
-    <ul className="flex justify-center space-x-6">
+    <ul className={`flex ${align === 'left' ? 'justify-start space-x-4' : 'justify-center space-x-6'}`}>
       {socials.map(({ href, iconUrl, label }, idx) => (
         <li key={idx} className="relative group">
           <Link

@@ -78,7 +78,7 @@ export default function AdminLeadershipPage() {
 
   const tabs = ['All Leaders', 'Executives', 'Patrons'];
   
-  const filteredRecords = (Array.isArray(records) ? records : []).filter(r => {
+  const filteredRecords = (records || []).filter(r => {
     if (activeTab === 'All Leaders') return true;
     if (activeTab === 'Executives') return r.type === 'executive';
     if (activeTab === 'Patrons') return r.type === 'patron';

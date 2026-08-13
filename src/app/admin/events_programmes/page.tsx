@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import CloudinaryUpload from '@/components/CloudinaryUpload';
 
+
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 type ViewState = 'list' | 'add' | 'edit' | 'details';
@@ -39,7 +40,7 @@ export default function EventsManagement() {
   // --- Handlers ---
   
   const handleOpenAdd = () => {
-    reset({ title: '', description: '', event_date: '', location: '', image_url: '', url: '', theme: '', is_featured: false });
+    reset({ title: '', slug: '', description: '', event_date: '', location: '', image_url: '', url: '', is_featured: false, type: 'Event', display_on_page: true, theme: '' });
     setSelectedEvent(null);
     setView('add');
   };
@@ -101,7 +102,7 @@ export default function EventsManagement() {
 
   const tabs = ['All Events', 'Upcoming', 'Ongoing', 'Past', 'Draft'];
   
-  const filteredRecords = (Array.isArray(records) ? records : []).filter(r => {
+  const filteredRecords = records?.filter(r => {
     if (activeTab === 'All Events') return true;
     const status = getStatus(r.event_date);
     if (activeTab === status) return true;
@@ -206,8 +207,7 @@ export default function EventsManagement() {
                         <div className="flex items-start gap-2 text-sm text-gray-600">
                           <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
                           <div className="max-w-[150px]">
-                            <p className="font-medium text-gray-900 truncate">{record.location || 'TBA'}</p>
-                            <p className="text-xs text-gray-500 truncate">UPSA Campus</p>
+                            <p className="text-xs text-gray-500 truncate max-w-[150px]">{record.location || 'TBA'}</p>
                           </div>
                         </div>
                       </td>
@@ -225,6 +225,11 @@ export default function EventsManagement() {
                           record.is_featured ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-gray-50 text-gray-600 border-gray-200'
                         }`}>
                           {record.is_featured ? 'Published' : 'Unpublished'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="inline-flex px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700">
+                          {record.type || 'Event'}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
@@ -281,37 +286,17 @@ export default function EventsManagement() {
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-5">
             <h2 className="font-semibold text-gray-900 text-lg">Event Information</h2>
-            
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Event Title <span className="text-red-500">*</span></label>
               <input 
                 {...register('title')} 
-                placeholder="Enter event title"
                 className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
               />
-              {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title.message as string}</p>}
+              {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title.message}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Theme / Subtitle</label>
-              <input 
-                {...register('theme')} 
-                placeholder="Enter event theme..."
-                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Location / Venue</label>
-              <input 
-                {...register('location')} 
-                placeholder="e.g. UPSA Auditorium"
-                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description <span className="text-red-500">*</span></label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Event Description</label>
               <textarea 
                 {...register('description')} 
                 rows={6}
@@ -319,12 +304,35 @@ export default function EventsManagement() {
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm resize-none"
               />
             </div>
-            
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Event Type</label>
+                <select 
+                  {...register('type')} 
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                >
+                  <option value="Event">Event</option>
+                  <option value="Programme">Programme</option>
+                  <option value="Congress">Congress</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Event External URL</label>
+                <input 
+                  {...register('url')} 
+                  placeholder="https://..."
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                />
+              </div>
+            </div>
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Event External URL</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Theme (Optional)</label>
               <input 
-                {...register('url')} 
-                placeholder="https://..."
+                {...register('theme')} 
+                placeholder="Event theme..."
                 className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
               />
             </div>
@@ -364,12 +372,20 @@ export default function EventsManagement() {
               {errors.event_date && <p className="text-xs text-red-500 mt-1">{errors.event_date.message as string}</p>}
             </div>
 
-            <div className="pt-4 border-t border-gray-100">
+            <div className="pt-4 border-t border-gray-100 space-y-4">
+               <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" {...register('display_on_page')} className="w-5 h-5 rounded border-gray-300 text-[#2563eb] focus:ring-[#2563eb]" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">Publish to Events Page</p>
+                    <p className="text-xs text-gray-500">Make this visible on the public events listing</p>
+                  </div>
+               </label>
+               
                <label className="flex items-center gap-3 cursor-pointer">
                   <input type="checkbox" {...register('is_featured')} className="w-5 h-5 rounded border-gray-300 text-[#2563eb] focus:ring-[#2563eb]" />
                   <div>
-                    <p className="text-sm font-medium text-gray-900">Publish Event</p>
-                    <p className="text-xs text-gray-500">Make this event visible to students</p>
+                    <p className="text-sm font-medium text-gray-900">Feature on Homepage</p>
+                    <p className="text-xs text-gray-500">Show this event on the main homepage banner slider</p>
                   </div>
                </label>
             </div>

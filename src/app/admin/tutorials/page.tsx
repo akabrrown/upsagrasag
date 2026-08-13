@@ -70,7 +70,7 @@ export default function AdminTutorialsPage() {
   };
 
   const tabs = ['All Tutorials'];
-  const recordsArray = Array.isArray(records) ? records : [];
+  const recordsArray = records ?? [];
   
   const ListView = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">

@@ -57,13 +57,45 @@ const objectives = [
 export default function AboutPage() {
   const [activeObjective, setActiveObjective] = useState(0);
   const [activeTab, setActiveTab] = useState(0); // 0: GAFF, 1: Business Lounge
+  
+  const [focusAreasState, setFocusAreas] = useState<any[]>(focusAreas);
+  const [objectivesState, setObjectives] = useState<any[]>(objectives);
+
+  useEffect(() => {
+    const fetchFocusAreas = async () => {
+      try {
+        const res = await fetch('/api/admin/focus-areas');
+        const data = await res.json();
+        if (data && data.length > 0) {
+           setFocusAreas(data);
+        }
+      } catch (e) {
+        console.error('Failed to fetch focus areas', e);
+      }
+    };
+    
+    const fetchObjectives = async () => {
+      try {
+        const res = await fetch('/api/admin/objectives');
+        const data = await res.json();
+        if (data && data.length > 0) {
+           setObjectives(data);
+        }
+      } catch (e) {
+        console.error('Failed to fetch objectives', e);
+      }
+    };
+    
+    fetchFocusAreas();
+    fetchObjectives();
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setActiveObjective((prev) => (prev + 1) % objectives.length);
+      setActiveObjective((prev) => (prev + 1) % objectivesState.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, []);
+  }, [objectivesState.length]);
 
   return (
     <div className="w-full bg-background text-foreground">
@@ -273,8 +305,10 @@ export default function AboutPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {focusAreas.map((area, idx) => {
-              const IconComponent = area.icon;
+            {focusAreasState.map((area, idx) => {
+              // Attempt to map from iconMap if we had it, or just use Scale as a fallback if no icon_name maps correctly.
+              // Note: area.icon handles the hardcoded fallback
+              const IconComponent = area.icon || (area.icon_name && (require('lucide-react') as any)[area.icon_name]) || Scale;
               return (
                 <div
                   key={idx}
@@ -298,7 +332,7 @@ export default function AboutPage() {
                   {/* Right Side: Image */}
                   <div className="w-full sm:w-[42%] relative h-48 sm:h-full min-h-[180px]">
                     <Image
-                      src={area.image}
+                      src={area.image_url || area.image || "/inclusive.png"}
                       alt={area.title}
                       fill
                       className="object-cover"
@@ -318,8 +352,9 @@ export default function AboutPage() {
               Objectives
             </h2>
             <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 scrollbar-thin">
-              {objectives.map((objective, idx) => {
+              {objectivesState.map((objective, idx) => {
                 const isActive = activeObjective === idx;
+                const objectiveText = typeof objective === 'string' ? objective : objective.description;
                 return (
                   <div 
                     key={idx}
@@ -331,7 +366,7 @@ export default function AboutPage() {
                     }`}
                   >
                     <p className="text-sm sm:text-base leading-relaxed">
-                      {objective}
+                      {objectiveText}
                     </p>
                   </div>
                 );

@@ -88,7 +88,7 @@ export default function AdminPartnersPage() {
 
   const tabs = ['All Partners', 'Active', 'Archived'];
   
-  const sortedRecords = (Array.isArray(records) ? records : []).map(r => ({ ...r, logo_url: r.logo_url || (r as any).image_url || (r as any).photo_url || '' })).sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
+  const sortedRecords = (records || []).map(r => ({ ...r, logo_url: r.logo_url || (r as any).image_url || (r as any).photo_url || '' })).sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
 
   const ListView = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">

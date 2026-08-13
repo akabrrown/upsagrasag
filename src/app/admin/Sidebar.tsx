@@ -23,7 +23,12 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
-  Hexagon // Using Hexagon as a placeholder brand icon
+  Hexagon,
+  Layers,
+  Target,
+  SlidersHorizontal,
+  Shield // Using placeholder icons for new sections
+
 } from 'lucide-react';
 
 // Navigation groups definition
@@ -42,7 +47,15 @@ const navGroups = [
       { name: 'Resources', href: '/admin/resources', icon: Folder },
       { name: 'Tutorials', href: '/admin/tutorials', icon: Book },
       { name: 'Quick Links', href: '/admin/quick-links', icon: LinkIcon },
-      { name: 'Page Contents', href: '/admin/page_contents', icon: FileText },
+      // New sections
+      { name: 'Focus Areas', href: '/admin/focus-areas', icon: Layers },
+      { name: 'Objectives', href: '/admin/objectives', icon: Target },
+      { name: 'Hero Slides', href: '/admin/hero-slides', icon: SlidersHorizontal },
+      { name: 'Leadership', href: '/admin/leadership', icon: Users },
+      { name: 'Welfare Services', href: '/admin/welfare', icon: Shield },
+      { name: 'Welfare Steps', href: '/admin/welfare-steps', icon: ListChecks },
+      { name: 'Membership Benefits', href: '/admin/membership', icon: Users },
+      { name: 'Page Contents', href: '/admin/page_contents', icon: FileText }
     ],
   },
   {
@@ -53,8 +66,9 @@ const navGroups = [
       { name: 'Events & Programmes', href: '/admin/events_programmes', icon: CalendarCheck },
       { name: 'Leadership', href: '/admin/leadership', icon: Users },
       { name: 'Past Questions', href: '/admin/past_questions', icon: FileText },
+      { name: 'Academic Supports', href: '/admin/academic-supports', icon: BookOpen },
       { name: 'President', href: '/admin/president', icon: UserCircle },
-      { name: 'Research Opportunities', href: '/admin/research_opportunities', icon: Search },
+
     ],
   },
   {

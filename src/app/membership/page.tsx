@@ -1,13 +1,33 @@
-import React from 'react';
+"use client";
+
+import React, { useState, useEffect } from 'react';
 import { Award, Gift, Heart, BadgeCheck } from 'lucide-react';
 
+const defaultBenefits = [
+  { title: 'Academic Resources', description: 'Unlimited access to the Past Question Bank, formatting templates, and Turnitin checking vouchers.', icon: Award, icon_name: 'Award' },
+  { title: 'Research & Funding', description: 'Direct applications for internal research grants and support for external funding applications.', icon: BadgeCheck, icon_name: 'BadgeCheck' },
+  { title: 'Welfare Schemes', description: 'Subsidized health insurance, roommate matching, off-campus accommodation listings, and emergency hardship funding.', icon: Heart, icon_name: 'Heart' },
+  { title: 'Career Acceleration', description: 'Access to graduate internships, workshops, corporate recruitment fairs, and alumni mentorship programs.', icon: Gift, icon_name: 'Gift' }
+];
+
 export default function MembershipPage() {
-  const benefits = [
-    { title: 'Academic Resources', desc: 'Unlimited access to the Past Question Bank, formatting templates, and Turnitin checking vouchers.', icon: Award },
-    { title: 'Research & Funding', desc: 'Direct applications for internal research grants and support for external funding applications.', icon: BadgeCheck },
-    { title: 'Welfare Schemes', desc: 'Subsidized health insurance, roommate matching, off-campus accommodation listings, and emergency hardship funding.', icon: Heart },
-    { title: 'Career Acceleration', desc: 'Access to graduate internships, workshops, corporate recruitment fairs, and alumni mentorship programs.', icon: Gift }
-  ];
+  const [benefitsState, setBenefits] = useState<any[]>(defaultBenefits);
+
+  useEffect(() => {
+    const fetchBenefits = async () => {
+      try {
+        const res = await fetch('/api/admin/membership_benefits');
+        const data = await res.json();
+        if (data && data.length > 0) {
+           setBenefits(data);
+        }
+      } catch (e) {
+        console.error('Failed to fetch membership benefits', e);
+      }
+    };
+    
+    fetchBenefits();
+  }, []);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8 space-y-12 bg-background text-foreground">
@@ -26,22 +46,37 @@ export default function MembershipPage() {
 
       {/* Grid of benefits */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {benefits.map((b) => {
-          const Icon = b.icon;
+        {benefitsState.map((b, idx) => {
+          // Determine the icon to render
+          let IconComponent = Award; // Fallback
+          if (b.icon && typeof b.icon === 'function') {
+            IconComponent = b.icon;
+          } else if (b.icon && typeof b.icon === 'string') {
+            try {
+               const lucide = require('lucide-react');
+               IconComponent = lucide[b.icon] || Award;
+            } catch(e) {}
+          } else if (b.icon_name) {
+            try {
+               const lucide = require('lucide-react');
+               IconComponent = lucide[b.icon_name] || Award;
+            } catch(e) {}
+          }
+
           return (
             <div
-              key={b.title}
+              key={idx}
               className="site-card-light bg-white flex gap-5"
             >
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
-                <Icon className="h-6 w-6 text-accent" />
+                <IconComponent className="h-6 w-6 text-accent" />
               </div>
               <div className="space-y-1.5">
                 <h3 className="font-bold text-accent text-base">
                   {b.title}
                 </h3>
                 <p className="text-sm text-neutral-600 leading-relaxed">
-                  {b.desc}
+                  {b.description || b.desc}
                 </p>
               </div>
             </div>

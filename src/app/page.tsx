@@ -9,7 +9,7 @@ import ChatModal from '@/components/ChatModal';
 import PartnerCarousel from '@/components/PartnerCarousel';
 import { supabaseClient } from '@/lib/supabaseClient';
 import Image from 'next/image';
-import { CongressEvent } from '@/types/admin';
+import { EventProgrammeRecord } from '@/types/admin';
 
 
 export default function HomePage() {
@@ -17,7 +17,7 @@ export default function HomePage() {
   // Countdown timer state
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
-  const [events, setEvents] = useState<CongressEvent[]>([]);
+  const [events, setEvents] = useState<EventProgrammeRecord[]>([]);
   const [currentEventIndex, setCurrentEventIndex] = useState(0);
   const currentEvent = events[currentEventIndex] || null;
 
@@ -113,12 +113,13 @@ export default function HomePage() {
     const fetchCongress = async () => {
       const today = new Date().toISOString().split('T')[0];
       const { data, error } = await supabaseClient
-        .from('congress_events')
-        .select('title, description, event_date, image_url, location, is_featured, theme')
+        .from('events_programmes')
+        .select('id, title, description, event_date, image_url, location, is_featured, type')
         .eq('is_featured', true)
         .gte('event_date', today)
         .order('event_date', { ascending: true })
         .limit(5);
+
       if (!error && data) {
         setEvents(data);
       }
@@ -617,7 +618,7 @@ export default function HomePage() {
                 key={idx}
                 className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${currentEventIndex === idx ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
               >
-                <Image src={event.image_url || '/bkg-grasag.jpg'} alt={event.title || 'Event Image'} fill className="object-contain object-right md:object-center opacity-40 md:opacity-90" />
+                <img src={event.image_url || '/bkg-grasag.jpg'} alt={event.title} className="absolute right-0 top-0 w-full md:w-1/2 h-full object-contain object-right md:object-center opacity-40 md:opacity-90" />
                 <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-transparent md:bg-gradient-to-r md:from-slate-950 md:via-slate-950/80 md:to-transparent" />
               </div>
             ))}
@@ -768,11 +769,6 @@ export default function HomePage() {
                     <h3 className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight">
                       {ev.title}
                     </h3>
-                    {ev.theme && (
-                      <p className="text-accent text-sm font-semibold italic mb-3">
-                        {ev.theme}
-                      </p>
-                    )}
                     <div className="mt-2 mb-4 text-white/70 text-xs font-bold uppercase tracking-wider bg-white/10 inline-block px-2 py-0.5 rounded border border-white/10 w-max">
                       Event
                     </div>

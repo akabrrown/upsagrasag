@@ -96,7 +96,7 @@ export default function AdminNewsPage() {
 
   const tabs = ['All Articles', 'Published', 'Drafts', 'News', 'Announcements'];
   
-  const filteredRecords = (Array.isArray(records) ? records : []).filter(r => {
+  const filteredRecords = records?.filter(r => {
     if (activeTab === 'All Articles') return true;
     if (activeTab === 'Published') return isPublished(r.published_at);
     if (activeTab === 'Drafts') return !isPublished(r.published_at);
@@ -292,7 +292,7 @@ export default function AdminNewsPage() {
                       theme="snow"
                       value={field.value || ''}
                       onChange={field.onChange}
-                      modules={{ toolbar: [['bold', 'italic', 'underline'], [{ 'header': [1, 2, 3, false] }], [{ 'list': 'ordered' }, { 'list': 'bullet' }], ['link', 'image', 'blockquote']] }}
+                      modules={{ toolbar: [['bold', 'italic', 'underline'], [{ 'header': [1, 2, 3, false] }], [{ 'list': 'ordered' }, { 'list': 'bullet' }], ['link', 'blockquote']] }}
                       className="bg-white border-none min-h-[400px]"
                     />
                   )}
@@ -329,9 +329,12 @@ export default function AdminNewsPage() {
                 {...register('category')}
                 className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
               >
-                <option value="news">News</option>
+                <option value="news">Campus News</option>
                 <option value="announcements">Announcement</option>
-                <option value="articles">Article</option>
+                <option value="articles">Student Story</option>
+                <option value="press">Press Release</option>
+                <option value="grasag-updates">GRASAG Update</option>
+                <option value="events-recaps">Events Recap</option>
               </select>
             </div>
 

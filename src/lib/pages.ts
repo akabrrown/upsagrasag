@@ -1,13 +1,23 @@
-import { promises as fs } from 'fs';
-import path from 'path';
+import supabaseAdmin from '@/lib/supabaseAdmin';
 
 export async function getPageData(slug: string) {
-  const filePath = path.join(process.cwd(), 'src', 'data', 'pages', `${slug}.json`);
   try {
-    const data = await fs.readFile(filePath, 'utf-8');
-    return JSON.parse(data);
+    const { data, error } = await supabaseAdmin
+      .from('page_contents')
+      .select('title, content, image_url')
+      .eq('slug', slug)
+      .single();
+
+    if (error) throw error;
+    
+    // Map database fields to the format expected by the frontend
+    return {
+      title: data.title,
+      content: data.content,
+      imageUrl: data.image_url || ''
+    };
   } catch (err) {
-    console.error(`Error reading page file for ${slug}:`, err);
+    console.error(`Error reading page_contents for slug ${slug}:`, err);
     return null;
   }
 }
