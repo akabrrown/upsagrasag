@@ -34,7 +34,7 @@ export default function EventsManagement() {
   } = useForm<EventProgramme>({
     resolver: zodResolver(eventProgrammeSchema) as any,
     defaultValues: {
-      title: '', slug: '', description: '', start_date: '', end_date: '', location: '', 
+      title: '', slug: '', description: '', start_date: '', start_time: '', end_date: '', end_time: '', location: '', 
       image_url: '', url: '', is_featured: false, type: 'Event', 
       display_on_page: true, theme: '', price: 'Free', discount_code: '', 
       discount_info: '', registration_deadline: '', speaker: ''
@@ -47,7 +47,7 @@ export default function EventsManagement() {
   
   const handleOpenAdd = () => {
     reset({ 
-      title: '', slug: '', description: '', start_date: '', end_date: '', location: '', 
+      title: '', slug: '', description: '', start_date: '', start_time: '', end_date: '', end_time: '', location: '', 
       image_url: '', url: '', is_featured: false, type: 'Event', 
       display_on_page: true, theme: '', price: 'Free', discount_code: '', 
       discount_info: '', registration_deadline: '', speaker: '' 
@@ -62,11 +62,17 @@ export default function EventsManagement() {
     const formattedItem = { ...rest } as any;
     if (formattedItem.start_date) {
       const d = new Date(formattedItem.start_date);
-      formattedItem.start_date = d.toISOString().slice(0, 16);
+      const tzOffset = d.getTimezoneOffset() * 60000;
+      const localISOTime = (new Date(d.getTime() - tzOffset)).toISOString();
+      formattedItem.start_date = localISOTime.slice(0, 10);
+      formattedItem.start_time = localISOTime.slice(11, 16);
     }
     if (formattedItem.end_date) {
       const d = new Date(formattedItem.end_date);
-      formattedItem.end_date = d.toISOString().slice(0, 16);
+      const tzOffset = d.getTimezoneOffset() * 60000;
+      const localISOTime = (new Date(d.getTime() - tzOffset)).toISOString();
+      formattedItem.end_date = localISOTime.slice(0, 10);
+      formattedItem.end_time = localISOTime.slice(11, 16);
     }
     reset(formattedItem);
     setSelectedEvent(item);
@@ -95,11 +101,16 @@ export default function EventsManagement() {
       const isEditing = view === 'edit' && selectedEvent;
       const url = isEditing ? `/api/admin/events_programmes/${selectedEvent.id}` : '/api/admin/events_programmes';
       const method = isEditing ? 'PATCH' : 'POST';
+      const startDateTime = data.start_time ? `${data.start_date}T${data.start_time}` : data.start_date;
+      const endDateTime = data.end_date ? (data.end_time ? `${data.end_date}T${data.end_time}` : data.end_date) : null;
+
       const payload = { 
         ...data, 
-        start_date: new Date(data.start_date).toISOString(),
-        end_date: data.end_date ? new Date(data.end_date).toISOString() : null
+        start_date: new Date(startDateTime).toISOString(),
+        end_date: endDateTime ? new Date(endDateTime).toISOString() : null
       };
+      delete payload.start_time;
+      delete payload.end_time;
       
       const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       if (!res.ok) throw new Error('Failed to save');
@@ -112,7 +123,7 @@ export default function EventsManagement() {
   };
 
   // --- Helpers ---
-  const getStatus = (startStr: string, endStr?: string) => {
+  const getStatus = (startStr: string, endStr?: string | null) => {
     const startDate = new Date(startStr);
     const now = new Date();
     if (endStr) {
@@ -442,27 +453,45 @@ export default function EventsManagement() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Start Date & Time <span className="text-red-500">*</span></label>
-                <div className="relative">
-                  <input 
-                    type="datetime-local" 
-                    {...register('start_date')} 
-                    className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
-                  />
-                  <Calendar className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <label className="block text-sm font-medium text-gray-700 mb-1">Start Date <span className="text-red-500">*</span></label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <input 
+                      type="date" 
+                      {...register('start_date')} 
+                      className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                    />
+                    <Calendar className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  </div>
+                  <div className="relative w-32">
+                    <input 
+                      type="time" 
+                      {...register('start_time')} 
+                      className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                    />
+                  </div>
                 </div>
                 {errors.start_date && <p className="text-xs text-red-500 mt-1">{errors.start_date.message as string}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">End Date & Time (Optional)</label>
-                <div className="relative">
-                  <input 
-                    type="datetime-local" 
-                    {...register('end_date')} 
-                    className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
-                  />
-                  <Calendar className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <label className="block text-sm font-medium text-gray-700 mb-1">End Date (Optional)</label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <input 
+                      type="date" 
+                      {...register('end_date')} 
+                      className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                    />
+                    <Calendar className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  </div>
+                  <div className="relative w-32">
+                    <input 
+                      type="time" 
+                      {...register('end_time')} 
+                      className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
