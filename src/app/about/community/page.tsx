@@ -530,8 +530,10 @@ export default function CommunityPage() {
           )}
 
           {loading && images.length === 0 ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B8860B]"></div>
+            <div className="columns-1 sm:columns-2 md:columns-3 gap-6 space-y-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="group relative rounded-2xl overflow-hidden bg-neutral-100 break-inside-avoid shadow-sm animate-pulse" style={{ height: `${Math.max(200, Math.random() * 400)}px` }} />
+              ))}
             </div>
           ) : images.length > 0 ? (
             <div className="columns-1 sm:columns-2 md:columns-3 gap-6 space-y-6">

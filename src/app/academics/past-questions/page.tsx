@@ -37,7 +37,19 @@ export default function PastQuestionsPage() {
 
       {/* Resource Cards */}
       {loading ? (
-        <p className="text-center text-neutral-600">Loading...</p>
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="site-card-light bg-white p-6 space-y-4 animate-pulse">
+              <div className="h-10 w-10 rounded-lg bg-gray-200" />
+              <div className="h-6 w-3/4 bg-gray-200 rounded" />
+              <div className="space-y-2">
+                <div className="h-4 w-full bg-gray-200 rounded" />
+                <div className="h-4 w-5/6 bg-gray-200 rounded" />
+              </div>
+              <div className="h-10 w-32 bg-gray-200 rounded mt-4" />
+            </div>
+          ))}
+        </section>
       ) : (
         <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {items.map((item, idx) => (

@@ -151,9 +151,10 @@ export default function AdminGalleryPage() {
 
         <div className="p-6">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-20 gap-4 text-gray-500">
-              <div className="w-8 h-8 border-2 border-gray-200 border-t-[#001a54] rounded-full animate-spin"></div>
-              <span className="text-sm font-medium">Loading library...</span>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="aspect-square bg-gray-100 rounded-lg animate-pulse" />
+              ))}
             </div>
           ) : filteredImages.length === 0 ? (
             <div className="text-center py-24 border border-dashed border-gray-200 rounded-lg bg-gray-50/50">
