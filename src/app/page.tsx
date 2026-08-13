@@ -11,7 +11,7 @@ import dynamic from 'next/dynamic';
 const ChatModal = dynamic(() => import('@/components/ChatModal'), { ssr: false });
 const PartnerCarousel = dynamic(() => import('@/components/PartnerCarousel'), { ssr: false });
 import { supabaseClient } from '@/lib/supabaseClient';
-import Image from 'next/image';
+
 import { EventProgrammeRecord } from '@/types/admin';
 import { optimizeCloudinaryUrl } from '@/lib/optimizeImage';
 
