@@ -31,7 +31,7 @@ const AnimatedCounter: React.FC<{ target: number; suffix?: string }> = ({ target
   useEffect(() => {
     if (!isInView) return;
 
-    let start = 0;
+    const start = 0;
     const duration = 2000; // 2 seconds
     const startTime = performance.now();
 

@@ -8,7 +8,7 @@ type Event = {
 };
 
 // In-memory store (note: resets on server restart)
-let events: Event[] = [];
+const events: Event[] = [];
 
 export async function GET(req: Request) {
   return NextResponse.json(events);

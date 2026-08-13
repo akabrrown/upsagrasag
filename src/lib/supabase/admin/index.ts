@@ -53,10 +53,10 @@ export class AdminCrudService<T extends { id?: string | number }> {
     return [];
   }
 
-  protected async filterPayload(item: any): Promise<any> {
+  protected async filterPayload(item: Record<string, unknown>): Promise<Record<string, unknown>> {
     const cols = await this.getTableColumns();
     if (cols.length === 0) return item;
-    const filtered: any = {};
+    const filtered: Record<string, unknown> = {};
     for (const k of Object.keys(item)) {
       if (cols.includes(k)) {
         filtered[k] = item[k];
@@ -110,7 +110,7 @@ export class AdminCrudService<T extends { id?: string | number }> {
     const filtered = await this.filterPayload(item);
     const { data, error } = await supabase
       .from(this.tableName)
-      .insert(filtered as any)
+      .insert(filtered as Record<string, unknown>)
       .select()
       .single();
     if (error) {
@@ -125,7 +125,7 @@ export class AdminCrudService<T extends { id?: string | number }> {
     const filtered = await this.filterPayload(item);
     const { data, error } = await supabase
       .from(this.tableName)
-      .update(filtered as any)
+      .update(filtered as Record<string, unknown>)
       .eq('id', id)
       .select()
       .single();
@@ -188,7 +188,7 @@ export class ExecutiveCrudService extends AdminCrudService<Executive> {
       console.error(`[ExecutiveCrudService list] error:`, error);
       throw new Error(error.message);
     }
-    return (data || []).map((item: any) => ({
+    return (data || []).map((item: Record<string, unknown>) => ({
       ...item,
       id: String(item.id),
       display_order: item.order ?? 0
@@ -294,7 +294,7 @@ export class PastQuestionCrudService extends AdminCrudService<PastQuestion> {
       console.error(`[PastQuestionCrudService list] error:`, error);
       throw new Error(error.message);
     }
-    return (data || []).map((item: any) => {
+    return (data || []).map((item: Record<string, unknown>) => {
       return {
         id: String(item.id),
         programSlug: item.program_slug,
@@ -344,7 +344,7 @@ export class PastQuestionCrudService extends AdminCrudService<PastQuestion> {
   async create(item: Partial<PastQuestion>): Promise<PastQuestion> {
     const supabase = supabaseAdminClient;
     const dbPayload: any = {
-      program_slug: (item as any).programSlug,
+      program_slug: (item as Record<string, unknown>).programSlug,
       title: item.title,
       description: item.description,
       type: item.type ?? 'exam',
@@ -459,8 +459,8 @@ export class AdminUserCrudService extends AdminCrudService<AdminUser> {
       console.error(`[AdminUserCrudService list] failed to list auth users:`, err);
     }
 
-    return (dbUsers || []).map((dbUser: any) => {
-      const authUser = authUsers.find((u: any) => u.id === dbUser.auth_uid);
+    return (dbUsers || []).map((dbUser: Record<string, unknown>) => {
+      const authUser = authUsers.find((u: Record<string, unknown>) => u.id === dbUser.auth_uid);
       return {
         id: dbUser.id,
         email: authUser?.email || 'unknown@example.com',
@@ -678,7 +678,7 @@ export const serviceMap: Record<string, AdminCrudService<any>> = {
 };
 
 // Utility to normalize records with image URLs across different tables
-export const normalizeRecord = (record: any) => ({
+export const normalizeRecord = (record: Record<string, unknown>) => ({
   ...record,
   imageUrl: record.photo_url || record.logo_url || record.image_url || ''
 });
