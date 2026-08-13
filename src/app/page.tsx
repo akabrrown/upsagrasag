@@ -612,7 +612,7 @@ export default function HomePage() {
 
       {/* Featured Upcoming Events Banner Section */}
       {events.length > 0 && (
-        <section className="w-full relative overflow-hidden bg-slate-950 min-h-[405px] sm:min-h-[486px] flex flex-col justify-center">
+        <section className="w-full relative overflow-hidden bg-slate-950">
           <div className="absolute inset-0">
             {events.map((event, idx) => (
               <div
@@ -626,7 +626,7 @@ export default function HomePage() {
           </div>
 
           {/* Content overlay positioned to stay visible */}
-          <div className="relative z-20 flex flex-col justify-center p-6 sm:p-12 max-w-7xl w-full mx-auto text-left flex-1">
+          <div className="relative z-20 flex flex-col justify-center p-6 sm:p-12 max-w-7xl mx-auto text-left min-h-[450px] sm:min-h-[500px]">
             <div>
               <span className="inline-block rounded-full bg-[#B8860B]/20 px-4 py-1 text-xs sm:text-sm font-semibold text-[#B8860B] uppercase tracking-widest border border-[#B8860B]/30">
                 Featured Event
