@@ -77,7 +77,7 @@ export default function AdminOpportunitiesPage() {
     }
   };
 
-  const tabs = ['All', 'Jobs & Internships', 'Scholarships', 'Research Grants', 'Fellowships', 'Calls for Papers', 'Conferences'];
+  const tabs = ['All', 'Jobs & Internships', 'Scholarships', 'Research Grants', 'Fellowships', 'Calls for Papers', 'Conferences', 'Volunteers'];
   
   const filteredRecords = (records || []).filter(r => {
     if (activeTab === 'All') return true;
@@ -92,6 +92,7 @@ export default function AdminOpportunitiesPage() {
     if (tab === 'fellowships' && cat.includes('fellow')) return true;
     if (tab === 'calls for papers' && (cat.includes('call') || cat.includes('paper'))) return true;
     if (tab === 'conferences' && cat.includes('conf')) return true;
+    if (tab === 'volunteers' && cat.includes('volunteer')) return true;
     
     return r.category === activeTab;
   });

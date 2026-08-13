@@ -41,7 +41,6 @@ interface OpportunitiesClientProps {
   initialOpportunities: Opportunity[];
 }
 
-// Updated categories list matching the user's specification
 const categoriesList = [
   { name: 'All', icon: BookOpen, color: 'text-[#001a54]' },
   { name: 'Jobs & Internships', icon: Briefcase, color: 'text-blue-600' },
@@ -51,6 +50,7 @@ const categoriesList = [
   { name: 'Calls for Papers', icon: Newspaper, color: 'text-red-600' },
   { name: 'Conferences', icon: Users, color: 'text-cyan-600' },
   { name: 'Publication Opportunities', icon: FileText, color: 'text-pink-600' },
+  { name: 'Volunteers', icon: Users, color: 'text-indigo-600' },
 ];
 
 // Status badge colours
@@ -72,6 +72,7 @@ function normalizeCategory(raw: string): string {
   if (s.includes('call') || s.includes('paper')) return 'Calls for Papers';
   if (s.includes('conf')) return 'Conferences';
   if (s.includes('publ')) return 'Publication Opportunities';
+  if (s.includes('volunteer')) return 'Volunteers';
   return 'Jobs & Internships';
 }
 
