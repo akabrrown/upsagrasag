@@ -1,27 +1,56 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { rateLimit } from "@/lib/rate-limit";
+import { createServerClient } from '@supabase/ssr';
+import { NextResponse, type NextRequest } from 'next/server';
+import { rateLimit } from '@/lib/rate-limit';
 
 export async function middleware(request: NextRequest) {
   // Only rate limit mutation API routes (POST, PATCH, DELETE)
   if (
-    request.nextUrl.pathname.startsWith("/api/") &&
-    ["POST", "PATCH", "DELETE"].includes(request.method)
+    request.nextUrl.pathname.startsWith('/api/') &&
+    ['POST', 'PATCH', 'DELETE'].includes(request.method)
   ) {
-    const ip = request.ip ?? "127.0.0.1";
+    const ip = request.ip ?? '127.0.0.1';
     const { success } = await rateLimit.limit(ip);
     
     if (!success) {
       return NextResponse.json(
-        { error: "Too many requests. Please try again later." },
+        { error: 'Too many requests. Please try again later.' },
         { status: 429 }
       );
     }
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next({
+    request,
+  });
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set(name, value, options);
+          });
+        },
+      },
+    }
+  );
+
+  const { data: { session } } = await supabase.auth.getSession();
+  const { pathname } = request.nextUrl;
+
+  if (pathname.startsWith('/admin') && !session) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/signin';
+    return NextResponse.redirect(url);
+  }
+  return response;
 }
 
 export const config = {
-  matcher: "/api/:path*",
+  matcher: ['/admin/:path*', '/api/:path*'],
 };
