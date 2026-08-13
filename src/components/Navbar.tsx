@@ -60,17 +60,24 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (!isHomePage) return;
     const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
+      if (isHomePage) {
+        if (window.scrollY > 50) {
+          setIsScrolled(true);
+        } else {
+          setIsScrolled(false);
+        }
+      }
+      
+      // Close mobile menu on scroll
+      if (isOpen) {
+        setIsOpen(false);
+        setActiveDropdown(null);
       }
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isHomePage]);
+  }, [isHomePage, isOpen]);
 
   const toggleDropdown = (name: string) => {
     if (activeDropdown === name) {
