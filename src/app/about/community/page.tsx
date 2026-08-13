@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 import React, { useState, useEffect, FormEvent } from 'react';
 import Image from 'next/image';
 import { supabaseClient } from '@/lib/supabaseClient';
+import { AcademicProgramme } from '@/types/admin';
 import { 
   GraduationCap, 
   Briefcase, 
@@ -27,6 +28,7 @@ export default function CommunityPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [selectedProgramme, setSelectedProgramme] = useState('mba');
   const [images, setImages] = useState<GalleryImage[]>([]);
+  const [programmes, setProgrammes] = useState<AcademicProgramme[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -34,6 +36,19 @@ export default function CommunityPage() {
     supabaseClient.auth.getUser().then(({ data }) => {
       if (data?.user) setIsAdmin(true);
     });
+  }, []);
+
+  useEffect(() => {
+    const fetchProgrammes = async () => {
+      const { data } = await supabaseClient
+        .from('academic_programmes')
+        .select('*')
+        .order('display_order', { ascending: true })
+        .order('created_at', { ascending: false });
+      
+      if (data) setProgrammes(data);
+    };
+    fetchProgrammes();
   }, []);
 
   useEffect(() => {
@@ -135,7 +150,7 @@ export default function CommunityPage() {
                 <option value="mphil">What are you studying? (MPhil) ▼</option>
                 <option value="msc">What are you studying? (MSc) ▼</option>
                 <option value="ma">What are you studying? (MA) ▼</option>
-                <option value="phd">What are you studying? (PhD) ▼</option>
+                <option value="llm">What are you studying? (LLM) ▼</option>
               </select>
             </div>
             <button 
@@ -156,7 +171,7 @@ export default function CommunityPage() {
             <span>•</span>
             <button onClick={() => { setSelectedProgramme('ma'); handleScrollToSection('ma-section'); }} className="hover:text-[#B8860B] transition-colors">MA</button>
             <span>•</span>
-            <button onClick={() => { setSelectedProgramme('phd'); handleScrollToSection('phd-section'); }} className="hover:text-[#B8860B] transition-colors">PhD</button>
+            <button onClick={() => { setSelectedProgramme('llm'); handleScrollToSection('llm-section'); }} className="hover:text-[#B8860B] transition-colors">LLM</button>
           </div>
 
           {/* Speech bubble tail pointer */}
@@ -248,111 +263,38 @@ export default function CommunityPage() {
           </div>
 
           <div className="space-y-8">
-            {/* MBA Card */}
-            <div id="mba-section" className="bg-[#FAF6EC] border border-[#F5EAD2] p-8 rounded-2xl transition-all duration-300">
-              <h3 className="text-2xl font-bold text-neutral-900 mb-4">MBA Students</h3>
-              <p className="text-neutral-600 mb-6 font-medium text-sm">
-                Designed for professional career advancement, executive leadership, and business administration.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-[#B8860B] text-base sm:text-lg block mb-1">Networking</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Connect with industry leaders, corporate peers, and alumni.</p>
-                </div>
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-[#B8860B] text-base sm:text-lg block mb-1">Industry Events</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Seminars, enterprise showcases, and strategic workshops.</p>
-                </div>
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-[#B8860B] text-base sm:text-lg block mb-1">Leadership</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Executive opportunities to coordinate forums and lead projects.</p>
-                </div>
-              </div>
-            </div>
+            {['MBA', 'MPhil', 'MSc', 'MA', 'LLM'].map((category) => {
+              const categoryProgrammes = programmes.filter(p => p.category === category);
+              if (categoryProgrammes.length === 0) return null;
 
-            {/* MPhil Card */}
-            <div id="mphil-section" className="bg-[#f0f3fa] border border-[#d2def5] p-8 rounded-2xl transition-all duration-300">
-              <h3 className="text-2xl font-bold text-neutral-900 mb-4">MPhil Students</h3>
-              <p className="text-neutral-600 mb-6 font-medium text-sm">
-                Tailored for academic research excellence, conceptual frameworks, and methodology training.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-[#001a54] text-base sm:text-lg block mb-1">Research Support</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Access data repositories, research methodologies, and thesis guidelines.</p>
-                </div>
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-[#001a54] text-base sm:text-lg block mb-1">Publishing</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Publishing assistance, peer clinics, and journal review cycles.</p>
-                </div>
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-[#001a54] text-base sm:text-lg block mb-1">Conferences</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Participate in national and international research presentations.</p>
-                </div>
-              </div>
-            </div>
+              // Styles mapping for each category to match the flyer aesthetics
+              const styles: Record<string, { bg: string, border: string, text: string, titleBg: string }> = {
+                'MBA': { bg: 'bg-[#FAF6EC]', border: 'border-[#F5EAD2]', text: 'text-[#B8860B]', titleBg: 'bg-[#001a54]' },
+                'MPhil': { bg: 'bg-[#f0f3fa]', border: 'border-[#d2def5]', text: 'text-[#001a54]', titleBg: 'bg-[#001a54]' },
+                'MSc': { bg: 'bg-[#eefcf5]', border: 'border-[#d2f5e3]', text: 'text-emerald-700', titleBg: 'bg-[#001a54]' },
+                'MA': { bg: 'bg-[#FAF5FF]', border: 'border-[#F3E8FF]', text: 'text-purple-700', titleBg: 'bg-[#001a54]' },
+                'LLM': { bg: 'bg-[#FFF7ED]', border: 'border-[#FFEDD5]', text: 'text-orange-700', titleBg: 'bg-[#001a54]' }
+              };
+              const s = styles[category] || styles['MBA'];
 
-            {/* MSc Card */}
-            <div id="msc-section" className="bg-[#eefcf5] border border-[#d2f5e3] p-8 rounded-2xl transition-all duration-300">
-              <h3 className="text-2xl font-bold text-neutral-900 mb-4">MSc Students</h3>
-              <p className="text-neutral-600 mb-6 font-medium text-sm">
-                Focused on specialized scientific methodology, technical skills, and practical problem-solving.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-emerald-700 text-base sm:text-lg block mb-1">Technical Skills</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Access tools, technical workshops, and software programs.</p>
+              return (
+                <div key={category} id={`${category.toLowerCase()}-section`} className={`${s.bg} border ${s.border} p-8 rounded-2xl transition-all duration-300`}>
+                  <div className="flex items-center gap-3 mb-6">
+                    <h3 className="text-2xl font-extrabold text-[#001a54]">{category} Programmes</h3>
+                    <div className="flex-1 h-px bg-neutral-200"></div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {categoryProgrammes.map(prog => (
+                      <div key={prog.id} className="bg-white p-4 rounded-xl shadow-sm border border-neutral-100 flex items-start gap-3 hover:shadow-md transition-shadow">
+                        <div className="w-2 h-2 mt-2 rounded-full bg-[#B8860B] shrink-0"></div>
+                        <span className="font-bold text-neutral-800 text-sm sm:text-base leading-snug">{prog.name}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-emerald-700 text-base sm:text-lg block mb-1">Professional Dev</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Skill certifications, case study groups, and business consulting projects.</p>
-                </div>
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-emerald-700 text-base sm:text-lg block mb-1">Industry Links</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Bridge with tech hubs, finance houses, and corporate agencies.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* MA Card */}
-            <div id="ma-section" className="bg-[#FAF5FF] border border-[#F3E8FF] p-8 rounded-2xl transition-all duration-300">
-              <h3 className="text-2xl font-bold text-neutral-900 mb-4">MA Students</h3>
-              <p className="text-neutral-600 mb-6 font-medium text-sm">
-                Supporting communication, liberal arts, media, and humanities postgraduate students.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-purple-700 text-base sm:text-lg block mb-1">Student Community</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Interactive group dialogues, cultural panels, and public speaking forums.</p>
-                </div>
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-purple-700 text-base sm:text-lg block mb-1">Professional Dev</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Mentorship access, portfolio showcases, and career fairs.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* PhD Card */}
-            <div id="phd-section" className="bg-[#FFF7ED] border border-[#FFEDD5] p-8 rounded-2xl transition-all duration-300">
-              <h3 className="text-2xl font-bold text-neutral-900 mb-4">PhD Students</h3>
-              <p className="text-neutral-600 mb-6 font-medium text-sm">
-                The pinnacle of research excellence, thought leadership, and academic contributions.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-orange-700 text-base sm:text-lg block mb-1">Scholarly Research</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Doctoral research circles, data analysis clinics, and publications.</p>
-                </div>
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-orange-700 text-base sm:text-lg block mb-1">Thesis Support</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Direct academic mentoring, cohort peer review, and defense guides.</p>
-                </div>
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-orange-700 text-base sm:text-lg block mb-1">Fellowships</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Opportunities for lecturing, research grants, and university projects.</p>
-                </div>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </section>
 

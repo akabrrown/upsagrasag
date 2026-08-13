@@ -291,3 +291,12 @@ export const academicSupportSchema = z.object({
   updated_at: z.string().optional(),
 });
 export type AcademicSupport = z.infer<typeof academicSupportSchema>;
+
+export const academicProgrammeSchema = z.object({
+  id: z.string().uuid().optional(),
+  category: z.enum(['LLM', 'MA', 'MSc', 'MBA', 'MPhil']),
+  name: z.string().min(1, "Name is required"),
+  display_order: z.number().int().default(0),
+  created_at: z.string().optional(),
+});
+export type AcademicProgramme = z.infer<typeof academicProgrammeSchema>;
