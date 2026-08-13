@@ -39,6 +39,7 @@ interface EventItem {
   is_featured?: boolean;
   status: 'Registration open' | 'Limited seats' | 'Sold out' | 'Registration closed' | 'Past Event';
   speaker?: string;
+  theme?: string;
 }
 
 export default function EventsClient({ initialEvents = [] }: { initialEvents?: any[] }) {
@@ -72,7 +73,8 @@ export default function EventsClient({ initialEvents = [] }: { initialEvents?: a
       image_url: e.image_url,
       url: e.url || '#',
       is_featured: e.is_featured,
-      status: (new Date(e.event_date).getTime() < Date.now()) ? 'Past Event' : 'Registration open'
+      status: (new Date(e.event_date).getTime() < Date.now()) ? 'Past Event' : 'Registration open',
+      theme: e.theme
     }));
 
     return formattedDB;
@@ -384,6 +386,11 @@ export default function EventsClient({ initialEvents = [] }: { initialEvents?: a
                         <span className="absolute bottom-2 right-2 bg-black/75 text-white text-[10px] font-bold px-2 py-0.5 rounded-md">
                           {item.price}
                         </span>
+                        {item.theme && (
+                           <span className="absolute top-2 right-2 bg-[#001a54] text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-md uppercase tracking-wider shadow-sm">
+                             Theme: {item.theme}
+                           </span>
+                        )}
                       </div>
 
                       {/* Content */}
@@ -472,6 +479,9 @@ export default function EventsClient({ initialEvents = [] }: { initialEvents?: a
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-[#001a54]">
                   {selectedEventModal.title}
                 </h2>
+                {selectedEventModal.theme && (
+                  <p className="text-sm font-semibold text-[#B8860B] mt-1">Theme: {selectedEventModal.theme}</p>
+                )}
               </div>
 
               {/* Event Details Grid */}
