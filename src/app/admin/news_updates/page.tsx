@@ -292,7 +292,15 @@ export default function AdminNewsPage() {
                       theme="snow"
                       value={field.value || ''}
                       onChange={field.onChange}
-                      modules={{ toolbar: [['bold', 'italic', 'underline'], [{ 'header': [1, 2, 3, false] }], [{ 'list': 'ordered' }, { 'list': 'bullet' }], ['link', 'blockquote']] }}
+                      modules={{ 
+                        toolbar: [
+                          ['bold', 'italic', 'underline', 'strike'], 
+                          [{ 'header': [1, 2, 3, false] }], 
+                          [{ 'list': 'ordered' }, { 'list': 'bullet' }], 
+                          ['link', 'image', 'video', 'blockquote'],
+                          ['clean']
+                        ] 
+                      }}
                       className="bg-white border-none min-h-[400px]"
                     />
                   )}
