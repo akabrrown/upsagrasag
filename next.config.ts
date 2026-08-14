@@ -1,14 +1,15 @@
 import type { NextConfig } from "next";
 
 const cspHeader = `
-    default-src 'self';
-    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://translate.google.com https://translate.googleapis.com;
+    default-src 'self' https://vercel.live;
+    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com;
     style-src 'self' 'unsafe-inline' https://translate.googleapis.com;
-    img-src 'self' blob: data: https://images.unsplash.com https://cdn.simpleicons.org https://res.cloudinary.com https://translate.google.com https://translate.googleapis.com;
+    img-src 'self' blob: data: https://images.unsplash.com https://cdn.simpleicons.org https://res.cloudinary.com https://translate.google.com https://translate.googleapis.com https://fonts.gstatic.com;
     font-src 'self' https://db.onlinewebfonts.com;
     object-src 'none';
     base-uri 'self';
     form-action 'self';
+    frame-src 'self' https://vercel.live;
     frame-ancestors 'none';
     upgrade-insecure-requests;
     connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vercel.live;

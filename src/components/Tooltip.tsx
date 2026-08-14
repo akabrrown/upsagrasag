@@ -35,7 +35,7 @@ export default function Tooltip({ align = 'center' }: TooltipProps) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Image src={iconUrl} alt={label} width={20} height={20} className="w-5 h-5 object-contain" />
+            <Image src={iconUrl} alt={label} width={20} height={20} className="w-5 h-5 object-contain" unoptimized={true} />
           </Link>
           <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-neutral-800 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
             {label}
