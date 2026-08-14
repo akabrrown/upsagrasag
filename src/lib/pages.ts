@@ -18,7 +18,7 @@ export async function getPageData(slug: string) {
   try {
     const { data, error } = await supabaseAdmin
       .from('page_contents')
-      .select('title, content, image_url')
+      .select('title, body, image_url')
       .eq('slug', slug)
       .single();
 
@@ -27,7 +27,7 @@ export async function getPageData(slug: string) {
     // Map database fields to the format expected by the frontend
     const pageData = {
       title: data.title,
-      content: data.content,
+      content: data.body,
       imageUrl: data.image_url || ''
     };
 

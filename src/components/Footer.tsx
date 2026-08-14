@@ -50,7 +50,7 @@ export default function Footer() {
             {openAccordion === 'Useful Links' && (
               <ul className="pb-4 space-y-3">
                 <li><Link href="/about" className="text-[15px] text-neutral-300 hover:text-accent transition-colors block">About the Association</Link></li>
-                <li><Link href="/academics" className="text-[15px] text-neutral-300 hover:text-accent transition-colors block">Academics & Thesis Support</Link></li>
+                <li><Link href="/resources" className="text-[15px] text-neutral-300 hover:text-accent transition-colors block">Academics & Thesis Support</Link></li>
                 <li><Link href="/opportunities" className="text-[15px] text-neutral-300 hover:text-accent transition-colors block">Graduate Opportunities</Link></li>
                 <li><Link href="/welfare" className="text-[15px] text-neutral-300 hover:text-accent transition-colors block">Student Welfare Schemes</Link></li>
               </ul>
@@ -126,7 +126,7 @@ export default function Footer() {
               <h3 className="text-sm font-bold text-accent uppercase tracking-wider">Useful Links</h3>
               <ul className="mt-4 space-y-2.5">
                 <li><Link href="/about" className="text-sm text-neutral-400 hover:text-accent transition-colors">About the Association</Link></li>
-                <li><Link href="/academics" className="text-sm text-neutral-400 hover:text-accent transition-colors">Academics & Thesis Support</Link></li>
+                <li><Link href="/resources" className="text-sm text-neutral-400 hover:text-accent transition-colors">Academics & Thesis Support</Link></li>
                 <li><Link href="/opportunities" className="text-sm text-neutral-400 hover:text-accent transition-colors">Graduate Opportunities</Link></li>
                 <li><Link href="/welfare" className="text-sm text-neutral-400 hover:text-accent transition-colors">Student Welfare Schemes</Link></li>
               </ul>

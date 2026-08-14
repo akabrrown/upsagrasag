@@ -88,12 +88,7 @@ export default function HomePage() {
         setQuickLinks(data);
       } else {
         // Fallback sample links in case of error or empty data
-        setQuickLinks([
-          { id: '1', title: 'Volunteer with Us', subtitle: '', icon_name: 'Heart', url: '/volunteer', display_order: 1 },
-          { id: '2', title: 'Reach Out', subtitle: 'Report A Case', icon_name: 'AlertCircle', url: '/report', display_order: 2 },
-          { id: '3', title: 'Apply for a Job', subtitle: 'Upload a Job Opportunity', icon_name: 'Briefcase', url: '/jobs', display_order: 3 },
-          { id: '4', title: 'Reports and Publications', subtitle: '', icon_name: 'FileText', url: '/reports', display_order: 4 },
-        ]);
+        setQuickLinks([]);
       }
     };
     fetchQuickLinks();
@@ -269,7 +264,7 @@ export default function HomePage() {
   // Slides will be defined after hero defaults
   // Updated hero defaults for fallback when slide has no custom data
   const heroTitle = hero.title || 'Inspiring Students To Uncover Their True Potential';
-  const heroSubtitle = hero.subtitle || 'Lorem ipsum dolor sit amet consectetur. Vel imperdiet quam nisl vehicula nec blandit orci. Cras laoreet urna in dui nisl et. Vestibulum fermentum.';
+  const heroSubtitle = hero.subtitle || 'Empowering postgraduate students through academic excellence, leadership opportunities and a supportive community that prepares them to thrive.';
   const heroCtaText = hero.ctaText || 'Explore Academics';
   const heroCtaLink = hero.ctaLink || '/opportunities';
 
