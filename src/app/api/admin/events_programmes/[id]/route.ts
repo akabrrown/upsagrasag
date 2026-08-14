@@ -4,8 +4,8 @@ import { eventProgrammeSchema } from '@/types/admin';
 import { eventProgrammeService } from '@/services/admin/eventProgrammeService';
 
 // GET a single event programme by id
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   try {
     const { data, error } = await supabase
       .from('events_programmes')
@@ -39,8 +39,8 @@ export async function POST(request: Request) {
 }
 
 // UPDATE an event programme by id (PATCH)
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   try {
     const body = await request.json();
     const parse = eventProgrammeSchema.safeParse({ id, ...body });
@@ -54,8 +54,8 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 }
 
 // DELETE an event programme by id
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const { error } = await supabase.from('events_programmes').delete().eq('id', id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });

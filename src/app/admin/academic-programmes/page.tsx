@@ -102,26 +102,28 @@ export default function AcademicProgrammesAdmin() {
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-6">
-          {isLoading ? (
-            <AdminTableSkeleton columns={4} />
-          ) : !programmes || programmes.length === 0 ? (
-            <div className="text-center py-12">
-              <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500">No programmes found.</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-gray-100">
-                    <th className="py-3 px-4 text-sm font-medium text-gray-500">Category</th>
-                    <th className="py-3 px-4 text-sm font-medium text-gray-500">Programme Name</th>
-                    <th className="py-3 px-4 text-sm font-medium text-gray-500">Display Order</th>
-                    <th className="py-3 px-4 text-sm font-medium text-gray-500 text-right">Actions</th>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="py-3 px-4 text-sm font-medium text-gray-500">Category</th>
+                  <th className="py-3 px-4 text-sm font-medium text-gray-500">Programme Name</th>
+                  <th className="py-3 px-4 text-sm font-medium text-gray-500">Display Order</th>
+                  <th className="py-3 px-4 text-sm font-medium text-gray-500 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {isLoading ? (
+                  <AdminTableSkeleton columns={4} />
+                ) : !programmes || programmes.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="py-12 text-center">
+                      <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                      <p className="text-gray-500">No programmes found.</p>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {programmes.map((prog) => (
+                ) : (
+                  programmes.map((prog) => (
                     <tr key={prog.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                       <td className="py-3 px-4 text-sm font-medium text-gray-900">
                         <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded-md text-xs">{prog.category}</span>
@@ -139,11 +141,11 @@ export default function AcademicProgrammesAdmin() {
                         </div>
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

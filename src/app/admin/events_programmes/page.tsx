@@ -113,6 +113,9 @@ export default function EventsManagement() {
       };
       delete payload.start_time;
       delete payload.end_time;
+      if (!payload.slug) {
+        delete payload.slug;
+      }
       
       const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       if (!res.ok) throw new Error('Failed to save');

@@ -5,7 +5,8 @@ import ReactMarkdown from 'react-markdown';
 export const dynamic = 'force-dynamic';
 
 export default async function StudentSupportAcademicCalendarPage() {
-  const res = await fetch('http://localhost:3000/api/admin/academic-calendar');
+  const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
+  const res = await fetch(`${baseUrl}/api/admin/academic-calendar`);
   const data = await res.json();
   const { title = 'Academic Calendar', content = '', imageUrl = '' } = data;
   
