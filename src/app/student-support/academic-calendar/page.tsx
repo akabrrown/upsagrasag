@@ -8,8 +8,9 @@ export default async function StudentSupportAcademicCalendarPage() {
   let fetchError = false;
 
   try {
-    events = await academicCalendarService.getAll();
-  } catch {
+    events = await academicCalendarService.list('date', true);
+  } catch (err) {
+    console.error('[academic-calendar] Failed to load events:', err);
     fetchError = true;
   }
 
