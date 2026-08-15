@@ -6,12 +6,14 @@ export const dynamic = 'force-dynamic';
 export default async function StudentSupportAcademicCalendarPage() {
   let events: { id: string; title: string; date: string; description?: string }[] = [];
   let fetchError = false;
+  let errorMessage = '';
 
   try {
     events = await academicCalendarService.list('date', true);
-  } catch (err) {
+  } catch (err: any) {
     console.error('[academic-calendar] Failed to load events:', err);
     fetchError = true;
+    errorMessage = err.message || String(err);
   }
 
   return (
@@ -22,9 +24,10 @@ export default async function StudentSupportAcademicCalendarPage() {
       </div>
 
       {fetchError && (
-        <p className="text-center text-red-500">
-          Unable to load calendar events. Please try again later.
-        </p>
+        <div className="text-center text-red-500">
+          <p>Unable to load calendar events. Please try again later.</p>
+          <p className="text-sm mt-2 font-mono bg-red-50 p-2 rounded inline-block text-red-700">{errorMessage}</p>
+        </div>
       )}
 
       {!fetchError && events.length === 0 && (
