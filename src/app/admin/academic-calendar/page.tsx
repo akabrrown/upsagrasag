@@ -47,8 +47,8 @@ export default function AdminAcademicCalendarPage() {
   const handleOpenEdit = (raw_ev: any) => {
     const ev = Object.fromEntries(Object.entries(raw_ev).map(([k, v]) => [k, v === null ? '' : v])) as any;
     setTitle(ev.title);
-    if (ev.date) {
-      const d = new Date(ev.date);
+    if (ev.event_date) {
+      const d = new Date(ev.event_date);
       setDate(d.toISOString().slice(0, 10)); // YYYY-MM-DD
     } else {
       setDate('');
@@ -80,7 +80,7 @@ export default function AdminAcademicCalendarPage() {
       const res = await fetch('/api/admin/academic-calendar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, date, description })
+        body: JSON.stringify({ title, event_date: date, description })
       });
       if (!res.ok) throw new Error('Failed to save');
       
@@ -121,7 +121,7 @@ export default function AdminAcademicCalendarPage() {
   
   const filteredRecords = events.filter(r => {
     if (activeTab === 'All Semesters') return true;
-    const status = getStatus(r.date);
+    const status = getStatus(r.event_date);
     if (activeTab === 'Upcoming') return status === 'Upcoming' || status === 'Today';
     if (activeTab === 'Past') return status === 'Past';
     return false;
@@ -189,14 +189,14 @@ export default function AdminAcademicCalendarPage() {
                 <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">No events found.</td></tr>
               ) : (
                 filteredRecords.map(record => {
-                  const status = getStatus(record.date);
+                  const status = getStatus(record.event_date);
                   return (
                     <tr key={record.id} className="hover:bg-gray-50/50 transition-colors group">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-lg bg-gray-50 border border-gray-200 flex flex-col items-center justify-center flex-shrink-0">
-                            <span className="text-[10px] font-bold text-red-500 uppercase">{new Date(record.date).toLocaleString('default', { month: 'short' })}</span>
-                            <span className="text-lg font-black text-gray-900 leading-none">{new Date(record.date).getDate()}</span>
+                            <span className="text-[10px] font-bold text-red-500 uppercase">{new Date(record.event_date).toLocaleString('default', { month: 'short' })}</span>
+                            <span className="text-lg font-black text-gray-900 leading-none">{new Date(record.event_date).getDate()}</span>
                           </div>
                           <div>
                             <p className="font-semibold text-gray-900 line-clamp-1">{record.title}</p>
@@ -207,7 +207,7 @@ export default function AdminAcademicCalendarPage() {
                       <td className="px-6 py-4">
                         <div className="flex items-start gap-2 text-sm text-gray-600">
                           <CalendarIcon className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                          <p className="font-medium text-gray-900">{new Date(record.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                          <p className="font-medium text-gray-900">{new Date(record.event_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -314,7 +314,7 @@ export default function AdminAcademicCalendarPage() {
 
   const DetailsView = () => {
     if (!selectedEvent) return null;
-    const status = getStatus(selectedEvent.date);
+    const status = getStatus(selectedEvent.event_date);
     
     return (
       <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -332,14 +332,14 @@ export default function AdminAcademicCalendarPage() {
 
         <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center text-center">
            <div className="w-24 h-24 rounded-2xl bg-blue-50 border border-blue-100 flex flex-col items-center justify-center mb-6">
-             <span className="text-sm font-bold text-blue-600 uppercase">{new Date(selectedEvent.date).toLocaleString('default', { month: 'short' })}</span>
-             <span className="text-4xl font-black text-[#004080] leading-none">{new Date(selectedEvent.date).getDate()}</span>
+             <span className="text-sm font-bold text-blue-600 uppercase">{new Date(selectedEvent.event_date).toLocaleString('default', { month: 'short' })}</span>
+             <span className="text-4xl font-black text-[#004080] leading-none">{new Date(selectedEvent.event_date).getDate()}</span>
            </div>
            
            <h2 className="text-3xl font-bold text-gray-900 mb-2">{selectedEvent.title}</h2>
            
            <div className="flex items-center gap-4 text-sm text-gray-500 mb-8">
-             <span className="flex items-center gap-1.5"><CalendarIcon className="w-4 h-4"/> {new Date(selectedEvent.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric' })}</span>
+             <span className="flex items-center gap-1.5"><CalendarIcon className="w-4 h-4"/> {new Date(selectedEvent.event_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric' })}</span>
              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full font-medium ${status === 'Upcoming' || status === 'Today' ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}>
                <CheckCircle2 className="w-3.5 h-3.5" /> {status}
              </span>

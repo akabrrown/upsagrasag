@@ -222,7 +222,7 @@ export interface PresidentRecord {
 export interface AcademicCalendarRecord {
   id: string;
   title: string;
-  date: string;
+  event_date: string;
   description?: string;
   created_at?: string;
 };

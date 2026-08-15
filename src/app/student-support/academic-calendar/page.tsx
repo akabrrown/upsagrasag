@@ -4,12 +4,12 @@ import { academicCalendarService } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 
 export default async function StudentSupportAcademicCalendarPage() {
-  let events: { id: string; title: string; date: string; description?: string }[] = [];
+  let events: { id: string; title: string; event_date: string; description?: string }[] = [];
   let fetchError = false;
   let errorMessage = '';
 
   try {
-    events = await academicCalendarService.list('date', true);
+    events = await academicCalendarService.list('event_date', true);
   } catch (err: any) {
     console.error('[academic-calendar] Failed to load events:', err);
     fetchError = true;
@@ -44,7 +44,7 @@ export default async function StudentSupportAcademicCalendarPage() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <h2 className="text-lg font-semibold text-gray-900">{event.title}</h2>
                 <time className="text-sm text-gray-500 whitespace-nowrap">
-                  {new Date(event.date).toLocaleDateString('en-GB', {
+                  {new Date(event.event_date).toLocaleDateString('en-GB', {
                     day: 'numeric',
                     month: 'long',
                     year: 'numeric',
