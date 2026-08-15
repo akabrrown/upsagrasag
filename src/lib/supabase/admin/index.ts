@@ -1,5 +1,6 @@
 import { createServerSupabaseClient } from '../server';
 import { createClient } from '@supabase/supabase-js';
+import { AcademicCalendarRecord } from '@/types/admin';
 
 // Dedicated admin client that runs with service role privileges, bypassing RLS.
 // This is safe because all admin API routes are pre-validated using requireAdmin().
