@@ -621,7 +621,60 @@ export const presidentService = new AdminCrudService<President>('homepage_presid
 export const academicCalendarService = new AdminCrudService<AcademicCalendarRecord>('academic_calendar');
 export const partnerService = new AdminCrudService<Partner>('partners');
 export const constitutionService = new AdminCrudService<ConstitutionFile>('constitution_files');
-export const leadershipService = new AdminCrudService<Leadership>('leadership');
+class LeadershipCrudService extends AdminCrudService<Leadership> {
+  constructor() {
+    super('leadership');
+  }
+
+  async list(orderCol: string = 'display_order', ascending: boolean = true): Promise<Leadership[]> {
+    const records = await super.list(orderCol, ascending);
+    return records.map(r => {
+      const contactInfo = r.contact_info as any;
+      return {
+        ...r,
+        email: contactInfo?.email || '',
+        phone: contactInfo?.phone || ''
+      };
+    });
+  }
+
+  async get(id: string): Promise<Leadership | null> {
+    const record = await super.get(id);
+    if (!record) return null;
+    const contactInfo = record.contact_info as any;
+    return {
+      ...record,
+      email: contactInfo?.email || '',
+      phone: contactInfo?.phone || ''
+    };
+  }
+
+  async create(item: Partial<Leadership>): Promise<Leadership> {
+    const dbPayload: any = { ...item };
+    dbPayload.contact_info = {
+      ...(item.contact_info as any || {}),
+      email: item.email || '',
+      phone: item.phone || ''
+    };
+    return super.create(dbPayload);
+  }
+
+  async update(id: string, item: Partial<Leadership>): Promise<Leadership> {
+    const dbPayload: any = { ...item };
+    // If email or phone is provided, we should merge it into contact_info
+    if (item.email !== undefined || item.phone !== undefined) {
+      const existing = await super.get(id);
+      dbPayload.contact_info = {
+        ...(existing?.contact_info as any || {}),
+        email: item.email !== undefined ? item.email : (existing as any)?.email || '',
+        phone: item.phone !== undefined ? item.phone : (existing as any)?.phone || ''
+      };
+    }
+    return super.update(id, dbPayload);
+  }
+}
+
+export const leadershipService = new LeadershipCrudService();
 export const executiveService = new ExecutiveCrudService();
 export const pastExecutiveService = new PastExecutiveCrudService();
 export const opportunityService = new AdminCrudService<Opportunity>('opportunities');
