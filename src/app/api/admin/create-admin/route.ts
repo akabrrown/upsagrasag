@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { supabaseAdminClient } from '@/lib/supabase/admin/index';
 import { requireAdmin } from '@/lib/authHelpers';
-import { adminUserService } from '@/lib/supabase/admin/index';
 
 export async function POST(request: Request) {
   // 1. Enforce Admin Access
@@ -19,7 +18,7 @@ export async function POST(request: Request) {
     // 2. Generate a random temporary password
     const tempPassword = Math.random().toString(36).slice(-10) + 'Aa1!'; 
 
-    const supabaseAdmin = await createServerSupabaseClient();
+    const supabaseAdmin = supabaseAdminClient;
 
     // 3. Create the user in Supabase Auth
     const { data: authData, error: authErrorResult } = await supabaseAdmin.auth.admin.createUser({
