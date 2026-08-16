@@ -138,10 +138,10 @@ export default function AdminUsersPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0 text-[#2563eb] font-bold uppercase">
-                          {record.email.charAt(0)}
+                          {(record.email || '?').charAt(0)}
                         </div>
                         <div>
-                          <p className="font-semibold text-gray-900">{record.email}</p>
+                          <p className="font-semibold text-gray-900">{record.email || 'No email'}</p>
                           <p className="text-xs text-gray-500 mt-0.5 font-mono">{record.id?.split('-')[0]}</p>
                         </div>
                       </div>
@@ -275,10 +275,10 @@ export default function AdminUsersPage() {
 
         <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center text-center">
            <div className="w-24 h-24 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-[#2563eb] text-3xl font-bold uppercase mb-4">
-             {selectedUser.email.charAt(0)}
+             {(selectedUser.email || '?').charAt(0)}
            </div>
            
-           <h2 className="text-2xl font-bold text-gray-900 mb-1">{selectedUser.email}</h2>
+           <h2 className="text-2xl font-bold text-gray-900 mb-1">{selectedUser.email || 'No email'}</h2>
            <p className="text-sm font-mono text-gray-500 mb-6">ID: {selectedUser.id}</p>
            
            <div className="flex gap-4">
