@@ -15,28 +15,60 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
-    // 2. Generate a random temporary password
-    const tempPassword = Math.random().toString(36).slice(-10) + 'Aa1!'; 
-
     const supabaseAdmin = supabaseAdminClient;
 
-    // 3. Create the user in Supabase Auth
-    const { data: authData, error: authErrorResult } = await supabaseAdmin.auth.admin.createUser({
-      email,
-      password: tempPassword,
-      email_confirm: true, // Auto-confirm email
-      user_metadata: { role: role || 'admin' }
-    });
+    // Check if user already exists in Auth
+    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
+    const existingAuth = existingUsers?.users?.find(
+      (u: any) => u.email?.toLowerCase() === email.toLowerCase()
+    );
 
-    if (authErrorResult) {
-      return NextResponse.json({ error: authErrorResult.message }, { status: 400 });
+    let authUid: string;
+    let tempPassword: string | null = null;
+
+    if (existingAuth) {
+      // User already exists in Auth — just use their ID
+      authUid = existingAuth.id;
+
+      // Check if they already have an admin_users record
+      const { data: existingAdmin } = await supabaseAdmin
+        .from('admin_users')
+        .select('id')
+        .eq('auth_uid', authUid)
+        .maybeSingle();
+
+      if (existingAdmin) {
+        return NextResponse.json(
+          { error: `An admin with email ${email} already exists.` },
+          { status: 400 }
+        );
+      }
+    } else {
+      // Generate a strong temporary password
+      const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+      let pwd = '';
+      for (let i = 0; i < 12; i++) {
+        pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      tempPassword = pwd + 'Aa1!';
+
+      // Create user in Supabase Auth
+      const { data: authData, error: authErrorResult } = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password: tempPassword,
+        email_confirm: true,
+        user_metadata: { role: role || 'admin' }
+      });
+
+      if (authErrorResult) {
+        console.error('[create-admin] Auth error:', authErrorResult);
+        return NextResponse.json({ error: authErrorResult.message }, { status: 400 });
+      }
+
+      authUid = authData.user.id;
     }
 
-    const authUid = authData.user.id;
-
-    // 4. Create the corresponding record in admin_users
-    // (We bypass the adminUserService.create here because it currently expects the auth user to already exist, 
-    // but doing it directly via supabaseAdmin is cleaner since we already have the auth_uid).
+    // Create the admin_users record
     const { data: adminRecord, error: dbError } = await supabaseAdmin
       .from('admin_users')
       .insert({
@@ -47,12 +79,14 @@ export async function POST(request: Request) {
       .single();
 
     if (dbError) {
-      // Rollback Auth user if DB insert fails
-      await supabaseAdmin.auth.admin.deleteUser(authUid);
+      // Only rollback if we created the auth user (not if they pre-existed)
+      if (tempPassword) {
+        await supabaseAdmin.auth.admin.deleteUser(authUid);
+      }
+      console.error('[create-admin] DB error:', dbError);
       return NextResponse.json({ error: dbError.message }, { status: 500 });
     }
 
-    // Return the required structure { admin: AdminUser, tempPassword: string }
     const adminUserResult = {
       id: adminRecord.id,
       email: email,
@@ -61,9 +95,13 @@ export async function POST(request: Request) {
       updated_at: adminRecord.updated_at
     };
 
-    return NextResponse.json({ admin: adminUserResult, tempPassword }, { status: 201 });
+    return NextResponse.json({
+      admin: adminUserResult,
+      tempPassword: tempPassword || '(existing auth user — no new password generated)'
+    }, { status: 201 });
 
   } catch (error: any) {
+    console.error('[create-admin] Unexpected error:', error);
     return NextResponse.json({ error: error.message || 'An error occurred' }, { status: 500 });
   }
 }
