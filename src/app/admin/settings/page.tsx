@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { platformSettingsSchema, PlatformSettings } from '@/types/admin';
 import { Save, ShieldAlert, CheckCircle2, Globe, Settings as SettingsIcon, Lock, KeyRound, Construction, ChevronRight } from 'lucide-react';
-import { supabaseClient } from '@/lib/supabaseClient';
+import { createClient } from '@/lib/supabase';
 import './settings.css';
 import { cn } from '@/lib/utils';
 
@@ -76,7 +76,8 @@ export default function AdminSettingsPage() {
     }
 
     try {
-      const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+      const supabase = createClient();
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) throw error;
       setPwdSuccess('Password changed successfully!');
       (e.target as HTMLFormElement).reset();

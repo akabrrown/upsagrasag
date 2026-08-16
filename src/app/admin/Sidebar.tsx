@@ -1,7 +1,8 @@
 "use client";
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase';
 import {
   Home,
   Image,
@@ -84,8 +85,25 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const [userEmail, setUserEmail] = useState<string>('');
+  const [userRole, setUserRole] = useState<string>('');
 
-  const handleLogout = () => {
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user?.email) {
+        setUserEmail(user.email);
+      }
+    });
+    // Fetch role from auth-status API
+    fetch('/api/admin/auth-status').then(r => r.json()).then(data => {
+      if (data.role) setUserRole(data.role);
+    }).catch(() => {});
+  }, []);
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
     router.push('/signin');
   };
 
@@ -136,8 +154,8 @@ export default function Sidebar() {
           <UserRound className="w-5 h-5 text-gray-500" />
         </div>
         <div className="sidebar-footer-details">
-          <div className="sidebar-footer-name">Admin User</div>
-          <div className="sidebar-footer-role">Sign Out</div>
+          <div className="sidebar-footer-name">{userEmail || 'Loading...'}</div>
+          <div className="sidebar-footer-role">{userRole ? userRole.charAt(0).toUpperCase() + userRole.slice(1) : 'Sign Out'}</div>
         </div>
         <LogOut className="w-4 h-4 text-gray-400 ml-auto" />
       </div>
