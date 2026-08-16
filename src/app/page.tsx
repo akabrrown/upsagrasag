@@ -59,40 +59,7 @@ export default function HomePage() {
   // News updates state
   const [newsUpdates, setNewsUpdates] = useState<{ id: string; title: string; content: string; image_url: string; created_at: string; category: string }[]>([]);
 
-  // Quick Links state
-  interface QuickLink {
-    id: string;
-    title: string;
-    subtitle?: string;
-    icon_name: string;
-    url: string;
-    display_order: number;
-  }
-  const [quickLinks, setQuickLinks] = useState<QuickLink[]>([
-    { id: '1', title: 'Volunteer with Us', subtitle: '', icon_name: 'Heart', url: '/volunteer', display_order: 1 },
-    { id: '2', title: 'Reach Out', subtitle: 'Report A Case', icon_name: 'AlertCircle', url: '/report', display_order: 2 },
-    { id: '3', title: 'Apply for a Job', subtitle: 'Upload a Job Opportunity', icon_name: 'Briefcase', url: '/jobs', display_order: 3 },
-    { id: '4', title: 'Reports and Publications', subtitle: '', icon_name: 'FileText', url: '/reports', display_order: 4 },
-  ]);
-  useEffect(() => {
-    const fetchQuickLinks = async () => {
-      const { data, error } = await supabaseClient
-        .from('quick_links')
-        .select('*')
-        .order('display_order', { ascending: true });
-      // Log meaningful errors only
-      if (error && typeof (error as any).message === 'string' && (error as any).message.length > 0) {
-        console.error('Error fetching quick links:', error);
-      }
-      if (!error && data && data.length > 0) {
-        setQuickLinks(data);
-      } else {
-        // Fallback sample links in case of error or empty data
-        setQuickLinks([]);
-      }
-    };
-    fetchQuickLinks();
-  }, []);
+
   useEffect(() => {
     const fetchNews = async () => {
       const { data, error } = await supabaseClient
@@ -807,29 +774,6 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
-      </section>
-
-      {/* Quick Links Section (moved before footer) */}
-      <section className="mx-auto max-w-5xl px-4 py-16">
-        <h2 className="text-2xl font-bold text-accent mb-6">Quick Links</h2>
-        {quickLinks.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-            {quickLinks.map((link) => {
-              const IconComponent = (LucideIcons as any)[link.icon_name] || LucideIcons.Link;
-              return (
-                <Link key={link.id} href={link.url} className="flex items-start gap-5 p-4 rounded-2xl bg-gray-50 border border-gray-200 hover:bg-white hover:shadow-sm transition-all group">
-                  <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-white shadow-sm border border-neutral-100 flex items-center justify-center group-hover:border-accent/30 group-hover:shadow-md transition-all">
-                    <IconComponent className="w-6 h-6 text-primary" strokeWidth={2} />
-                  </div>
-                  <div className="flex flex-col justify-center min-h-[3.5rem]">
-                    <h3 className="text-lg font-extrabold text-neutral-800 group-hover:text-primary transition-colors">{link.title}</h3>
-                    {link.subtitle && <p className="text-sm font-medium text-neutral-500 mt-0.5">{link.subtitle}</p>}
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        )}
       </section>
 
       {/* Floating Chatbot Indicator */}
