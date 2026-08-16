@@ -22,19 +22,16 @@ export default function AdminAuthGuard({ children }: { children: React.ReactNode
           return;
         }
 
-        // Check if user is in admin_users and if they need to change password
-        const { data: adminRecord, error } = await supabase
-          .from('admin_users')
-          .select('must_change_password')
-          .eq('auth_uid', session.user.id)
-          .single();
-
-        if (error || !adminRecord) {
-          // No admin record found, meaning they aren't authorized for the dashboard
-          console.error('Admin Auth Check Error:', error);
+        // Call our secure API to check if they are an admin and if they need a password change
+        const response = await fetch('/api/admin/auth-status');
+        
+        if (!response.ok) {
+          console.error('Admin Auth Check Failed:', await response.text());
           router.push('/signin');
           return;
         }
+
+        const adminRecord = await response.json();
 
         // If they need to change their password and they are NOT on the change-password page
         if (adminRecord.must_change_password && pathname !== '/admin/change-password') {
