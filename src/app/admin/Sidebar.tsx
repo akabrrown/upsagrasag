@@ -52,6 +52,7 @@ const navGroups = [
       { name: 'Objectives', href: '/admin/objectives', icon: Target },
       { name: 'Hero Slides', href: '/admin/hero-slides', icon: SlidersHorizontal },
       { name: 'Leadership', href: '/admin/leadership', icon: Users },
+      { name: 'Past Executives', href: '/admin/past-executives', icon: Users },
       { name: 'Welfare Services', href: '/admin/welfare', icon: Shield },
       { name: 'Welfare Steps', href: '/admin/welfare-steps', icon: ListChecks },
       { name: 'Membership Benefits', href: '/admin/membership', icon: Users },
@@ -63,7 +64,6 @@ const navGroups = [
     links: [
       { name: 'Academic Calendar', href: '/admin/academic-calendar', icon: Calendar },
       { name: 'Academic Programmes', href: '/admin/academic-programmes', icon: BookOpen },
-      { name: 'Academic Programs (Old)', href: '/admin/programs', icon: BookOpen },
       { name: 'Congress', href: '/admin/congress', icon: Landmark },
       { name: 'Events & Programmes', href: '/admin/events_programmes', icon: CalendarCheck },
       { name: 'Leadership', href: '/admin/leadership', icon: Users },

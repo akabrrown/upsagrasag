@@ -54,6 +54,17 @@ export const executiveSchema = z.object({
   display_order: z.number().int().default(0),
   slug: z.string().optional(),
 });
+export const pastExecutiveSchema = z.object({
+  id: z.string().uuid().optional(),
+  name: z.string().min(1, "Name is required"),
+  role: z.string().min(1, "Role is required"),
+  term: z.string().min(1, "Term is required (e.g. 2024/2025)"),
+  bio: z.string().optional(),
+  image_url: z.union([z.literal(''), z.string().url()]).optional(),
+  display_order: z.number().int().default(0),
+  created_at: z.string().optional(),
+});
+
 export const opportunitySchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string().min(1, "Title is required"),
@@ -75,11 +86,6 @@ export const resourceSchema = z.object({
   file_url: z.union([z.literal(''), z.string().url()]).optional(),
   link_url: z.union([z.literal(''), z.string().url()]).optional(),
   slug: z.string().optional(),
-});
-export const programSchema = z.object({
-  id: z.string().uuid().optional(),
-  name: z.string().min(1, "Name is required"),
-  slug: z.string().min(1, "Slug is required")
 });
 
 export const pastQuestionSchema = z.object({
@@ -188,12 +194,12 @@ export const pageContentSchema = z.object({
 export type PageContent = z.infer<typeof pageContentSchema>;
 
 export type President = z.infer<typeof presidentSchema>;
-export type Program = z.infer<typeof programSchema>;
 export type PastQuestion = z.infer<typeof pastQuestionSchema>;
 export type Partner = z.infer<typeof partnerSchema>;
 export type Constitution = z.infer<typeof constitutionSchema>;
 export type Leadership = z.infer<typeof leadershipSchema>;
 export type Executive = z.infer<typeof executiveSchema>;
+export type PastExecutive = z.infer<typeof pastExecutiveSchema>;
 export type Opportunity = z.infer<typeof opportunitySchema>;
 
 export type Resource = z.infer<typeof resourceSchema>;

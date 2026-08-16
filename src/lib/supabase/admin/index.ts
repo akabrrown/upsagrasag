@@ -158,9 +158,9 @@ import type {
   ConstitutionFile, 
   Leadership, 
   Executive, 
+  PastExecutive,
   Opportunity, 
   Resource, 
-  Program, 
   PastQuestion, 
   Tutorial, 
   EventProgramme, 
@@ -277,6 +277,25 @@ export class ExecutiveCrudService extends AdminCrudService<Executive> {
       console.error(`[ExecutiveCrudService delete] error:`, error);
       throw new Error(error.message);
     }
+  }
+}
+
+export class PastExecutiveCrudService extends AdminCrudService<PastExecutive> {
+  constructor() {
+    super('past_executives');
+  }
+
+  async list(orderCol: string = 'display_order', ascending: boolean = true): Promise<PastExecutive[]> {
+    const supabase = supabaseAdminClient;
+    const { data, error } = await supabase
+      .from('past_executives')
+      .select('*')
+      .order(orderCol, { ascending });
+    if (error) {
+      console.error(`[PastExecutiveCrudService list] error:`, error);
+      throw new Error(error.message);
+    }
+    return data as PastExecutive[];
   }
 }
 
@@ -604,9 +623,9 @@ export const partnerService = new AdminCrudService<Partner>('partners');
 export const constitutionService = new AdminCrudService<ConstitutionFile>('constitution_files');
 export const leadershipService = new AdminCrudService<Leadership>('leadership');
 export const executiveService = new ExecutiveCrudService();
+export const pastExecutiveService = new PastExecutiveCrudService();
 export const opportunityService = new AdminCrudService<Opportunity>('opportunities');
 export const resourceService = new AdminCrudService<Resource>('resources');
-export const programService = new AdminCrudService<Program>('programs');
 export const pastQuestionService = new PastQuestionCrudService();
 export const tutorialService = new AdminCrudService<Tutorial>('tutorials');
 export const membershipBenefitService = new AdminCrudService<MembershipBenefit>('membership_benefits');
@@ -667,9 +686,9 @@ export const serviceMap: Record<string, AdminCrudService<any>> = {
   'constitution': constitutionService,
   'leadership': leadershipService,
   'executives': executiveService,
+  'past_executives': pastExecutiveService,
   'opportunities': opportunityService,
   'resources': resourceService,
-  'programs': programService,
   'past_questions': pastQuestionService,
   'tutorials': tutorialService,
   'events_programmes': eventProgrammeService,
@@ -692,9 +711,9 @@ import {
   constitutionSchema,
   leadershipSchema,
   executiveSchema,
+  pastExecutiveSchema,
   opportunitySchema,
   resourceSchema,
-  programSchema,
   pastQuestionSchema,
   tutorialSchema,
   eventProgrammeSchema,
@@ -711,9 +730,9 @@ export const schemaMap: Record<string, any> = {
   'constitution': constitutionSchema,
   'leadership': leadershipSchema,
   'executives': executiveSchema,
+  'past_executives': pastExecutiveSchema,
   'opportunities': opportunitySchema,
   'resources': resourceSchema,
-  'programs': programSchema,
   'past_questions': pastQuestionSchema,
   'tutorials': tutorialSchema,
   'events_programmes': eventProgrammeSchema,

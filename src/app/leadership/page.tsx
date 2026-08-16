@@ -1,6 +1,6 @@
 import React from 'react';
 import { LeadershipClient } from './LeadershipClient';
-import { leadershipService } from '@/lib/supabase/admin';
+import { leadershipService, pastExecutiveService } from '@/lib/supabase/admin';
 
 export const revalidate = 60; // Revalidate every 60 seconds
 
@@ -70,6 +70,7 @@ const MOCK_EXECUTIVES = [
 type Executive = { id: string; name: string; role: string; email: string; bio: string; type: string; display_order: number; image_url: string; };
 export default async function LeadershipPage() {
   let executives: Executive[] = [];
+  let pastExecutives: any[] = [];
   try {
     const allLeaders = await leadershipService.list();
     executives = allLeaders
@@ -87,6 +88,12 @@ export default async function LeadershipPage() {
       .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
   } catch (error) {
     console.error("Error fetching leaders from Supabase, using mock fallback data:", error);
+  }
+
+  try {
+    pastExecutives = await pastExecutiveService.list();
+  } catch (error) {
+    console.error("Error fetching past executives from Supabase:", error);
   }
 
   // Fall back to high-quality mock data if database has no executives or connection failed
@@ -108,7 +115,7 @@ export default async function LeadershipPage() {
           </p>
         </div>
 
-        <LeadershipClient executives={displayExecutives} />
+        <LeadershipClient executives={displayExecutives} pastExecutives={pastExecutives} />
       </div>
     </div>
   );

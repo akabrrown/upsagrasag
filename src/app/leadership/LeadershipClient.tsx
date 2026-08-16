@@ -19,8 +19,19 @@ interface Leader {
   email?: string | null;
 }
 
+interface PastExecutive {
+  id: string;
+  name: string;
+  role: string;
+  term: string;
+  bio?: string | null;
+  image_url?: string | null;
+  display_order?: number;
+}
+
 interface LeadershipClientProps {
   executives: Leader[];
+  pastExecutives?: PastExecutive[];
 }
 
 // Custom Counter Component for animated statistics
@@ -64,7 +75,7 @@ const AnimatedCounter: React.FC<{ target: number; suffix?: string }> = ({ target
   );
 };
 
-export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives }) => {
+export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives, pastExecutives = [] }) => {
   const [showPresidentModal, setShowPresidentModal] = useState(false);
 
   // Find President
@@ -302,6 +313,52 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives }
           ))}
         </div>
       </section>
+
+      {/* 5. Past Executives Section */}
+      {pastExecutives && pastExecutives.length > 0 && (
+        <section className="space-y-16 pt-16 border-t border-neutral-100">
+          <div className="text-center space-y-4">
+            <span className="text-primary text-xs font-bold uppercase tracking-widest px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">Legacy</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-neutral-900">Past Executives</h2>
+            <p className="text-neutral-550 max-w-xl mx-auto text-sm sm:text-base">
+              Honoring the dedicated leaders who previously served and built the foundation of our association.
+            </p>
+          </div>
+
+          {/* Group past executives by term */}
+          <div className="space-y-16">
+            {Array.from(new Set(pastExecutives.map(p => p.term))).sort().reverse().map(term => {
+              const termExecs = pastExecutives.filter(p => p.term === term).sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
+              return (
+                <div key={term} className="space-y-8">
+                  <h3 className="text-2xl font-bold text-neutral-800 text-center border-b border-neutral-100 pb-4">{term} Academic Year</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {termExecs.map((leader) => (
+                      <div key={leader.id} className="group relative overflow-hidden rounded-2xl bg-white border border-neutral-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 text-center">
+                        <div className="relative w-24 h-24 mx-auto mb-4">
+                          <Image 
+                            src={optimizeCloudinaryUrl(leader.image_url, { width: 200 }) ?? "/default-avatar.png"} 
+                            alt={leader.name}
+                            fill
+                            className="rounded-full object-cover border-4 border-neutral-50 group-hover:border-primary/20 transition-colors"
+                          />
+                        </div>
+                        <h4 className="font-bold text-neutral-900 line-clamp-1">{leader.name}</h4>
+                        <p className="text-xs font-semibold text-primary uppercase tracking-wide mt-1">{leader.role}</p>
+                        {leader.bio && (
+                          <p className="text-sm text-neutral-500 mt-3 line-clamp-3 leading-relaxed">
+                            {leader.bio}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
     </div>
   );
 };
