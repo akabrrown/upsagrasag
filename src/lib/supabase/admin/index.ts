@@ -604,13 +604,38 @@ export class AdminUserCrudService extends AdminCrudService<AdminUser> {
 
   async delete(id: string): Promise<void> {
     const supabase = supabaseAdminClient;
-    const { error } = await supabase
+    
+    // 1. Get the auth_uid first so we can delete the Auth user
+    const { data: record, error: fetchError } = await supabase
+      .from('admin_users')
+      .select('auth_uid')
+      .eq('id', id)
+      .single();
+      
+    if (fetchError) {
+      console.error(`[AdminUserCrudService delete] fetch error:`, fetchError);
+      throw new Error(fetchError.message);
+    }
+
+    // 2. Delete the record from admin_users
+    const { error: dbError } = await supabase
       .from('admin_users')
       .delete()
       .eq('id', id);
-    if (error) {
-      console.error(`[AdminUserCrudService delete] error:`, error);
-      throw new Error(error.message);
+      
+    if (dbError) {
+      console.error(`[AdminUserCrudService delete] db error:`, dbError);
+      throw new Error(dbError.message);
+    }
+
+    // 3. Delete the user from Supabase Auth
+    if (record?.auth_uid) {
+      const { error: authError } = await supabase.auth.admin.deleteUser(record.auth_uid);
+      if (authError) {
+        console.error(`[AdminUserCrudService delete] auth delete error:`, authError);
+        // Note: We don't throw here because the admin_users record is already gone, 
+        // so the user effectively has no admin access anymore.
+      }
     }
   }
 }
