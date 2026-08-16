@@ -17,6 +17,7 @@ interface Leader {
   type?: string | null;
   display_order?: number | null;
   email?: string | null;
+  phone?: string | null;
 }
 
 interface PastExecutive {
@@ -157,8 +158,8 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives, 
               </p>
             </div>
 
-            <p className="text-sm sm:text-base text-neutral-600 leading-relaxed max-w-xl">
-              Leading graduate student advocacy, academic excellence, and community impact initiatives to build a stronger student body.
+            <p className="text-neutral-600 leading-relaxed text-base whitespace-pre-wrap">
+              {president.bio || `Samuel Sasu Adonteng is a youth development practitioner, policy advocate, and emerging academic with experience in project management, public policy, entrepreneurship, education, and students’ rights. He is currently affiliated with the University of Professional Studies, Accra, supporting work across the Media and Website Unit and the UPSA Enterprise and Innovation Centre, where he contributes to programme design, research, communications, innovation, and student enterprise development.`}
             </p>
 
             {/* Badges / Tags */}
@@ -206,19 +207,30 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives, 
               <div className="space-y-6">
                 <div>
                   <h4 className="text-xs uppercase tracking-widest text-primary font-semibold mb-2">President's Biography</h4>
-                  <div className="text-neutral-600 space-y-4 leading-relaxed text-sm sm:text-base">
-                    <p>
-                      {president.bio}
-                    </p>
-                  </div>
+                  <p className="text-neutral-350 leading-relaxed text-sm md:text-base mb-6 max-w-xl whitespace-pre-wrap">
+                    {president.bio || `Samuel Sasu Adonteng is a youth development practitioner, policy advocate, and emerging academic with experience in project management, public policy, entrepreneurship, education, and students’ rights.`}
+                  </p>
                 </div>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-neutral-200 flex items-center justify-between">
-                <span className="text-xs text-neutral-500">{president.email || "president@grasagupsa.org"}</span>
+              <div className="mt-8 pt-6 border-t border-neutral-250 flex items-center justify-between flex-wrap gap-4">
+                <div className="flex flex-col gap-2">
+                  {president.email && (
+                    <a href={`mailto:${president.email}`} className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-primary transition-colors duration-200">
+                      <Mail className="w-5 h-5 text-primary" />
+                      <span>{president.email}</span>
+                    </a>
+                  )}
+                  {president.phone && (
+                    <a href={`tel:${president.phone}`} className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-primary transition-colors duration-200">
+                      <span className="flex items-center justify-center w-5 h-5 text-primary">📞</span>
+                      <span>{president.phone}</span>
+                    </a>
+                  )}
+                </div>
                 <button
                   onClick={() => setShowPresidentModal(false)}
-                  className="px-6 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-sm font-semibold rounded-lg text-neutral-800 transition-colors"
+                  className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-sm font-semibold rounded-lg transition-colors duration-200"
                 >
                   Close
                 </button>
@@ -307,7 +319,8 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives, 
               name={leader.name}
               role={leader.role}
               image={leader.image_url ?? "/default-avatar.png"}
-              email={leader.email ?? ""}
+              email={leader.email ?? undefined}
+              phone={leader.phone ?? undefined}
               bio={leader.bio ?? ""}
             />
           ))}

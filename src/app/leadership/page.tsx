@@ -67,7 +67,7 @@ const MOCK_EXECUTIVES = [
     image_url: "/Secretary.jpeg"
   }
 ];
-type Executive = { id: string; name: string; role: string; email: string; bio: string; type: string; display_order: number; image_url: string; };
+type Executive = { id: string; name: string; role: string; email: string; phone: string; bio: string; type: string; display_order: number; image_url: string; };
 export default async function LeadershipPage() {
   let executives: Executive[] = [];
   let pastExecutives: any[] = [];
@@ -79,7 +79,8 @@ export default async function LeadershipPage() {
         id: l.id ?? '',
         name: l.name ?? '',
         role: l.role ?? '',
-        email: l.email ?? '',
+        email: (l as any).email ?? '',
+        phone: (l as any).phone ?? '',
         bio: l.bio ?? '',
         type: l.type ?? 'executive',
         display_order: l.display_order ?? 0,

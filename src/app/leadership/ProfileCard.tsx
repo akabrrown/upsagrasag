@@ -11,11 +11,12 @@ interface ProfileProps {
   role: string;
   image: string;
   email?: string;
+  phone?: string;
   bio?: string;
   term?: string;
 }
 
-export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email, bio, term }) => {
+export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email, phone, bio, term }) => {
   const [showInfo, setShowInfo] = useState(false);
 
   return (
@@ -96,20 +97,27 @@ export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email, 
               <div className="space-y-6">
                 <div>
                   <h4 className="text-xs uppercase tracking-widest text-primary font-semibold mb-2">Biography</h4>
-                  <p className="text-neutral-600 leading-relaxed text-base">
+                  <p className="text-neutral-600 leading-relaxed text-base whitespace-pre-wrap">
                     {bio || `${name} is an active executive member of the GRASAG-UPSA team, working tirelessly to execute initiatives that support academic excellence, career development, and graduate student welfare.`}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-neutral-250 flex items-center justify-between">
-                <a 
-                  href={`mailto:${email}`} 
-                  className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-primary transition-colors duration-200"
-                >
-                  <Mail className="w-5 h-5 text-primary" />
-                  <span>{email}</span>
-                </a>
+              <div className="mt-8 pt-6 border-t border-neutral-250 flex items-center justify-between flex-wrap gap-4">
+                <div className="flex flex-col gap-2">
+                  {email && (
+                    <a href={`mailto:${email}`} className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-primary transition-colors duration-200">
+                      <Mail className="w-5 h-5 text-primary" />
+                      <span>{email}</span>
+                    </a>
+                  )}
+                  {phone && (
+                    <a href={`tel:${phone}`} className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-primary transition-colors duration-200">
+                      <span className="flex items-center justify-center w-5 h-5 text-primary">📞</span>
+                      <span>{phone}</span>
+                    </a>
+                  )}
+                </div>
                 <button
                   onClick={() => setShowInfo(false)}
                   className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-sm font-semibold rounded-lg transition-colors duration-200"
