@@ -8,24 +8,36 @@ export async function GET() {
   const supabase = await createServerSupabaseClient();
   
   try {
-    // Use getUser() instead of getSession() — more reliable server-side
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     
     if (userError || !user) {
-      console.error('[auth-status] getUser failed:', userError?.message);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log('[auth-status] Authenticated user:', user.id, user.email);
+    // Try with must_change_password column first
+    let adminRecord: any = null;
+    let dbError: any = null;
 
-    // Use admin client to bypass any RLS on admin_users table for this check
-    const { data: adminRecord, error: dbError } = await supabaseAdminClient
+    const result = await supabaseAdminClient
       .from('admin_users')
       .select('role, must_change_password, auth_uid')
       .eq('auth_uid', user.id)
       .maybeSingle();
 
-    console.log('[auth-status] DB query result:', { adminRecord, dbError: dbError?.message });
+    adminRecord = result.data;
+    dbError = result.error;
+
+    // If the column doesn't exist yet, fall back to querying without it
+    if (dbError && dbError.message?.includes('must_change_password')) {
+      const fallback = await supabaseAdminClient
+        .from('admin_users')
+        .select('role, auth_uid')
+        .eq('auth_uid', user.id)
+        .maybeSingle();
+
+      adminRecord = fallback.data ? { ...fallback.data, must_change_password: false } : null;
+      dbError = fallback.error;
+    }
 
     if (dbError) {
       console.error('[auth-status] DB error:', dbError);
@@ -33,12 +45,7 @@ export async function GET() {
     }
 
     if (!adminRecord) {
-      // Log all admin_users to see what auth_uids exist
-      const { data: allAdmins } = await supabaseAdminClient
-        .from('admin_users')
-        .select('id, auth_uid, role');
-      console.log('[auth-status] No match. User auth_uid:', user.id);
-      console.log('[auth-status] All admin_users records:', JSON.stringify(allAdmins));
+      console.log('[auth-status] No admin record for auth_uid:', user.id, user.email);
       return NextResponse.json({ error: 'Not an admin' }, { status: 403 });
     }
 

@@ -69,15 +69,38 @@ export async function POST(request: Request) {
     }
 
     // Create the admin_users record
-    const { data: adminRecord, error: dbError } = await supabaseAdmin
+    const insertPayload: Record<string, any> = {
+      auth_uid: authUid,
+      role: role || 'admin',
+    };
+    // Try including must_change_password (requires migration to have run)
+    if (tempPassword) {
+      insertPayload.must_change_password = true;
+    }
+
+    let adminRecord: any = null;
+    let dbError: any = null;
+
+    const result = await supabaseAdmin
       .from('admin_users')
-      .insert({
-        auth_uid: authUid,
-        role: role || 'admin',
-        must_change_password: !!tempPassword
-      })
+      .insert(insertPayload)
       .select()
       .single();
+
+    adminRecord = result.data;
+    dbError = result.error;
+
+    // If must_change_password column doesn't exist yet, retry without it
+    if (dbError && dbError.message?.includes('must_change_password')) {
+      delete insertPayload.must_change_password;
+      const retry = await supabaseAdmin
+        .from('admin_users')
+        .insert(insertPayload)
+        .select()
+        .single();
+      adminRecord = retry.data;
+      dbError = retry.error;
+    }
 
     if (dbError) {
       // Only rollback if we created the auth user (not if they pre-existed)
