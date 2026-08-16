@@ -73,7 +73,8 @@ export async function POST(request: Request) {
       .from('admin_users')
       .insert({
         auth_uid: authUid,
-        role: role || 'admin'
+        role: role || 'admin',
+        must_change_password: !!tempPassword
       })
       .select()
       .single();
