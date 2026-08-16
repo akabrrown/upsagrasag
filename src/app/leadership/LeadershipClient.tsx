@@ -325,37 +325,25 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives, 
             </p>
           </div>
 
-          {/* Group past executives by term */}
-          <div className="space-y-16">
-            {Array.from(new Set(pastExecutives.map(p => p.term))).sort().reverse().map(term => {
-              const termExecs = pastExecutives.filter(p => p.term === term).sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
-              return (
-                <div key={term} className="space-y-8">
-                  <h3 className="text-2xl font-bold text-neutral-800 text-center border-b border-neutral-100 pb-4">{term} Academic Year</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {termExecs.map((leader) => (
-                      <div key={leader.id} className="group relative overflow-hidden rounded-2xl bg-white border border-neutral-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 text-center">
-                        <div className="relative w-24 h-24 mx-auto mb-4">
-                          <Image 
-                            src={optimizeCloudinaryUrl(leader.image_url, { width: 200 }) ?? "/default-avatar.png"} 
-                            alt={leader.name}
-                            fill
-                            className="rounded-full object-cover border-4 border-neutral-50 group-hover:border-primary/20 transition-colors"
-                          />
-                        </div>
-                        <h4 className="font-bold text-neutral-900 line-clamp-1">{leader.name}</h4>
-                        <p className="text-xs font-semibold text-primary uppercase tracking-wide mt-1">{leader.role}</p>
-                        {leader.bio && (
-                          <p className="text-sm text-neutral-500 mt-3 line-clamp-3 leading-relaxed">
-                            {leader.bio}
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
+          {/* Single list of past executives using ProfileCard */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...pastExecutives]
+              .sort((a, b) => {
+                // Sort by term descending, then by display order
+                if (a.term !== b.term) return b.term.localeCompare(a.term);
+                return (a.display_order ?? 0) - (b.display_order ?? 0);
+              })
+              .map((leader) => (
+                <ProfileCard
+                  key={leader.id}
+                  name={leader.name}
+                  role={leader.role}
+                  image={leader.image_url ?? "/default-avatar.png"}
+                  email={""}
+                  bio={leader.bio ?? ""}
+                  term={leader.term}
+                />
+              ))}
           </div>
         </section>
       )}

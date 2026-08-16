@@ -10,11 +10,12 @@ interface ProfileProps {
   name: string;
   role: string;
   image: string;
-  email: string;
+  email?: string;
   bio?: string;
+  term?: string;
 }
 
-export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email, bio }) => {
+export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email, bio, term }) => {
   const [showInfo, setShowInfo] = useState(false);
 
   return (
@@ -38,11 +39,16 @@ export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email, 
 
         {/* Card Contents */}
         <div className="relative z-10 p-6 flex flex-col justify-end h-full">
-          {/* Role Badge */}
-          <div className="mb-2 self-start">
+          {/* Role & Term Badge */}
+          <div className="mb-2 self-start flex gap-2 flex-wrap">
             <span className="inline-block rounded-full bg-accent/20 border border-accent/35 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-accent transition-all duration-300 group-hover:bg-accent group-hover:text-neutral-950">
               {role}
             </span>
+            {term && (
+              <span className="inline-block rounded-full bg-white/10 border border-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white transition-all duration-300 group-hover:bg-white group-hover:text-neutral-950">
+                {term}
+              </span>
+            )}
           </div>
 
           {/* Name */}
@@ -71,9 +77,16 @@ export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email, 
               <Image src={optimizeCloudinaryUrl(image)} alt={name} fill className="absolute inset-0 w-full h-full object-cover object-top" />
               <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/20 to-transparent" />
               <div className="absolute bottom-6 left-6 right-6">
-                <span className="inline-block rounded-full bg-accent px-3 py-1 text-xs font-bold uppercase tracking-wider text-neutral-950 mb-2">
-                  {role}
-                </span>
+                <div className="flex gap-2 flex-wrap mb-2">
+                  <span className="inline-block rounded-full bg-accent px-3 py-1 text-xs font-bold uppercase tracking-wider text-neutral-950">
+                    {role}
+                  </span>
+                  {term && (
+                    <span className="inline-block rounded-full bg-white/20 border border-white/30 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
+                      {term}
+                    </span>
+                  )}
+                </div>
                 <h3 className="text-3xl font-extrabold text-white leading-none">{name}</h3>
               </div>
             </div>
