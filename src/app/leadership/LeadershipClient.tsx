@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { ProfileCard } from "./ProfileCard";
 import { ModalOverlay } from "./ui";
 import Image from "next/image";
-import { ArrowRight, Award, GraduationCap, Calendar, Users } from "lucide-react";
+import { ArrowRight, Award, GraduationCap, Calendar, Users, Mail } from "lucide-react";
 import { motion, useInView } from "framer-motion";
 import { optimizeCloudinaryUrl } from "@/lib/optimizeImage";
 
