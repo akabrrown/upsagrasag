@@ -654,7 +654,7 @@ class LeadershipCrudService extends AdminCrudService<Leadership> {
   async list(orderCol: string = 'display_order', ascending: boolean = true): Promise<Leadership[]> {
     const records = await super.list(orderCol, ascending);
     return records.map(r => {
-      const contactInfo = r.contact_info as any;
+      const contactInfo = (r as any).contact_info;
       return {
         ...r,
         email: contactInfo?.email || '',
@@ -666,7 +666,7 @@ class LeadershipCrudService extends AdminCrudService<Leadership> {
   async get(id: string): Promise<Leadership | null> {
     const record = await super.get(id);
     if (!record) return null;
-    const contactInfo = record.contact_info as any;
+    const contactInfo = (record as any).contact_info;
     return {
       ...record,
       email: contactInfo?.email || '',
@@ -677,7 +677,7 @@ class LeadershipCrudService extends AdminCrudService<Leadership> {
   async create(item: Partial<Leadership>): Promise<Leadership> {
     const dbPayload: any = { ...item };
     dbPayload.contact_info = {
-      ...(item.contact_info as any || {}),
+      ...((item as any).contactInfo || (item as any).contact_info || {}),
       email: item.email || '',
       phone: item.phone || ''
     };
@@ -690,7 +690,7 @@ class LeadershipCrudService extends AdminCrudService<Leadership> {
     if (item.email !== undefined || item.phone !== undefined) {
       const existing = await super.get(id);
       dbPayload.contact_info = {
-        ...(existing?.contact_info as any || {}),
+        ...((existing as any)?.contactInfo || (existing as any)?.contact_info || {}),
         email: item.email !== undefined ? item.email : (existing as any)?.email || '',
         phone: item.phone !== undefined ? item.phone : (existing as any)?.phone || ''
       };
