@@ -33,6 +33,7 @@ interface PastExecutive {
 interface LeadershipClientProps {
   executives: Leader[];
   pastExecutives?: PastExecutive[];
+  patrons?: Leader[];
 }
 
 // Custom Counter Component for animated statistics
@@ -76,7 +77,7 @@ const AnimatedCounter: React.FC<{ target: number; suffix?: string }> = ({ target
   );
 };
 
-export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives, pastExecutives = [] }) => {
+export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives, pastExecutives = [], patrons = [] }) => {
   const [showPresidentModal, setShowPresidentModal] = useState(false);
 
   // Find President
@@ -84,8 +85,11 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives, 
     (l) => l.role.toLowerCase().includes("president") && !l.role.toLowerCase().includes("vice")
   ) || executives[0];
 
-  // Generate timeline leaders dynamically from all executives sorted by order
-  const timelineLeaders = [...executives].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
+  // Generate timeline leaders dynamically from past executives
+  const timelineLeaders = [...pastExecutives].sort((a, b) => {
+    if (a.term !== b.term) return b.term.localeCompare(a.term);
+    return (a.display_order ?? 0) - (b.display_order ?? 0);
+  });
 
   return (
     <div className="space-y-32">
@@ -240,13 +244,14 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives, 
         </ModalOverlay>
       )}
 
-      {/* 3. Leadership Timeline (Scroll animation) */}
+      {/* 3. Leadership Timeline (Past Leaders — Scroll animation) */}
+      {timelineLeaders.length > 0 && (
       <section className="space-y-16">
         <div className="text-center space-y-4">
-          <span className="text-primary text-xs font-bold uppercase tracking-widest px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">Hierarchy</span>
+          <span className="text-primary text-xs font-bold uppercase tracking-widest px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">Legacy</span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-neutral-900">Leadership Timeline</h2>
           <p className="text-neutral-550 max-w-xl mx-auto text-sm sm:text-base">
-            Chronological workflow and leadership flow representing the core structure of the executive body.
+            Honoring the leaders who built the foundation of our association across successive terms.
           </p>
         </div>
 
@@ -290,7 +295,10 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives, 
                             {leader.role}
                           </span>
                           <h4 className="text-lg font-bold text-neutral-900 leading-tight">{leader.name}</h4>
-                          <p className="text-xs text-neutral-500 mt-1 line-clamp-2">{leader.bio || "Executive member"}</p>
+                          {leader.term && (
+                            <p className="text-[11px] font-semibold text-primary/70 mt-0.5">{leader.term}</p>
+                          )}
+                          <p className="text-xs text-neutral-500 mt-1 line-clamp-2">{leader.bio || "Former executive member"}</p>
                         </div>
                       </div>
                     </div>
@@ -301,8 +309,56 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives, 
           </div>
         </div>
       </section>
+      )}
 
-      {/* 4. Executive Cards (Magazine Style) */}
+      {/* 4. Patron Leaders Section */}
+      {patrons.length > 0 && (
+        <section className="space-y-16">
+          <div className="text-center space-y-4">
+            <span className="text-primary text-xs font-bold uppercase tracking-widest px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">Patrons</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-neutral-900">Patron Leaders</h2>
+            <p className="text-neutral-550 max-w-xl mx-auto text-sm sm:text-base">
+              Distinguished patrons whose guidance and counsel shape the direction of our association.
+            </p>
+          </div>
+
+          {/* First patron centered, rest in 2-col grid */}
+          <div className="space-y-8">
+            {/* First patron — standalone, centered */}
+            <div className="flex justify-center">
+              <div className="w-full max-w-sm">
+                <ProfileCard
+                  name={patrons[0].name}
+                  role={patrons[0].role}
+                  image={patrons[0].image_url ?? "/default-avatar.png"}
+                  email={patrons[0].email ?? undefined}
+                  phone={patrons[0].phone ?? undefined}
+                  bio={patrons[0].bio ?? ""}
+                />
+              </div>
+            </div>
+
+            {/* Remaining patrons — 2-column grid */}
+            {patrons.length > 1 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-2xl mx-auto">
+                {patrons.slice(1).map((patron) => (
+                  <ProfileCard
+                    key={patron.id}
+                    name={patron.name}
+                    role={patron.role}
+                    image={patron.image_url ?? "/default-avatar.png"}
+                    email={patron.email ?? undefined}
+                    phone={patron.phone ?? undefined}
+                    bio={patron.bio ?? ""}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* 5. Executive Cards (Magazine Style) */}
       <section className="space-y-16">
         <div className="text-center space-y-4">
           <span className="text-primary text-xs font-bold uppercase tracking-widest px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">Portraits</span>
@@ -326,40 +382,6 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives, 
           ))}
         </div>
       </section>
-
-      {/* 5. Past Executives Section */}
-      {pastExecutives && pastExecutives.length > 0 && (
-        <section className="space-y-16 pt-16 border-t border-neutral-100">
-          <div className="text-center space-y-4">
-            <span className="text-primary text-xs font-bold uppercase tracking-widest px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">Legacy</span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-neutral-900">Past Executives</h2>
-            <p className="text-neutral-550 max-w-xl mx-auto text-sm sm:text-base">
-              Honoring the dedicated leaders who previously served and built the foundation of our association.
-            </p>
-          </div>
-
-          {/* Single list of past executives using ProfileCard */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[...pastExecutives]
-              .sort((a, b) => {
-                // Sort by term descending, then by display order
-                if (a.term !== b.term) return b.term.localeCompare(a.term);
-                return (a.display_order ?? 0) - (b.display_order ?? 0);
-              })
-              .map((leader) => (
-                <ProfileCard
-                  key={leader.id}
-                  name={leader.name}
-                  role={leader.role}
-                  image={leader.image_url ?? "/default-avatar.png"}
-                  email={""}
-                  bio={leader.bio ?? ""}
-                  term={leader.term}
-                />
-              ))}
-          </div>
-        </section>
-      )}
     </div>
   );
 };

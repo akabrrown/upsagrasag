@@ -70,6 +70,7 @@ const MOCK_EXECUTIVES = [
 type Executive = { id: string; name: string; role: string; email: string; phone: string; bio: string; type: string; display_order: number; image_url: string; };
 export default async function LeadershipPage() {
   let executives: Executive[] = [];
+  let patrons: Executive[] = [];
   let pastExecutives: any[] = [];
   try {
     const allLeaders = await leadershipService.list();
@@ -87,6 +88,21 @@ export default async function LeadershipPage() {
         image_url: l.image_url ?? ''
       }))
       .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
+
+    patrons = allLeaders
+      .filter(l => l.type === 'patron')
+      .map(l => ({
+        id: l.id ?? '',
+        name: l.name ?? '',
+        role: l.role ?? '',
+        email: (l as any).email ?? '',
+        phone: (l as any).phone ?? '',
+        bio: l.bio ?? '',
+        type: l.type ?? 'patron',
+        display_order: l.display_order ?? 0,
+        image_url: l.image_url ?? ''
+      }))
+      .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
   } catch (error) {
     console.error("Error fetching leaders from Supabase, using mock fallback data:", error);
   }
@@ -99,6 +115,7 @@ export default async function LeadershipPage() {
 
   // Fall back to high-quality mock data if database has no executives or connection failed
   const displayExecutives = executives.length > 0 ? executives : MOCK_EXECUTIVES;
+  const displayPatrons = patrons;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -116,7 +133,7 @@ export default async function LeadershipPage() {
           </p>
         </div>
 
-        <LeadershipClient executives={displayExecutives} pastExecutives={pastExecutives} />
+        <LeadershipClient executives={displayExecutives} pastExecutives={pastExecutives} patrons={displayPatrons} />
       </div>
     </div>
   );

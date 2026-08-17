@@ -35,7 +35,7 @@ export const leadershipSchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(1, "Name is required"),
   role: z.string().min(1, "Role is required"),
-  email: z.string().email("Invalid email address").optional(),
+  email: z.union([z.literal(''), z.string().email("Invalid email address")]).optional(),
   phone: z.string().optional(),
   type: z.enum(["executive","advisor","authority","patron"]).default("executive"),
   bio: z.string().optional(),

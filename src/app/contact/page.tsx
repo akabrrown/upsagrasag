@@ -14,6 +14,8 @@ export default function ContactPage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [contactData, setContactData] = useState<any>(null);
+  const [selectedRole, setSelectedRole] = useState('');
+  const [roleOptions, setRoleOptions] = useState<{ role: string; email: string }[]>([]);
 
   useEffect(() => {
     const fetchContactData = async () => {
@@ -31,6 +33,29 @@ export default function ContactPage() {
       }
     };
     fetchContactData();
+
+    const fetchRoleOptions = async () => {
+      try {
+        const { data, error } = await supabaseClient
+          .from('leaders')
+          .select('role, email')
+          .eq('type', 'executive')
+          .not('email', 'is', null)
+          .order('display_order', { ascending: true });
+        if (!error && data) {
+          const unique = data.reduce<{ role: string; email: string }[]>((acc, cur) => {
+            if (cur.email && !acc.find(r => r.role === cur.role)) {
+              acc.push({ role: cur.role, email: cur.email });
+            }
+            return acc;
+          }, []);
+          setRoleOptions(unique);
+        }
+      } catch (err) {
+        console.warn('Could not load role options', err);
+      }
+    };
+    fetchRoleOptions();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,6 +64,8 @@ export default function ContactPage() {
       setErrorMsg('All fields are required.');
       return;
     }
+
+    const targetEmail = roleOptions.find(r => r.role === selectedRole)?.email || '';
 
     setIsSubmitting(true);
     setErrorMsg('');
@@ -50,7 +77,7 @@ export default function ContactPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name: `${firstName} ${lastName}`, email, subject, message }),
+        body: JSON.stringify({ name: `${firstName} ${lastName}`, email, subject, message, targetEmail }),
       });
 
       const data = await res.json();
@@ -65,6 +92,7 @@ export default function ContactPage() {
       setEmail('');
       setSubject('');
       setMessage('');
+      setSelectedRole('');
     } catch (err: any) {
       setErrorMsg(err.message || 'Something went wrong. Please check your internet connection and try again.');
     } finally {
@@ -221,6 +249,23 @@ export default function ContactPage() {
                   />
                 </div>
               </div>
+
+              {/* Role Dropdown */}
+              {roleOptions.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-primary">Send To (Role)</label>
+                  <select
+                    value={selectedRole}
+                    onChange={(e) => setSelectedRole(e.target.value)}
+                    className="w-full rounded-xl border border-neutral-200 px-4 py-3 text-sm focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all bg-neutral-50/50 appearance-none"
+                  >
+                    <option value="">General Inquiry (President)</option>
+                    {roleOptions.map((opt) => (
+                      <option key={opt.role} value={opt.role}>{opt.role}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               {/* Message */}
               <div className="flex flex-col gap-2">
