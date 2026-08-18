@@ -59,7 +59,7 @@ export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email, 
 
           {/* Bio / Message (Short excerpt) */}
           <p className="text-sm text-neutral-350 line-clamp-2 mb-4 leading-relaxed opacity-90 group-hover:opacity-100 transition-opacity duration-300">
-            {bio || `Dedicated to advancing the academic, professional, and social interests of all graduate students.`}
+            {bio}
           </p>
 
           {/* Button (Slides in / fades in) */}
@@ -98,7 +98,7 @@ export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email, 
                 <div>
                   <h4 className="text-xs uppercase tracking-widest text-primary font-semibold mb-2">Biography</h4>
                   <p className="text-neutral-600 leading-relaxed text-base whitespace-pre-wrap">
-                    {bio || `${name} is an active executive member of the GRASAG-UPSA team, working tirelessly to execute initiatives that support academic excellence, career development, and graduate student welfare.`}
+                    {bio}
                   </p>
                 </div>
               </div>

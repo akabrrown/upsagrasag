@@ -163,7 +163,7 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives, 
             </div>
 
             <p className="text-neutral-600 leading-relaxed text-base whitespace-pre-wrap">
-              {president.bio || `Samuel Sasu Adonteng is a youth development practitioner, policy advocate, and emerging academic with experience in project management, public policy, entrepreneurship, education, and students’ rights. He is currently affiliated with the University of Professional Studies, Accra, supporting work across the Media and Website Unit and the UPSA Enterprise and Innovation Centre, where he contributes to programme design, research, communications, innovation, and student enterprise development.`}
+              {president.bio}
             </p>
 
             {/* Badges / Tags */}
@@ -212,7 +212,7 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives, 
                 <div>
                   <h4 className="text-xs uppercase tracking-widest text-primary font-semibold mb-2">President's Biography</h4>
                   <p className="text-neutral-350 leading-relaxed text-sm md:text-base mb-6 max-w-xl whitespace-pre-wrap">
-                    {president.bio || `Samuel Sasu Adonteng is a youth development practitioner, policy advocate, and emerging academic with experience in project management, public policy, entrepreneurship, education, and students’ rights.`}
+                    {president.bio}
                   </p>
                 </div>
               </div>
@@ -298,7 +298,7 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives, 
                           {leader.term && (
                             <p className="text-[11px] font-semibold text-primary/70 mt-0.5">{leader.term}</p>
                           )}
-                          <p className="text-xs text-neutral-500 mt-1 line-clamp-2">{leader.bio || "Former executive member"}</p>
+                          <p className="text-xs text-neutral-500 mt-1 line-clamp-2">{leader.bio}</p>
                         </div>
                       </div>
                     </div>
