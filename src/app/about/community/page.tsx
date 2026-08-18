@@ -4,11 +4,12 @@ export const runtime = 'nodejs';
 import React, { useState, useEffect, FormEvent } from 'react';
 import Image from 'next/image';
 import { supabaseClient } from '@/lib/supabaseClient';
-import { 
-  GraduationCap, 
-  Briefcase, 
-  HeartHandshake, 
-  Globe, 
+import { AcademicProgramme } from '@/types/admin';
+import {
+  GraduationCap,
+  Briefcase,
+  HeartHandshake,
+  Globe,
   PartyPopper,
   Quote,
   Star,
@@ -27,6 +28,7 @@ export default function CommunityPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [selectedProgramme, setSelectedProgramme] = useState('mba');
   const [images, setImages] = useState<GalleryImage[]>([]);
+  const [programmes, setProgrammes] = useState<AcademicProgramme[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -34,6 +36,19 @@ export default function CommunityPage() {
     supabaseClient.auth.getUser().then(({ data }) => {
       if (data?.user) setIsAdmin(true);
     });
+  }, []);
+
+  useEffect(() => {
+    const fetchProgrammes = async () => {
+      const { data } = await supabaseClient
+        .from('academic_programmes')
+        .select('*')
+        .order('display_order', { ascending: true })
+        .order('created_at', { ascending: false });
+
+      if (data) setProgrammes(data);
+    };
+    fetchProgrammes();
   }, []);
 
   useEffect(() => {
@@ -76,12 +91,12 @@ export default function CommunityPage() {
         body: formData,
       });
       if (!res.ok) throw new Error('Upload failed');
-      
+
       const fetchRes = await fetch('/api/gallery');
       if (!fetchRes.ok) throw new Error('Failed to refresh images');
       const data = await fetchRes.json();
       setImages(data);
-      
+
       form.reset();
     } catch (e) {
       setError((e as Error).message);
@@ -100,9 +115,9 @@ export default function CommunityPage() {
   return (
     <div className="w-full bg-background text-foreground">
       {/* Speech-bubble Hero Section */}
-      <section 
+      <section
         className="relative w-full min-h-[500px] md:min-h-[580px] bg-no-repeat bg-bottom bg-white flex flex-col justify-start items-center pt-20 px-4 md:px-8 border-b border-neutral-100"
-        style={{ 
+        style={{
           backgroundImage: "url('/community-imag.png')",
           backgroundSize: "100% auto",
         }}
@@ -126,7 +141,7 @@ export default function CommunityPage() {
           {/* Selector Dropdown & Explore Button */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 max-w-md mx-auto">
             <div className="relative flex-1">
-              <select 
+              <select
                 value={selectedProgramme}
                 onChange={(e) => setSelectedProgramme(e.target.value)}
                 className="w-full appearance-none bg-neutral-50 hover:bg-neutral-100 transition-colors border border-neutral-200 rounded-full px-6 py-3 text-sm text-neutral-700 font-medium focus:outline-none focus:ring-2 focus:ring-[#001a54] cursor-pointer"
@@ -135,10 +150,10 @@ export default function CommunityPage() {
                 <option value="mphil">What are you studying? (MPhil) ▼</option>
                 <option value="msc">What are you studying? (MSc) ▼</option>
                 <option value="ma">What are you studying? (MA) ▼</option>
-                <option value="phd">What are you studying? (PhD) ▼</option>
+                <option value="llm">What are you studying? (LLM) ▼</option>
               </select>
             </div>
-            <button 
+            <button
               onClick={() => handleScrollToSection(`${selectedProgramme}-section`)}
               className="bg-[#001a54] hover:bg-[#0b2b73] text-white font-bold px-8 py-3 rounded-full text-sm transition-all duration-300 flex items-center justify-center gap-1.5 shadow-sm"
             >
@@ -156,7 +171,7 @@ export default function CommunityPage() {
             <span>•</span>
             <button onClick={() => { setSelectedProgramme('ma'); handleScrollToSection('ma-section'); }} className="hover:text-[#B8860B] transition-colors">MA</button>
             <span>•</span>
-            <button onClick={() => { setSelectedProgramme('phd'); handleScrollToSection('phd-section'); }} className="hover:text-[#B8860B] transition-colors">PhD</button>
+            <button onClick={() => { setSelectedProgramme('llm'); handleScrollToSection('llm-section'); }} className="hover:text-[#B8860B] transition-colors">LLM</button>
           </div>
 
           {/* Speech bubble tail pointer */}
@@ -166,7 +181,7 @@ export default function CommunityPage() {
 
       {/* Main container for standard layout sections */}
       <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8 space-y-28">
-        
+
         {/* Section 1: Unity in Diversity */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-7 space-y-4 text-left">
@@ -248,111 +263,38 @@ export default function CommunityPage() {
           </div>
 
           <div className="space-y-8">
-            {/* MBA Card */}
-            <div id="mba-section" className="bg-[#FAF6EC] border border-[#F5EAD2] p-8 rounded-2xl transition-all duration-300">
-              <h3 className="text-2xl font-bold text-neutral-900 mb-4">MBA Students</h3>
-              <p className="text-neutral-600 mb-6 font-medium text-sm">
-                Designed for professional career advancement, executive leadership, and business administration.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-[#B8860B] text-base sm:text-lg block mb-1">Networking</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Connect with industry leaders, corporate peers, and alumni.</p>
-                </div>
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-[#B8860B] text-base sm:text-lg block mb-1">Industry Events</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Seminars, enterprise showcases, and strategic workshops.</p>
-                </div>
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-[#B8860B] text-base sm:text-lg block mb-1">Leadership</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Executive opportunities to coordinate forums and lead projects.</p>
-                </div>
-              </div>
-            </div>
+            {['MBA', 'MPhil', 'MSc', 'MA', 'LLM'].map((category) => {
+              const categoryProgrammes = programmes.filter(p => p.category === category);
+              if (categoryProgrammes.length === 0) return null;
 
-            {/* MPhil Card */}
-            <div id="mphil-section" className="bg-[#f0f3fa] border border-[#d2def5] p-8 rounded-2xl transition-all duration-300">
-              <h3 className="text-2xl font-bold text-neutral-900 mb-4">MPhil Students</h3>
-              <p className="text-neutral-600 mb-6 font-medium text-sm">
-                Tailored for academic research excellence, conceptual frameworks, and methodology training.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-[#001a54] text-base sm:text-lg block mb-1">Research Support</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Access data repositories, research methodologies, and thesis guidelines.</p>
-                </div>
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-[#001a54] text-base sm:text-lg block mb-1">Publishing</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Publishing assistance, peer clinics, and journal review cycles.</p>
-                </div>
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-[#001a54] text-base sm:text-lg block mb-1">Conferences</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Participate in national and international research presentations.</p>
-                </div>
-              </div>
-            </div>
+              // Styles mapping for each category to match the flyer aesthetics
+              const styles: Record<string, { bg: string, border: string, text: string, titleBg: string }> = {
+                'MBA': { bg: 'bg-[#FAF6EC]', border: 'border-[#F5EAD2]', text: 'text-[#B8860B]', titleBg: 'bg-[#001a54]' },
+                'MPhil': { bg: 'bg-[#f0f3fa]', border: 'border-[#d2def5]', text: 'text-[#001a54]', titleBg: 'bg-[#001a54]' },
+                'MSc': { bg: 'bg-[#eefcf5]', border: 'border-[#d2f5e3]', text: 'text-emerald-700', titleBg: 'bg-[#001a54]' },
+                'MA': { bg: 'bg-[#FAF5FF]', border: 'border-[#F3E8FF]', text: 'text-purple-700', titleBg: 'bg-[#001a54]' },
+                'LLM': { bg: 'bg-[#FFF7ED]', border: 'border-[#FFEDD5]', text: 'text-orange-700', titleBg: 'bg-[#001a54]' }
+              };
+              const s = styles[category] || styles['MBA'];
 
-            {/* MSc Card */}
-            <div id="msc-section" className="bg-[#eefcf5] border border-[#d2f5e3] p-8 rounded-2xl transition-all duration-300">
-              <h3 className="text-2xl font-bold text-neutral-900 mb-4">MSc Students</h3>
-              <p className="text-neutral-600 mb-6 font-medium text-sm">
-                Focused on specialized scientific methodology, technical skills, and practical problem-solving.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-emerald-700 text-base sm:text-lg block mb-1">Technical Skills</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Access tools, technical workshops, and software programs.</p>
-                </div>
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-emerald-700 text-base sm:text-lg block mb-1">Professional Dev</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Skill certifications, case study groups, and business consulting projects.</p>
-                </div>
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-emerald-700 text-base sm:text-lg block mb-1">Industry Links</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Bridge with tech hubs, finance houses, and corporate agencies.</p>
-                </div>
-              </div>
-            </div>
+              return (
+                <div key={category} id={`${category.toLowerCase()}-section`} className={`${s.bg} border ${s.border} p-8 rounded-2xl transition-all duration-300`}>
+                  <div className="flex items-center gap-3 mb-6">
+                    <h3 className="text-2xl font-extrabold text-[#001a54]">{category} Programmes</h3>
+                    <div className="flex-1 h-px bg-neutral-200"></div>
+                  </div>
 
-            {/* MA Card */}
-            <div id="ma-section" className="bg-[#FAF5FF] border border-[#F3E8FF] p-8 rounded-2xl transition-all duration-300">
-              <h3 className="text-2xl font-bold text-neutral-900 mb-4">MA Students</h3>
-              <p className="text-neutral-600 mb-6 font-medium text-sm">
-                Supporting communication, liberal arts, media, and humanities postgraduate students.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-purple-700 text-base sm:text-lg block mb-1">Student Community</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Interactive group dialogues, cultural panels, and public speaking forums.</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {categoryProgrammes.map(prog => (
+                      <div key={prog.id} className="bg-white p-4 rounded-xl shadow-sm border border-neutral-100 flex items-start gap-3 hover:shadow-md transition-shadow">
+                        <div className="w-2 h-2 mt-2 rounded-full bg-[#B8860B] shrink-0"></div>
+                        <span className="font-bold text-neutral-800 text-sm sm:text-base leading-snug">{prog.name}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-purple-700 text-base sm:text-lg block mb-1">Professional Dev</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Mentorship access, portfolio showcases, and career fairs.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* PhD Card */}
-            <div id="phd-section" className="bg-[#FFF7ED] border border-[#FFEDD5] p-8 rounded-2xl transition-all duration-300">
-              <h3 className="text-2xl font-bold text-neutral-900 mb-4">PhD Students</h3>
-              <p className="text-neutral-600 mb-6 font-medium text-sm">
-                The pinnacle of research excellence, thought leadership, and academic contributions.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-orange-700 text-base sm:text-lg block mb-1">Scholarly Research</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Doctoral research circles, data analysis clinics, and publications.</p>
-                </div>
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-orange-700 text-base sm:text-lg block mb-1">Thesis Support</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Direct academic mentoring, cohort peer review, and defense guides.</p>
-                </div>
-                <div className="bg-white p-5 rounded-xl shadow-sm border border-neutral-100">
-                  <span className="font-bold text-orange-700 text-base sm:text-lg block mb-1">Fellowships</span>
-                  <p className="text-xs text-neutral-500 leading-relaxed">Opportunities for lecturing, research grants, and university projects.</p>
-                </div>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </section>
 
@@ -400,7 +342,7 @@ export default function CommunityPage() {
             <h2 className="text-3xl font-extrabold text-[#001a54] tracking-tight">
               Community Life
             </h2>
-            <button 
+            <button
               onClick={() => handleScrollToSection('gallery-section')}
               className="text-sm font-bold text-[#B8860B] hover:text-[#001a54] transition-colors"
             >
@@ -411,11 +353,11 @@ export default function CommunityPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             {/* Card 1 */}
             <div className="relative h-80 rounded-2xl overflow-hidden group shadow-sm">
-              <Image 
-                src="/president-speech.png" 
-                alt="Networking & Mentorship" 
-                fill 
-                className="object-cover group-hover:scale-105 transition-transform duration-500" 
+              <Image
+                src="/president-speech.png"
+                alt="Networking & Mentorship"
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
               <div className="absolute bottom-0 left-0 p-5 text-left text-white space-y-1">
@@ -426,11 +368,11 @@ export default function CommunityPage() {
 
             {/* Card 2 */}
             <div className="relative h-80 rounded-2xl overflow-hidden group shadow-sm">
-              <Image 
-                src="/researchhh.png" 
-                alt="Capacity Building" 
-                fill 
-                className="object-cover group-hover:scale-105 transition-transform duration-500" 
+              <Image
+                src="/researchhh.png"
+                alt="Capacity Building"
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
               <div className="absolute bottom-0 left-0 p-5 text-left text-white space-y-1">
@@ -441,11 +383,11 @@ export default function CommunityPage() {
 
             {/* Card 3 */}
             <div className="relative h-80 rounded-2xl overflow-hidden group shadow-sm">
-              <Image 
-                src="/bkg-grasag.jpg" 
-                alt="Social Events" 
-                fill 
-                className="object-cover group-hover:scale-105 transition-transform duration-500" 
+              <Image
+                src="/bkg-grasag.jpg"
+                alt="Social Events"
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
               <div className="absolute bottom-0 left-0 p-5 text-left text-white space-y-1">
@@ -456,11 +398,11 @@ export default function CommunityPage() {
 
             {/* Card 4 */}
             <div className="relative h-80 rounded-2xl overflow-hidden group shadow-sm">
-              <Image 
-                src="/communittty.jpg" 
-                alt="Community Impact" 
-                fill 
-                className="object-cover group-hover:scale-105 transition-transform duration-500" 
+              <Image
+                src="/communittty.jpg"
+                alt="Community Impact"
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
               <div className="absolute bottom-0 left-0 p-5 text-left text-white space-y-1">
@@ -493,7 +435,7 @@ export default function CommunityPage() {
                 </div>
                 <div className="text-xs">
                   <span className="font-bold text-[#001a54] block">Abena Mensah</span>
-                  <span className="text-neutral-400 block font-medium">PhD Candidate, Business Admin</span>
+                  <span className="text-neutral-400 block font-medium">Master of Business Administration in Marketing</span>
                 </div>
               </div>
             </div>
@@ -514,7 +456,7 @@ export default function CommunityPage() {
                 </div>
                 <div className="text-xs">
                   <span className="font-bold text-[#001a54] block">Kwame Boateng</span>
-                  <span className="text-neutral-400 block font-medium">MSc. Information Technology</span>
+                  <span className="text-neutral-400 block font-medium">Master of Science in Information System</span>
                 </div>
               </div>
             </div>
@@ -563,9 +505,9 @@ export default function CommunityPage() {
         {/* Section 8: Photo Gallery (Original intact with upload styles) */}
         <section id="gallery-section" className="pt-8 border-t border-neutral-100">
           <h2 className="text-3xl sm:text-4xl font-extrabold mb-8 text-center text-[#001a54]">Photo Gallery</h2>
-          
+
           {error && <p className="text-red-600 mb-4 text-center">{error}</p>}
-          
+
           {isAdmin && (
             <form onSubmit={handleUpload} className="mb-8 space-y-4 border border-neutral-200 p-6 rounded-2xl bg-white shadow-sm max-w-2xl mx-auto">
               <h3 className="text-xl font-semibold text-[#001a54]">Upload New Image</h3>
@@ -588,24 +530,38 @@ export default function CommunityPage() {
           )}
 
           {loading && images.length === 0 ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B8860B]"></div>
+            <div className="columns-1 sm:columns-2 md:columns-3 gap-6 space-y-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="group relative rounded-2xl overflow-hidden bg-neutral-100 break-inside-avoid shadow-sm animate-pulse" style={{ height: `${Math.max(200, Math.random() * 400)}px` }} />
+              ))}
             </div>
           ) : images.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {images.map((img) => (
-                <div key={img.url} className="group bg-white border border-neutral-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
-                  <div className="relative h-64 w-full bg-neutral-100 overflow-hidden">
-                    <Image src={img.url} alt={img.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+            <div className="columns-1 sm:columns-2 md:columns-3 gap-6 space-y-6">
+              {images.map((img, idx) => {
+                const hasTitle = img.title && img.title.trim().toLowerCase() !== 'untitled';
+                return (
+                  <div
+                    key={img.url + idx}
+                    className="group relative rounded-2xl overflow-hidden bg-neutral-100 break-inside-avoid cursor-pointer shadow-sm"
+                  >
+                    <Image
+                      src={img.url}
+                      alt={hasTitle ? img.title : 'Community moment'}
+                      width={600}
+                      height={800}
+                      className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                      unoptimized
+                    />
+
+                    {/* Subtle hover state - only show title if it's not untitled */}
+                    {hasTitle && (
+                      <div className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <h3 className="font-bold text-white text-lg leading-tight drop-shadow-md">{img.title}</h3>
+                      </div>
+                    )}
                   </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-[#001a54] truncate">{img.title}</h3>
-                    <p className="text-xs font-medium text-neutral-500 mt-1 uppercase tracking-wide">
-                      {new Date(img.uploaded_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-12 text-neutral-500 bg-neutral-50 rounded-2xl border border-neutral-100">

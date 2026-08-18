@@ -1,39 +1,64 @@
-"use client";
+import React from 'react';
+import { academicCalendarService } from '@/lib/supabase/admin';
 
-import React, { useEffect, useState } from 'react';
+export const dynamic = 'force-dynamic';
 
-export default function StudentSupportAcademicCalendarPage() {
-  const [data, setData] = useState<any[] | null>(null);
-  const [error, setError] = useState(false);
+export default async function StudentSupportAcademicCalendarPage() {
+  let events: { id: string; title: string; event_date: string; description?: string }[] = [];
+  let fetchError = false;
+  let errorMessage = '';
 
-  useEffect(() => {
-    fetch('/api/academic-calendar')
-      .then((res) => res.json())
-      .then(setData)
-      .catch(() => setError(true));
-  }, []);
-
-  if (error) return <div className="p-4 text-red-500">Failed to load calendar.</div>;
-  if (!data) return <div className="p-4">Loading...</div>;
+  try {
+    events = await academicCalendarService.list('event_date', true);
+  } catch (err: any) {
+    console.error('[academic-calendar] Failed to load events:', err);
+    fetchError = true;
+    errorMessage = err.message || String(err);
+  }
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Academic Calendar</h1>
-      {data.length === 0 ? (
-        <p>No events scheduled.</p>
-      ) : (
-        <ul className="space-y-2">
-          {data.map((item: any) => (
-            <li key={item.id} className="border p-3 rounded-md">
-              <div className="flex justify-between items-center">
-                <span className="font-medium">{item.title}</span>
-                <span className="text-sm text-gray-600">{new Date(item.date).toLocaleDateString()}</span>
+    <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8 space-y-12 bg-background text-foreground">
+      <div className="text-center space-y-3">
+        <span className="badge-accent">Academic Calendar</span>
+        <h1 className="text-4xl font-extrabold text-primary sm:text-5xl">Academic Calendar</h1>
+      </div>
+
+      {fetchError && (
+        <div className="text-center text-red-500">
+          <p>Unable to load calendar events. Please try again later.</p>
+          <p className="text-sm mt-2 font-mono bg-red-50 p-2 rounded inline-block text-red-700">{errorMessage}</p>
+        </div>
+      )}
+
+      {!fetchError && events.length === 0 && (
+        <p className="text-center text-gray-500">No calendar events found.</p>
+      )}
+
+      {events.length > 0 && (
+        <div className="space-y-6">
+          {events.map((event) => (
+            <div
+              key={event.id}
+              className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <h2 className="text-lg font-semibold text-gray-900">{event.title}</h2>
+                <time className="text-sm text-gray-500 whitespace-nowrap">
+                  {new Date(event.event_date).toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </time>
               </div>
-              <p className="mt-1 text-gray-700">{item.description}</p>
-            </li>
+              {event.description && (
+                <p className="mt-2 text-gray-600">{event.description}</p>
+              )}
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
 }
+

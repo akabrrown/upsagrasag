@@ -10,6 +10,7 @@ import {
   ArrowLeft, Copy, FileText, Link as LinkIcon, Download
 } from 'lucide-react';
 import CloudinaryUpload from '@/components/CloudinaryUpload';
+import { AdminTableSkeleton } from '@/components/admin/AdminTableSkeleton';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -35,7 +36,8 @@ export default function AdminResourcesPage() {
     setView('add');
   };
 
-  const handleOpenEdit = (item: Resource) => {
+  const handleOpenEdit = (raw_item: Resource) => {
+    const item = Object.fromEntries(Object.entries(raw_item).map(([k, v]) => [k, v === null ? '' : v])) as any;
     reset(item);
     setSelectedRecord(item);
     setView('edit');
@@ -76,7 +78,7 @@ export default function AdminResourcesPage() {
 
   const tabs = ['All Resources', 'Documents', 'External Links'];
   
-  const filteredRecords = (Array.isArray(records) ? records : []).filter(r => {
+  const filteredRecords = (records || []).filter(r => {
     if (activeTab === 'All Resources') return true;
     if (activeTab === 'Documents') return !!r.file_url;
     if (activeTab === 'External Links') return !!r.link_url && !r.file_url;
@@ -142,7 +144,7 @@ export default function AdminResourcesPage() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {isLoading ? (
-                <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">Loading resources...</td></tr>
+                <AdminTableSkeleton columns={4} />
               ) : filteredRecords.length === 0 ? (
                 <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">No resources found.</td></tr>
               ) : (

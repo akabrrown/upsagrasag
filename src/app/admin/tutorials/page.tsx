@@ -10,6 +10,7 @@ import {
   ArrowLeft, PlayCircle, Video
 } from 'lucide-react';
 import CloudinaryUpload from '@/components/CloudinaryUpload';
+import { AdminTableSkeleton } from '@/components/admin/AdminTableSkeleton';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -35,7 +36,8 @@ export default function AdminTutorialsPage() {
     setView('add');
   };
 
-  const handleOpenEdit = (item: Tutorial) => {
+  const handleOpenEdit = (raw_item: Tutorial) => {
+    const item = Object.fromEntries(Object.entries(raw_item).map(([k, v]) => [k, v === null ? '' : v])) as any;
     reset(item);
     setSelectedTutorial(item);
     setView('edit');
@@ -70,7 +72,7 @@ export default function AdminTutorialsPage() {
   };
 
   const tabs = ['All Tutorials'];
-  const recordsArray = Array.isArray(records) ? records : [];
+  const recordsArray = records ?? [];
   
   const ListView = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -128,14 +130,7 @@ export default function AdminTutorialsPage() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {isLoading ? (
-                <tr>
-                  <td colSpan={3} className="px-6 py-8 text-center text-gray-500">
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-[#2563eb] border-t-transparent rounded-full animate-spin"></div>
-                      Loading tutorials...
-                    </div>
-                  </td>
-                </tr>
+                <AdminTableSkeleton columns={3} />
               ) : recordsArray.length === 0 ? (
                 <tr>
                   <td colSpan={3} className="px-6 py-12 text-center text-gray-500">

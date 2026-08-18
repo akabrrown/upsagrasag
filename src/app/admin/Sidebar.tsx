@@ -1,7 +1,8 @@
 "use client";
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase';
 import {
   Home,
   Image,
@@ -23,7 +24,12 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
-  Hexagon // Using Hexagon as a placeholder brand icon
+  Hexagon,
+  Layers,
+  Target,
+  SlidersHorizontal,
+  Shield // Using placeholder icons for new sections
+
 } from 'lucide-react';
 
 // Navigation groups definition
@@ -42,19 +48,28 @@ const navGroups = [
       { name: 'Resources', href: '/admin/resources', icon: Folder },
       { name: 'Tutorials', href: '/admin/tutorials', icon: Book },
       { name: 'Quick Links', href: '/admin/quick-links', icon: LinkIcon },
-      { name: 'Page Contents', href: '/admin/page_contents', icon: FileText },
+      // New sections
+      { name: 'Focus Areas', href: '/admin/focus-areas', icon: Layers },
+      { name: 'Objectives', href: '/admin/objectives', icon: Target },
+      { name: 'Hero Slides', href: '/admin/hero-slides', icon: SlidersHorizontal },
+      { name: 'Leadership', href: '/admin/leadership', icon: Users },
+      { name: 'Past Executives', href: '/admin/past-executives', icon: Users },
+      { name: 'Welfare Services', href: '/admin/welfare', icon: Shield },
+      { name: 'Welfare Steps', href: '/admin/welfare-steps', icon: ListChecks },
+      { name: 'Membership Benefits', href: '/admin/membership', icon: Users },
+      { name: 'Page Contents', href: '/admin/page_contents', icon: FileText }
     ],
   },
   {
     label: 'Academics',
     links: [
       { name: 'Academic Calendar', href: '/admin/academic-calendar', icon: Calendar },
-      { name: 'Congress', href: '/admin/congress', icon: Landmark },
+      { name: 'Academic Programmes', href: '/admin/academic-programmes', icon: BookOpen },
       { name: 'Events & Programmes', href: '/admin/events_programmes', icon: CalendarCheck },
       { name: 'Leadership', href: '/admin/leadership', icon: Users },
       { name: 'Past Questions', href: '/admin/past_questions', icon: FileText },
+      { name: 'Academic Supports', href: '/admin/academic-supports', icon: BookOpen },
       { name: 'President', href: '/admin/president', icon: UserCircle },
-      { name: 'Research Opportunities', href: '/admin/research_opportunities', icon: Search },
     ],
   },
   {
@@ -70,8 +85,25 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const [userEmail, setUserEmail] = useState<string>('');
+  const [userRole, setUserRole] = useState<string>('');
 
-  const handleLogout = () => {
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user?.email) {
+        setUserEmail(user.email);
+      }
+    });
+    // Fetch role from auth-status API
+    fetch('/api/admin/auth-status').then(r => r.json()).then(data => {
+      if (data.role) setUserRole(data.role);
+    }).catch(() => {});
+  }, []);
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
     router.push('/signin');
   };
 
@@ -122,8 +154,8 @@ export default function Sidebar() {
           <UserRound className="w-5 h-5 text-gray-500" />
         </div>
         <div className="sidebar-footer-details">
-          <div className="sidebar-footer-name">Admin User</div>
-          <div className="sidebar-footer-role">Sign Out</div>
+          <div className="sidebar-footer-name">{userEmail || 'Loading...'}</div>
+          <div className="sidebar-footer-role">{userRole ? userRole.charAt(0).toUpperCase() + userRole.slice(1) : 'Sign Out'}</div>
         </div>
         <LogOut className="w-4 h-4 text-gray-400 ml-auto" />
       </div>

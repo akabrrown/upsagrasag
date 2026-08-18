@@ -3,9 +3,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ProfileCard } from "./ProfileCard";
 import { ModalOverlay } from "./ui";
-import { ArrowRight, Award, GraduationCap, Calendar, Users } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, Award, GraduationCap, Calendar, Users, Mail } from "lucide-react";
 import { motion, useInView } from "framer-motion";
-import Image from 'next/image';
+import { optimizeCloudinaryUrl } from "@/lib/optimizeImage";
 
 interface Leader {
   id: string;
@@ -16,10 +17,23 @@ interface Leader {
   type?: string | null;
   display_order?: number | null;
   email?: string | null;
+  phone?: string | null;
+}
+
+interface PastExecutive {
+  id: string;
+  name: string;
+  role: string;
+  term: string;
+  bio?: string | null;
+  image_url?: string | null;
+  display_order?: number;
 }
 
 interface LeadershipClientProps {
   executives: Leader[];
+  pastExecutives?: PastExecutive[];
+  patrons?: Leader[];
 }
 
 // Custom Counter Component for animated statistics
@@ -31,7 +45,7 @@ const AnimatedCounter: React.FC<{ target: number; suffix?: string }> = ({ target
   useEffect(() => {
     if (!isInView) return;
 
-    let start = 0;
+    const start = 0;
     const duration = 2000; // 2 seconds
     const startTime = performance.now();
 
@@ -63,7 +77,7 @@ const AnimatedCounter: React.FC<{ target: number; suffix?: string }> = ({ target
   );
 };
 
-export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives }) => {
+export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives, pastExecutives = [], patrons = [] }) => {
   const [showPresidentModal, setShowPresidentModal] = useState(false);
 
   // Find President
@@ -71,8 +85,11 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives }
     (l) => l.role.toLowerCase().includes("president") && !l.role.toLowerCase().includes("vice")
   ) || executives[0];
 
-  // Generate timeline leaders dynamically from all executives sorted by order
-  const timelineLeaders = [...executives].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
+  // Generate timeline leaders dynamically from past executives
+  const timelineLeaders = [...pastExecutives].sort((a, b) => {
+    if (a.term !== b.term) return b.term.localeCompare(a.term);
+    return (a.display_order ?? 0) - (b.display_order ?? 0);
+  });
 
   return (
     <div className="space-y-32">
@@ -124,10 +141,10 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives }
           {/* Left: Grayscale Portrait with exact bleed fit */}
           <div className="relative w-full md:w-[35%] min-h-[300px] md:min-h-full overflow-hidden bg-neutral-100">
             <Image 
-              src={president.image_url ?? "/default-avatar.png"} 
+              src={optimizeCloudinaryUrl(president.image_url) ?? "/default-avatar.png"} 
               alt={president.name} 
               fill
-              className="object-cover object-top grayscale transition-transform duration-750 hover:scale-[1.03]"
+              className="absolute inset-0 w-full h-full object-cover object-top grayscale transition-transform duration-750 hover:scale-[1.03]"
             />
           </div>
 
@@ -145,8 +162,8 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives }
               </p>
             </div>
 
-            <p className="text-sm sm:text-base text-neutral-600 leading-relaxed max-w-xl">
-              Leading graduate student advocacy, academic excellence, and community impact initiatives to build a stronger student body.
+            <p className="text-neutral-600 leading-relaxed text-base whitespace-pre-wrap">
+              {president.bio}
             </p>
 
             {/* Badges / Tags */}
@@ -180,7 +197,7 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives }
         <ModalOverlay onClose={() => setShowPresidentModal(false)}>
           <div className="flex flex-col md:flex-row w-full h-full max-w-4xl bg-white text-neutral-800">
             <div className="relative w-full md:w-2/5 min-h-[300px] md:min-h-full">
-              <Image src={president.image_url ?? "/default-avatar.png"} alt={president.name} fill className="object-cover object-top" />
+              <Image src={optimizeCloudinaryUrl(president.image_url) ?? "/default-avatar.png"} alt={president.name} fill className="absolute inset-0 w-full h-full object-cover object-top" />
               <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/20 to-transparent" />
               <div className="absolute bottom-6 left-6 right-6">
                 <span className="inline-block rounded-full bg-accent px-3 py-1 text-xs font-bold uppercase tracking-wider text-neutral-950 mb-2">
@@ -194,19 +211,30 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives }
               <div className="space-y-6">
                 <div>
                   <h4 className="text-xs uppercase tracking-widest text-primary font-semibold mb-2">President's Biography</h4>
-                  <div className="text-neutral-600 space-y-4 leading-relaxed text-sm sm:text-base">
-                    <p>
-                      {president.bio}
-                    </p>
-                  </div>
+                  <p className="text-neutral-350 leading-relaxed text-sm md:text-base mb-6 max-w-xl whitespace-pre-wrap">
+                    {president.bio}
+                  </p>
                 </div>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-neutral-200 flex items-center justify-between">
-                <span className="text-xs text-neutral-500">{president.email || "president@grasagupsa.org"}</span>
+              <div className="mt-8 pt-6 border-t border-neutral-250 flex items-center justify-between flex-wrap gap-4">
+                <div className="flex flex-col gap-2">
+                  {president.email && (
+                    <a href={`mailto:${president.email}`} className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-primary transition-colors duration-200">
+                      <Mail className="w-5 h-5 text-primary" />
+                      <span>{president.email}</span>
+                    </a>
+                  )}
+                  {president.phone && (
+                    <a href={`tel:${president.phone}`} className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-primary transition-colors duration-200">
+                      <span className="flex items-center justify-center w-5 h-5 text-primary">📞</span>
+                      <span>{president.phone}</span>
+                    </a>
+                  )}
+                </div>
                 <button
                   onClick={() => setShowPresidentModal(false)}
-                  className="px-6 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-sm font-semibold rounded-lg text-neutral-800 transition-colors"
+                  className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-sm font-semibold rounded-lg transition-colors duration-200"
                 >
                   Close
                 </button>
@@ -216,13 +244,14 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives }
         </ModalOverlay>
       )}
 
-      {/* 3. Leadership Timeline (Scroll animation) */}
+      {/* 3. Leadership Timeline (Past Leaders — Scroll animation) */}
+      {timelineLeaders.length > 0 && (
       <section className="space-y-16">
         <div className="text-center space-y-4">
-          <span className="text-primary text-xs font-bold uppercase tracking-widest px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">Hierarchy</span>
+          <span className="text-primary text-xs font-bold uppercase tracking-widest px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">Legacy</span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-neutral-900">Leadership Timeline</h2>
           <p className="text-neutral-550 max-w-xl mx-auto text-sm sm:text-base">
-            Chronological workflow and leadership flow representing the core structure of the executive body.
+            Honoring the leaders who built the foundation of our association across successive terms.
           </p>
         </div>
 
@@ -254,20 +283,22 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives }
                   <div className="w-full sm:w-5/12 pl-12 sm:pl-0">
                     <div className="relative overflow-hidden rounded-2xl bg-white border border-neutral-200 p-5 shadow-md transition-all duration-300 hover:border-primary/30">
                       <div className="flex items-center gap-4">
-                        <div className="relative w-16 h-16 shrink-0 rounded-full overflow-hidden border-2 border-accent/20">
-                          <Image 
-                            src={leader.image_url ?? "/default-avatar.png"} 
-                            alt={leader.name} 
-                            fill
-                            className="object-cover object-top"
-                          />
-                        </div>
+                        <Image 
+                          src={optimizeCloudinaryUrl(leader.image_url, { width: 400 }) ?? "/default-avatar.png"} 
+                          alt={leader.name} 
+                          width={64}
+                          height={64}
+                          className="w-16 h-16 rounded-full object-cover object-top border-2 border-accent/20"
+                        />
                         <div>
                           <span className="text-[10px] font-bold text-accent uppercase tracking-widest">
                             {leader.role}
                           </span>
                           <h4 className="text-lg font-bold text-neutral-900 leading-tight">{leader.name}</h4>
-                          <p className="text-xs text-neutral-500 mt-1 line-clamp-2">{leader.bio || "Executive member"}</p>
+                          {leader.term && (
+                            <p className="text-[11px] font-semibold text-primary/70 mt-0.5">{leader.term}</p>
+                          )}
+                          <p className="text-xs text-neutral-500 mt-1 line-clamp-2">{leader.bio}</p>
                         </div>
                       </div>
                     </div>
@@ -278,8 +309,56 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives }
           </div>
         </div>
       </section>
+      )}
 
-      {/* 4. Executive Cards (Magazine Style) */}
+      {/* 4. Patron Leaders Section */}
+      {patrons.length > 0 && (
+        <section className="space-y-16">
+          <div className="text-center space-y-4">
+            <span className="text-primary text-xs font-bold uppercase tracking-widest px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">Patrons</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-neutral-900">Patron Leaders</h2>
+            <p className="text-neutral-550 max-w-xl mx-auto text-sm sm:text-base">
+              Distinguished patrons whose guidance and counsel shape the direction of our association.
+            </p>
+          </div>
+
+          {/* First patron centered, rest in 2-col grid */}
+          <div className="space-y-8">
+            {/* First patron — standalone, centered */}
+            <div className="flex justify-center">
+              <div className="w-full max-w-sm">
+                <ProfileCard
+                  name={patrons[0].name}
+                  role={patrons[0].role}
+                  image={patrons[0].image_url ?? "/default-avatar.png"}
+                  email={patrons[0].email ?? undefined}
+                  phone={patrons[0].phone ?? undefined}
+                  bio={patrons[0].bio ?? ""}
+                />
+              </div>
+            </div>
+
+            {/* Remaining patrons — 2-column grid */}
+            {patrons.length > 1 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-2xl mx-auto">
+                {patrons.slice(1).map((patron) => (
+                  <ProfileCard
+                    key={patron.id}
+                    name={patron.name}
+                    role={patron.role}
+                    image={patron.image_url ?? "/default-avatar.png"}
+                    email={patron.email ?? undefined}
+                    phone={patron.phone ?? undefined}
+                    bio={patron.bio ?? ""}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* 5. Executive Cards (Magazine Style) */}
       <section className="space-y-16">
         <div className="text-center space-y-4">
           <span className="text-primary text-xs font-bold uppercase tracking-widest px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">Portraits</span>
@@ -296,7 +375,8 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives }
               name={leader.name}
               role={leader.role}
               image={leader.image_url ?? "/default-avatar.png"}
-              email={leader.email ?? ""}
+              email={leader.email ?? undefined}
+              phone={leader.phone ?? undefined}
               bio={leader.bio ?? ""}
             />
           ))}

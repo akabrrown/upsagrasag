@@ -1,5 +1,6 @@
 import { createServerSupabaseClient } from '../server';
 import { createClient } from '@supabase/supabase-js';
+import { AcademicCalendarRecord } from '@/types/admin';
 
 // Dedicated admin client that runs with service role privileges, bypassing RLS.
 // This is safe because all admin API routes are pre-validated using requireAdmin().
@@ -53,10 +54,10 @@ export class AdminCrudService<T extends { id?: string | number }> {
     return [];
   }
 
-  protected async filterPayload(item: any): Promise<any> {
+  protected async filterPayload(item: Record<string, unknown>): Promise<Record<string, unknown>> {
     const cols = await this.getTableColumns();
     if (cols.length === 0) return item;
-    const filtered: any = {};
+    const filtered: Record<string, unknown> = {};
     for (const k of Object.keys(item)) {
       if (cols.includes(k)) {
         filtered[k] = item[k];
@@ -110,7 +111,7 @@ export class AdminCrudService<T extends { id?: string | number }> {
     const filtered = await this.filterPayload(item);
     const { data, error } = await supabase
       .from(this.tableName)
-      .insert(filtered as any)
+      .insert(filtered as Record<string, unknown>)
       .select()
       .single();
     if (error) {
@@ -125,7 +126,7 @@ export class AdminCrudService<T extends { id?: string | number }> {
     const filtered = await this.filterPayload(item);
     const { data, error } = await supabase
       .from(this.tableName)
-      .update(filtered as any)
+      .update(filtered as Record<string, unknown>)
       .eq('id', id)
       .select()
       .single();
@@ -153,23 +154,21 @@ export class AdminCrudService<T extends { id?: string | number }> {
 import type { 
   AdminUser, 
   President, 
-  CongressEvent, 
   Partner, 
   ConstitutionFile, 
   Leadership, 
   Executive, 
+  PastExecutive,
   Opportunity, 
   Resource, 
   PastQuestion, 
   Tutorial, 
   EventProgramme, 
   EventProgrammeRecord,
-  ResearchOpportunity, 
   NewsUpdate, 
   PlatformSettings,
-  QuickLink,
-  AcademicCalendarEvent,
-  PageContent
+  MembershipBenefit,
+  AcademicSupport
 } from '@/types/admin';
 
 // Custom subclasses to handle database mismatches
@@ -190,7 +189,7 @@ export class ExecutiveCrudService extends AdminCrudService<Executive> {
       console.error(`[ExecutiveCrudService list] error:`, error);
       throw new Error(error.message);
     }
-    return (data || []).map((item: any) => ({
+    return (data || []).map((item: Record<string, unknown>) => ({
       ...item,
       id: String(item.id),
       display_order: item.order ?? 0
@@ -281,6 +280,25 @@ export class ExecutiveCrudService extends AdminCrudService<Executive> {
   }
 }
 
+export class PastExecutiveCrudService extends AdminCrudService<PastExecutive> {
+  constructor() {
+    super('past_executives');
+  }
+
+  async list(orderCol: string = 'display_order', ascending: boolean = true): Promise<PastExecutive[]> {
+    const supabase = supabaseAdminClient;
+    const { data, error } = await supabase
+      .from('past_executives')
+      .select('*')
+      .order(orderCol, { ascending });
+    if (error) {
+      console.error(`[PastExecutiveCrudService list] error:`, error);
+      throw new Error(error.message);
+    }
+    return data as PastExecutive[];
+  }
+}
+
 export class PastQuestionCrudService extends AdminCrudService<PastQuestion> {
   constructor() {
     super('past_questions');
@@ -296,7 +314,7 @@ export class PastQuestionCrudService extends AdminCrudService<PastQuestion> {
       console.error(`[PastQuestionCrudService list] error:`, error);
       throw new Error(error.message);
     }
-    return (data || []).map((item: any) => {
+    return (data || []).map((item: Record<string, unknown>) => {
       return {
         id: String(item.id),
         programSlug: item.program_slug,
@@ -346,7 +364,7 @@ export class PastQuestionCrudService extends AdminCrudService<PastQuestion> {
   async create(item: Partial<PastQuestion>): Promise<PastQuestion> {
     const supabase = supabaseAdminClient;
     const dbPayload: any = {
-      program_slug: (item as any).programSlug,
+      program_slug: (item as Record<string, unknown>).programSlug,
       title: item.title,
       description: item.description,
       type: item.type ?? 'exam',
@@ -461,8 +479,8 @@ export class AdminUserCrudService extends AdminCrudService<AdminUser> {
       console.error(`[AdminUserCrudService list] failed to list auth users:`, err);
     }
 
-    return (dbUsers || []).map((dbUser: any) => {
-      const authUser = authUsers.find((u: any) => u.id === dbUser.auth_uid);
+    return (dbUsers || []).map((dbUser: Record<string, unknown>) => {
+      const authUser = authUsers.find((u: Record<string, unknown>) => u.id === dbUser.auth_uid);
       return {
         id: dbUser.id,
         email: authUser?.email || 'unknown@example.com',
@@ -586,28 +604,110 @@ export class AdminUserCrudService extends AdminCrudService<AdminUser> {
 
   async delete(id: string): Promise<void> {
     const supabase = supabaseAdminClient;
-    const { error } = await supabase
+    
+    // 1. Get the auth_uid first so we can delete the Auth user
+    const { data: record, error: fetchError } = await supabase
+      .from('admin_users')
+      .select('auth_uid')
+      .eq('id', id)
+      .single();
+      
+    if (fetchError) {
+      console.error(`[AdminUserCrudService delete] fetch error:`, fetchError);
+      throw new Error(fetchError.message);
+    }
+
+    // 2. Delete the record from admin_users
+    const { error: dbError } = await supabase
       .from('admin_users')
       .delete()
       .eq('id', id);
-    if (error) {
-      console.error(`[AdminUserCrudService delete] error:`, error);
-      throw new Error(error.message);
+      
+    if (dbError) {
+      console.error(`[AdminUserCrudService delete] db error:`, dbError);
+      throw new Error(dbError.message);
+    }
+
+    // 3. Delete the user from Supabase Auth
+    if (record?.auth_uid) {
+      const { error: authError } = await supabase.auth.admin.deleteUser(record.auth_uid);
+      if (authError) {
+        console.error(`[AdminUserCrudService delete] auth delete error:`, authError);
+        // Note: We don't throw here because the admin_users record is already gone, 
+        // so the user effectively has no admin access anymore.
+      }
     }
   }
 }
 
 export const adminUserService = new AdminUserCrudService();
 export const presidentService = new AdminCrudService<President>('homepage_president');
-export const congressService = new AdminCrudService<CongressEvent>('congress_events');
+
+export const academicCalendarService = new AdminCrudService<AcademicCalendarRecord>('academic_calendar');
 export const partnerService = new AdminCrudService<Partner>('partners');
 export const constitutionService = new AdminCrudService<ConstitutionFile>('constitution_files');
-export const leadershipService = new AdminCrudService<Leadership>('leadership');
+class LeadershipCrudService extends AdminCrudService<Leadership> {
+  constructor() {
+    super('leadership');
+  }
+
+  async list(orderCol: string = 'display_order', ascending: boolean = true): Promise<Leadership[]> {
+    const records = await super.list(orderCol, ascending);
+    return records.map(r => {
+      const contactInfo = (r as any).contact_info;
+      return {
+        ...r,
+        email: contactInfo?.email || '',
+        phone: contactInfo?.phone || ''
+      };
+    });
+  }
+
+  async get(id: string): Promise<Leadership | null> {
+    const record = await super.get(id);
+    if (!record) return null;
+    const contactInfo = (record as any).contact_info;
+    return {
+      ...record,
+      email: contactInfo?.email || '',
+      phone: contactInfo?.phone || ''
+    };
+  }
+
+  async create(item: Partial<Leadership>): Promise<Leadership> {
+    const dbPayload: any = { ...item };
+    dbPayload.contact_info = {
+      ...((item as any).contactInfo || (item as any).contact_info || {}),
+      email: item.email || '',
+      phone: item.phone || ''
+    };
+    return super.create(dbPayload);
+  }
+
+  async update(id: string, item: Partial<Leadership>): Promise<Leadership> {
+    const dbPayload: any = { ...item };
+    // If email or phone is provided, we should merge it into contact_info
+    if (item.email !== undefined || item.phone !== undefined) {
+      const existing = await super.get(id);
+      dbPayload.contact_info = {
+        ...((existing as any)?.contactInfo || (existing as any)?.contact_info || {}),
+        email: item.email !== undefined ? item.email : (existing as any)?.email || '',
+        phone: item.phone !== undefined ? item.phone : (existing as any)?.phone || ''
+      };
+    }
+    return super.update(id, dbPayload);
+  }
+}
+
+export const leadershipService = new LeadershipCrudService();
 export const executiveService = new ExecutiveCrudService();
+export const pastExecutiveService = new PastExecutiveCrudService();
 export const opportunityService = new AdminCrudService<Opportunity>('opportunities');
 export const resourceService = new AdminCrudService<Resource>('resources');
 export const pastQuestionService = new PastQuestionCrudService();
 export const tutorialService = new AdminCrudService<Tutorial>('tutorials');
+export const membershipBenefitService = new AdminCrudService<MembershipBenefit>('membership_benefits');
+export const academicSupportService = new AdminCrudService<AcademicSupport>('academic_supports');
 /* Custom service for events_programmes to safely handle optional fields */
 class EventProgrammeCrudService extends AdminCrudService<EventProgrammeRecord> {
   constructor() {
@@ -629,41 +729,8 @@ class EventProgrammeCrudService extends AdminCrudService<EventProgrammeRecord> {
 }
 
 export const eventProgrammeService = new EventProgrammeCrudService();
-export const researchOpportunityService = new AdminCrudService<ResearchOpportunity>('research_opportunities');
 
-class NewsUpdateCrudService extends AdminCrudService<NewsUpdate> {
-  constructor() {
-    super('news_updates');
-  }
-
-  private generateSlug(title: string): string {
-    return title
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9\-]/g, '')
-      .replace(/\-+/g, '-');
-  }
-
-  async create(item: Partial<NewsUpdate>): Promise<NewsUpdate> {
-    if (!item.slug && item.title) {
-      item.slug = this.generateSlug(item.title);
-    }
-    return super.create(item);
-  }
-
-  async update(id: string, item: Partial<NewsUpdate>): Promise<NewsUpdate> {
-    if (item.title && (item.slug === undefined || item.slug === '')) {
-      item.slug = this.generateSlug(item.title);
-    }
-    return super.update(id, item);
-  }
-}
-
-export const newsUpdateService = new NewsUpdateCrudService();
-export const quickLinkService = new AdminCrudService<QuickLink>('quick_links');
-export const academicCalendarService = new AdminCrudService<AcademicCalendarEvent>('academic_calendar');
-export const pageContentService = new AdminCrudService<PageContent>('page_contents');
+export const newsUpdateService = new AdminCrudService<NewsUpdate>('news_updates');
 
 // PlatformSettings is special, only 1 row
 export const platformSettingsService = {
@@ -692,25 +759,25 @@ export const platformSettingsService = {
 export const serviceMap: Record<string, AdminCrudService<any>> = {
   'users': adminUserService,
   'president': presidentService,
-  'congress': congressService,
+
   'partners': partnerService,
   'constitution': constitutionService,
   'leadership': leadershipService,
   'executives': executiveService,
+  'past_executives': pastExecutiveService,
   'opportunities': opportunityService,
   'resources': resourceService,
   'past_questions': pastQuestionService,
   'tutorials': tutorialService,
   'events_programmes': eventProgrammeService,
-  'research_opportunities': researchOpportunityService,
+  'membership_benefits': membershipBenefitService,
+  'academic_supports': academicSupportService,
+
   'news_updates': newsUpdateService,
-  'quick-links': quickLinkService,
-  'academic_calendar': academicCalendarService,
-  'page_contents': pageContentService,
 };
 
 // Utility to normalize records with image URLs across different tables
-export const normalizeRecord = (record: any) => ({
+export const normalizeRecord = (record: Record<string, unknown>) => ({
   ...record,
   imageUrl: record.photo_url || record.logo_url || record.image_url || ''
 });
@@ -718,39 +785,37 @@ export const normalizeRecord = (record: any) => ({
 import { adminUserSchema } from '@/types/page';
 import {
   presidentSchema,
-  congressSchema,
   partnerSchema,
   constitutionSchema,
   leadershipSchema,
   executiveSchema,
+  pastExecutiveSchema,
   opportunitySchema,
   resourceSchema,
   pastQuestionSchema,
   tutorialSchema,
   eventProgrammeSchema,
-  researchOpportunitySchema,
   newsUpdateSchema,
-  quickLinkSchema,
-  academicCalendarSchema,
-  pageContentSchema
+  membershipBenefitSchema,
+  academicSupportSchema
 } from '@/types/admin';
 
 export const schemaMap: Record<string, any> = {
   'users': adminUserSchema,
   'president': presidentSchema,
-  'congress': congressSchema,
+
   'partners': partnerSchema,
   'constitution': constitutionSchema,
   'leadership': leadershipSchema,
   'executives': executiveSchema,
+  'past_executives': pastExecutiveSchema,
   'opportunities': opportunitySchema,
   'resources': resourceSchema,
   'past_questions': pastQuestionSchema,
   'tutorials': tutorialSchema,
   'events_programmes': eventProgrammeSchema,
-  'research_opportunities': researchOpportunitySchema,
+  'membership_benefits': membershipBenefitSchema,
+  'academic_supports': academicSupportSchema,
+
   'news_updates': newsUpdateSchema,
-  'quick-links': quickLinkSchema,
-  'academic_calendar': academicCalendarSchema,
-  'page_contents': pageContentSchema,
 };

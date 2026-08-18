@@ -5,12 +5,14 @@ import useSWR from 'swr';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { opportunitySchema, Opportunity } from '@/types/admin';
+import Image from 'next/image';
 import { 
   Plus, Search, Filter, Eye, Pencil, Trash2, 
   ArrowLeft, Copy, Briefcase, Building2, Tag, 
   ExternalLink, MapPin
 } from 'lucide-react';
 import CloudinaryUpload from '@/components/CloudinaryUpload';
+import { AdminTableSkeleton } from '@/components/admin/AdminTableSkeleton';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -20,12 +22,12 @@ export default function AdminOpportunitiesPage() {
   const { data: records, isLoading, mutate } = useSWR<Opportunity[]>('/api/admin/opportunities', fetcher);
   
   const [view, setView] = useState<ViewState>('list');
-  const [activeTab, setActiveTab] = useState('All Opportunities');
+  const [activeTab, setActiveTab] = useState('All');
   const [selectedOpp, setSelectedOpp] = useState<Opportunity | null>(null);
 
   const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<Opportunity>({
     resolver: zodResolver(opportunitySchema) as any,
-    defaultValues: { title: '', company: '', type: 'Full-time', category: '', image_url: '', apply_url: '' }
+    defaultValues: { title: '', company: '', type: 'Full-time', category: '', image_url: '', apply_url: '', location: '', deadline: '', description: '' }
   });
 
   const imageUrl = useWatch({ control, name: 'image_url' });
@@ -33,12 +35,13 @@ export default function AdminOpportunitiesPage() {
   // --- Handlers ---
   
   const handleOpenAdd = () => {
-    reset({ title: '', company: '', type: 'Full-time', category: '', image_url: '', apply_url: '' });
+    reset({ title: '', company: '', type: 'Full-time', category: '', image_url: '', apply_url: '', location: '', deadline: '', description: '' });
     setSelectedOpp(null);
     setView('add');
   };
 
-  const handleOpenEdit = (item: Opportunity) => {
+  const handleOpenEdit = (raw_item: Opportunity) => {
+    const item = Object.fromEntries(Object.entries(raw_item).map(([k, v]) => [k, v === null ? '' : v])) as any;
     reset(item);
     setSelectedOpp(item);
     setView('edit');
@@ -77,14 +80,24 @@ export default function AdminOpportunitiesPage() {
     }
   };
 
-  const tabs = ['All Opportunities', 'Full-time', 'Internships', 'Contract'];
+  const tabs = ['All', 'Jobs & Internships', 'Scholarships', 'Research Grants', 'Fellowships', 'Calls for Papers', 'Conferences', 'Volunteers'];
   
-  const filteredRecords = (Array.isArray(records) ? records : []).filter(r => {
-    if (activeTab === 'All Opportunities') return true;
-    if (activeTab === 'Full-time') return r.type === 'Full-time';
-    if (activeTab === 'Internships') return r.type === 'Internship';
-    if (activeTab === 'Contract') return r.type === 'Contract' || r.type === 'Part-time';
-    return false;
+  const filteredRecords = (records || []).filter(r => {
+    if (activeTab === 'All') return true;
+    
+    // Simple matching logic similar to the frontend, or exact match if they typed it
+    const cat = (r.category || '').toLowerCase();
+    const tab = activeTab.toLowerCase();
+    
+    if (tab === 'jobs & internships' && (cat.includes('job') || cat.includes('intern'))) return true;
+    if (tab === 'scholarships' && cat.includes('scholar')) return true;
+    if (tab === 'research grants' && (cat.includes('grant') || cat.includes('research'))) return true;
+    if (tab === 'fellowships' && cat.includes('fellow')) return true;
+    if (tab === 'calls for papers' && (cat.includes('call') || cat.includes('paper'))) return true;
+    if (tab === 'conferences' && cat.includes('conf')) return true;
+    if (tab === 'volunteers' && cat.includes('volunteer')) return true;
+    
+    return r.category === activeTab;
   });
 
   const getTypeStyle = (type: string) => {
@@ -156,7 +169,7 @@ export default function AdminOpportunitiesPage() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {isLoading ? (
-                <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">Loading opportunities...</td></tr>
+                <AdminTableSkeleton columns={4} />
               ) : filteredRecords.length === 0 ? (
                 <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">No opportunities found.</td></tr>
               ) : (
@@ -166,7 +179,7 @@ export default function AdminOpportunitiesPage() {
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-lg bg-gray-50 border border-gray-200 overflow-hidden flex-shrink-0 flex items-center justify-center">
                           {record.image_url ? (
-                            <img src={record.image_url} alt="" className="w-full h-full object-cover" />
+                            <Image src={record.image_url} alt="" width={800} height={800} className="w-full h-full object-cover" />
                           ) : (
                             <Briefcase className="w-5 h-5 text-gray-400" />
                           )}
@@ -265,25 +278,80 @@ export default function AdminOpportunitiesPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Employment Type</label>
-                <select 
-                  {...register('type')} 
-                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
-                >
-                  <option value="Full-time">Full-time</option>
-                  <option value="Part-time">Part-time</option>
-                  <option value="Internship">Internship</option>
-                  <option value="Contract">Contract</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category / Industry</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Employment / Funding Type</label>
                 <input 
-                  {...register('category')} 
-                  placeholder="e.g. Technology, Finance"
+                  {...register('type')} 
+                  placeholder="e.g. Full-time, Fully Funded, Volunteer"
                   className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Category <span className="text-red-500">*</span></label>
+                <input 
+                  {...register('category')} 
+                  list="category-options"
+                  placeholder="e.g. Scholarships, Research Grants, Volunteers"
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                />
+                <datalist id="category-options">
+                  <option value="Jobs & Internships" />
+                  <option value="Scholarships" />
+                  <option value="Research Grants" />
+                  <option value="Fellowships" />
+                  <option value="Calls for Papers" />
+                  <option value="Conferences" />
+                  <option value="Publication Opportunities" />
+                  <option value="Volunteers" />
+                </datalist>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                <input 
+                  {...register('location')} 
+                  placeholder="e.g. Accra, Ghana or Remote"
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Deadline</label>
+                <input 
+                  {...register('deadline')} 
+                  type="date"
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                <input 
+                  {...register('start_date')} 
+                  type="date"
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                <input 
+                  {...register('end_date')} 
+                  type="date"
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <textarea 
+                {...register('description')} 
+                rows={4}
+                placeholder="Details about the opportunity..."
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm resize-none"
+              />
             </div>
 
             <div>
@@ -306,7 +374,7 @@ export default function AdminOpportunitiesPage() {
               <CloudinaryUpload onUpload={(url: string) => setValue('image_url', url, { shouldValidate: true })} />
               {imageUrl && (
                 <div className="mt-4 w-32 h-32 rounded-xl overflow-hidden border-4 border-white shadow-md mx-auto bg-white">
-                  <img src={imageUrl} alt="Preview" className="w-full h-full object-contain p-2" />
+                  <Image src={imageUrl} alt="Preview" width={800} height={800} className="w-full h-full object-contain p-2" />
                 </div>
               )}
             </div>
@@ -348,7 +416,7 @@ export default function AdminOpportunitiesPage() {
             {/* Logo */}
             <div className="w-32 h-32 sm:w-40 sm:h-40 bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm flex-shrink-0 mx-auto sm:mx-0 flex items-center justify-center p-4">
               {selectedOpp.image_url ? (
-                 <img src={selectedOpp.image_url} alt={selectedOpp.company} className="w-full h-full object-contain" />
+                 <Image src={selectedOpp.image_url} alt={selectedOpp.company} width={800} height={800} className="w-full h-full object-contain" />
               ) : (
                 <Building2 className="w-12 h-12 text-gray-300" />
               )}
@@ -364,9 +432,31 @@ export default function AdminOpportunitiesPage() {
                  <p className="text-lg font-bold text-[#004080]">{selectedOpp.company}</p>
                </div>
                
-               <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-sm text-gray-600 pt-2">
-                 <div className="flex items-center gap-2"><Tag className="w-4 h-4 text-gray-400"/> {selectedOpp.category || 'General'}</div>
+               <div className="flex flex-col gap-2 pt-2 text-sm text-gray-600">
+                 <div className="flex items-center gap-2">
+                   <Tag className="w-4 h-4 text-gray-400"/> 
+                   <span className="font-medium">{selectedOpp.category || 'General'}</span>
+                 </div>
+                 {selectedOpp.location && (
+                   <div className="flex items-center gap-2">
+                     <MapPin className="w-4 h-4 text-gray-400"/> 
+                     <span>{selectedOpp.location}</span>
+                   </div>
+                 )}
+                 {selectedOpp.deadline && (
+                   <div className="flex items-center gap-2">
+                     <span className="text-gray-400 font-bold text-xs uppercase tracking-wider">Deadline:</span>
+                     <span>{new Date(selectedOpp.deadline).toLocaleDateString()}</span>
+                   </div>
+                 )}
                </div>
+               
+               {selectedOpp.description && (
+                 <div className="pt-4 border-t border-gray-100">
+                   <h3 className="font-semibold text-gray-900 mb-2">Description</h3>
+                   <p className="text-gray-600 leading-relaxed text-sm whitespace-pre-wrap">{selectedOpp.description}</p>
+                 </div>
+               )}
             </div>
           </div>
 

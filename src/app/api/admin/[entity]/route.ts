@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { serviceMap, schemaMap } from '@/lib/supabase/admin/index';
 import { requireAdmin } from '@/lib/authHelpers';
 import { ZodError } from 'zod';
@@ -49,6 +50,7 @@ export async function POST(
     const body = await request.json();
     const validatedData = schema.parse(body);
     const data = await service.create(validatedData);
+    revalidatePath('/', 'layout');
     return NextResponse.json(data, { status: 201 });
   } catch (error: any) {
     if (error instanceof ZodError) {

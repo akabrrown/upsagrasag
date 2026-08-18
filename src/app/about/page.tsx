@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Landmark, Scale, HeartHandshake, GraduationCap, Globe, Users, Briefcase } from 'lucide-react';
+import { supabaseClient } from '@/lib/supabaseClient';
 
 const focusAreas = [
   {
@@ -57,13 +58,67 @@ const objectives = [
 export default function AboutPage() {
   const [activeObjective, setActiveObjective] = useState(0);
   const [activeTab, setActiveTab] = useState(0); // 0: GAFF, 1: Business Lounge
+  
+  const [focusAreasState, setFocusAreas] = useState<any[]>(focusAreas);
+  const [objectivesState, setObjectives] = useState<any[]>(objectives);
+  
+  const [contentBlocks, setContentBlocks] = useState<Record<string, any>>({});
+
+  useEffect(() => {
+    const fetchPageContents = async () => {
+      try {
+        const { data, error } = await supabaseClient
+          .from('page_contents')
+          .select('*')
+          .like('slug', 'about-%');
+        
+        if (!error && data) {
+          const blocks: Record<string, any> = {};
+          data.forEach(item => {
+            blocks[item.slug] = item;
+          });
+          setContentBlocks(blocks);
+        }
+      } catch (e) {
+        console.warn('Could not load page contents', e);
+      }
+    };
+    fetchPageContents();
+
+    const fetchFocusAreas = async () => {
+      try {
+        const res = await fetch('/api/admin/focus-areas');
+        const data = await res.json();
+        if (data && data.length > 0) {
+           setFocusAreas(data);
+        }
+      } catch (e) {
+        console.error('Failed to fetch focus areas', e);
+      }
+    };
+    
+    const fetchObjectives = async () => {
+      try {
+        const res = await fetch('/api/admin/objectives');
+        const data = await res.json();
+        if (data && data.length > 0) {
+           setObjectives(data);
+        }
+      } catch (e) {
+        console.error('Failed to fetch objectives', e);
+      }
+    };
+    
+    fetchFocusAreas();
+    fetchObjectives();
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setActiveObjective((prev) => (prev + 1) % objectives.length);
+      setActiveObjective((prev) => (prev + 1) % objectivesState.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, []);
+  }, [objectivesState.length]);
 
   return (
     <div className="w-full bg-background text-foreground">
@@ -93,14 +148,13 @@ export default function AboutPage() {
         {/* Who We Are */}
         <section className="space-y-6 text-center">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-[#001a54]">
-            Who We Are
+            {contentBlocks['about-who-we-are']?.title || 'Who We Are'}
           </h2>
-          <div className="max-w-3xl mx-auto space-y-6 text-sm sm:text-base text-neutral-600 leading-relaxed text-center">
+          <div className="max-w-3xl mx-auto space-y-6 text-sm sm:text-base text-neutral-600 leading-relaxed text-center whitespace-pre-line">
             <p>
-              GRASAG-UPSA is the official representative body of postgraduate students at the University of Professional Studies, Accra, and a strategic platform for leadership, research, enterprise, professional development and social impact. As the voice of UPSA’s postgraduate community, the Association represents emerging leaders, researchers, entrepreneurs, public servants, corporate professionals, academics, consultants and innovators who are being prepared to contribute meaningfully to national and continental development. Guided by its motto, &ldquo;The Nation’s Premium,&rdquo;
-            </p>
-            <p>
-              GRASAG-UPSA serves as a bridge between postgraduate students, the University, industry, government, development partners, alumni, professional bodies and society. It provides partners with direct access to a high-value graduate community active in business, governance, academia, civil society and the world of work.
+              {contentBlocks['about-who-we-are']?.body || `GRASAG-UPSA is the official representative body of postgraduate students at the University of Professional Studies, Accra, and a strategic platform for leadership, research, enterprise, professional development and social impact. As the voice of UPSA’s postgraduate community, the Association represents emerging leaders, researchers, entrepreneurs, public servants, corporate professionals, academics, consultants and innovators who are being prepared to contribute meaningfully to national and continental development. Guided by its motto, "The Nation's Premium,"
+              
+              GRASAG-UPSA serves as a bridge between postgraduate students, the University, industry, government, development partners, alumni, professional bodies and society. It provides partners with direct access to a high-value graduate community active in business, governance, academia, civil society and the world of work.`}
             </p>
           </div>
         </section>
@@ -131,7 +185,7 @@ export default function AboutPage() {
                       <span className="w-2.5 h-2.5 rounded-full bg-transparent group-hover:bg-neutral-600 transition-colors" />
                     )}
                     <span className={`font-semibold text-base transition-colors ${activeTab === 0 ? 'text-white' : 'text-neutral-500 group-hover:text-neutral-300'}`}>
-                      the Ghana Agribusiness Future Forum
+                      {contentBlocks['about-gaff']?.title || 'the Ghana Agribusiness Future Forum'}
                     </span>
                   </div>
                   {activeTab === 0 ? (
@@ -209,19 +263,19 @@ export default function AboutPage() {
               {activeTab === 0 ? (
                 <>
                   <h3 className="text-2xl sm:text-3xl font-bold text-white">
-                    Ghana Agribusiness Future Forum
+                    {contentBlocks['about-gaff']?.title || 'Ghana Agribusiness Future Forum'}
                   </h3>
-                  <p className="text-sm sm:text-base text-neutral-200 leading-relaxed">
-                    The GAFF convenes students, industry actors, policymakers and entrepreneurs around agribusiness, food systems and youth enterprise;
+                  <p className="text-sm sm:text-base text-neutral-200 leading-relaxed whitespace-pre-line">
+                    {contentBlocks['about-gaff']?.body || 'The GAFF convenes students, industry actors, policymakers and entrepreneurs around agribusiness, food systems and youth enterprise;'}
                   </p>
                 </>
               ) : (
                 <>
                   <h3 className="text-2xl sm:text-3xl font-bold text-white">
-                    The Business Lounge
+                    {contentBlocks['about-business-lounge']?.title || 'The Business Lounge'}
                   </h3>
-                  <p className="text-sm sm:text-base text-neutral-200 leading-relaxed">
-                    A networking and enterprise platform for conversations on business, leadership, innovation and career growth; and the Research Support Initiative, which supports postgraduate students through thesis clinics, publication guidance, seminars and research capacity-building.
+                  <p className="text-sm sm:text-base text-neutral-200 leading-relaxed whitespace-pre-line">
+                    {contentBlocks['about-business-lounge']?.body || 'A networking and enterprise platform for conversations on business, leadership, innovation and career growth; and the Research Support Initiative, which supports postgraduate students through thesis clinics, publication guidance, seminars and research capacity-building.'}
                   </p>
                 </>
               )}
@@ -247,17 +301,17 @@ export default function AboutPage() {
           <div className="flex flex-col gap-6 justify-between">
             {/* Mission Box */}
             <div className="bg-[#f0f2f5] p-8 rounded-sm flex-1 flex flex-col justify-center space-y-3">
-              <h3 className="text-2xl font-bold text-[#001a54]">Our Mission</h3>
-              <p className="text-sm sm:text-base text-neutral-800 leading-relaxed font-medium">
-                To serve as the official voice and representative body of postgraduate students at UPSA by promoting their academic, social, professional and general welfare through effective advocacy, responsive leadership, inclusive engagement, accountable governance and constructive collaboration with University authorities and relevant stakeholders.
+              <h3 className="text-2xl font-bold text-[#001a54]">{contentBlocks['about-mission']?.title || 'Our Mission'}</h3>
+              <p className="text-sm sm:text-base text-neutral-800 leading-relaxed font-medium whitespace-pre-line">
+                {contentBlocks['about-mission']?.body || 'To serve as the official voice and representative body of postgraduate students at UPSA by promoting their academic, social, professional and general welfare through effective advocacy, responsive leadership, inclusive engagement, accountable governance and constructive collaboration with University authorities and relevant stakeholders.'}
               </p>
             </div>
 
             {/* Vision Box */}
             <div className="bg-[#001a54] p-8 rounded-sm flex-1 flex flex-col justify-center space-y-3 text-white">
-              <h3 className="text-2xl font-bold text-white">Our Vision</h3>
-              <p className="text-sm sm:text-base text-neutral-200 leading-relaxed font-medium">
-                To build a vibrant, inclusive, research-driven and student-centred graduate community where every postgraduate student at UPSA is empowered to excel academically, grow professionally, participate meaningfully in student life, and contribute to national development through research and practice.
+              <h3 className="text-2xl font-bold text-white">{contentBlocks['about-vision']?.title || 'Our Vision'}</h3>
+              <p className="text-sm sm:text-base text-neutral-200 leading-relaxed font-medium whitespace-pre-line">
+                {contentBlocks['about-vision']?.body || 'To build a vibrant, inclusive, research-driven and student-centred graduate community where every postgraduate student at UPSA is empowered to excel academically, grow professionally, participate meaningfully in student life, and contribute to national development through research and practice.'}
               </p>
             </div>
           </div>
@@ -273,8 +327,10 @@ export default function AboutPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {focusAreas.map((area, idx) => {
-              const IconComponent = area.icon;
+            {focusAreasState.map((area, idx) => {
+              // Attempt to map from iconMap if we had it, or just use Scale as a fallback if no icon_name maps correctly.
+              // Note: area.icon handles the hardcoded fallback
+              const IconComponent = area.icon || (area.icon_name && (require('lucide-react') as any)[area.icon_name]) || Scale;
               return (
                 <div
                   key={idx}
@@ -298,7 +354,7 @@ export default function AboutPage() {
                   {/* Right Side: Image */}
                   <div className="w-full sm:w-[42%] relative h-48 sm:h-full min-h-[180px]">
                     <Image
-                      src={area.image}
+                      src={area.image_url || area.image || "/inclusive.png"}
                       alt={area.title}
                       fill
                       className="object-cover"
@@ -318,8 +374,9 @@ export default function AboutPage() {
               Objectives
             </h2>
             <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 scrollbar-thin">
-              {objectives.map((objective, idx) => {
+              {objectivesState.map((objective, idx) => {
                 const isActive = activeObjective === idx;
+                const objectiveText = typeof objective === 'string' ? objective : objective.description;
                 return (
                   <div 
                     key={idx}
@@ -331,7 +388,7 @@ export default function AboutPage() {
                     }`}
                   >
                     <p className="text-sm sm:text-base leading-relaxed">
-                      {objective}
+                      {objectiveText}
                     </p>
                   </div>
                 );
@@ -356,19 +413,18 @@ export default function AboutPage() {
           {/* Left Column: Text and CTA */}
           <div className="space-y-6 text-left">
             <h2 className="text-4xl font-extrabold text-[#001a54] tracking-tight">
-              Partner with Us
+              {contentBlocks['about-partner']?.title || 'Partner with Us'}
             </h2>
-            <div className="space-y-4 text-sm sm:text-base text-neutral-600 leading-relaxed font-medium">
+            <div className="space-y-4 text-sm sm:text-base text-neutral-600 leading-relaxed font-medium whitespace-pre-line">
               <p>
-                Through its focus on good governance, research, inclusion, student welfare, employability, entrepreneurship and graduate community engagement, GRASAG-UPSA offers partners a credible platform to support talent development, thought leadership, innovation, policy dialogue and professional excellence.
-              </p>
-              <p>
-                Partnering with GRASAG-UPSA is an opportunity to invest in a purposeful and influential postgraduate community capable of generating ideas, leading conversations, building enterprises, conducting research and shaping the future of work, business, governance and leadership in Ghana and beyond.
+                {contentBlocks['about-partner']?.body || `Through its focus on good governance, research, inclusion, student welfare, employability, entrepreneurship and graduate community engagement, GRASAG-UPSA offers partners a credible platform to support talent development, thought leadership, innovation, policy dialogue and professional excellence.
+
+                Partnering with GRASAG-UPSA is an opportunity to invest in a purposeful and influential postgraduate community capable of generating ideas, leading conversations, building enterprises, conducting research and shaping the future of work, business, governance and leadership in Ghana and beyond.`}
               </p>
             </div>
             <div>
               <button className="border border-[#001a54] text-[#001a54] hover:bg-[#001a54] hover:text-white transition-all duration-300 rounded-full px-8 py-3 text-sm font-semibold tracking-wide">
-                Partner with us
+                {contentBlocks['about-partner']?.cta_text || 'Partner with us'}
               </button>
             </div>
           </div>
