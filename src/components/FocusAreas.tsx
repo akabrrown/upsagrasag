@@ -62,12 +62,12 @@ export const FocusAreas = () => {
         </div>
 
         {/* Scrolling marquee container */}
-        <div className="relative w-full overflow-hidden py-4">
+        <div className="relative w-full overflow-hidden py-4 group">
           {/* Fade gradient overlays on the sides */}
           <div className="pointer-events-none absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-neutral-50 to-transparent z-10" />
           <div className="pointer-events-none absolute inset-y-0 right-0 w-16 md:w-32 bg-gradient-to-l from-neutral-50 to-transparent z-10" />
 
-          <div className="animate-marquee flex gap-6">
+          <div className="animate-marquee group-hover:[animation-play-state:paused] flex gap-6">
             {triplicatedCards.map((card, idx) => {
               const IconComponent = (LucideIcons as any)[card.icon_name] || LucideIcons.HelpCircle;
               return (
@@ -90,8 +90,13 @@ export const FocusAreas = () => {
                       </p>
                     </div>
                     <button
-                      onClick={() => setSelectedCard(card)}
-                      className="text-sm sm:text-base font-bold text-[#B8860B] hover:text-primary transition-colors flex items-center gap-1 mt-2 w-fit"
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setSelectedCard(card);
+                      }}
+                      className="text-sm sm:text-base font-bold text-[#B8860B] hover:text-primary transition-colors flex items-center gap-1 mt-2 w-fit cursor-pointer relative z-20"
                     >
                       Explore More <span className="text-sm font-normal">→</span>
                     </button>
