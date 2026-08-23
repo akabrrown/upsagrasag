@@ -335,7 +335,7 @@ export default function HomePage() {
                   : 'border-white/20 opacity-60 hover:opacity-100'
                   }`}
               >
-                <Image src={slide.imagePath} alt={`Slide ${idx + 1} preview`} fill className="object-contain" />
+                <Image src={slide.imagePath} alt={`Slide ${idx + 1} preview`} fill sizes="110px" className="object-contain" />
               </button>
             ))}
           </div>
