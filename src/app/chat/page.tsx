@@ -188,7 +188,7 @@ export default function ChatPage() {
                       : 'bg-[#f3f4f6] text-gray-800 rounded-2xl rounded-tr-sm font-medium'
                   }`}>
                     {message.content ? (
-                      <div className="prose prose-sm md:prose-base max-w-none prose-p:leading-relaxed prose-a:text-[#004080] prose-a:no-underline hover:prose-a:underline prose-table:w-full prose-th:bg-gray-50 prose-th:px-3 prose-th:py-2 prose-td:px-3 prose-td:py-2 prose-td:border-t prose-td:border-gray-100 break-words">
+                      <div className="prose prose-sm md:prose-base max-w-none prose-p:leading-relaxed prose-a:text-[#004080] prose-a:no-underline hover:prose-a:underline prose-table:w-full prose-th:bg-gray-50 prose-th:px-3 prose-th:py-2 prose-td:px-3 prose-td:py-2 prose-td:border-t prose-td:border-gray-100 break-words overflow-x-auto">
                         <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{message.content}</ReactMarkdown>
                       </div>
                     ) : (
