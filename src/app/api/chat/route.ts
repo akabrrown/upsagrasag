@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import * as cheerio from 'cheerio';
 import { createClient } from '@supabase/supabase-js';
 import { upsaKnowledge } from './knowledge';
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -47,6 +48,40 @@ export async function POST(req: NextRequest) {
         }
       } catch (ragError) {
         console.error('RAG Error (continuing without context):', ragError);
+      }
+    }
+
+    // Custom Web Scraper Logic
+    if (latestUserMessage) {
+      const urlRegex = /(https?:\/\/[^\s]+)/g;
+      const urls = latestUserMessage.match(urlRegex) || [];
+      
+      for (const url of urls) {
+        try {
+          // Add a short timeout to prevent hanging the chat
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 3000);
+          
+          const pageRes = await fetch(url, { signal: controller.signal });
+          clearTimeout(timeoutId);
+          
+          if (pageRes.ok) {
+            const html = await pageRes.text();
+            const $ = cheerio.load(html);
+            
+            // Remove unnecessary elements
+            $('script, style, nav, footer, header, iframe, noscript').remove();
+            
+            // Extract text and clean it
+            let text = $('body').text().replace(/\s+/g, ' ').trim();
+            // Truncate to roughly 2000 characters to prevent blowing up the context window
+            if (text.length > 2000) text = text.substring(0, 2000) + '...';
+            
+            contextText += `\n\n--- SCRAPED CONTENT FROM URL (${url}) ---\n${text}\n----------------------------------\n`;
+          }
+        } catch (scrapeError) {
+          console.error(`Failed to scrape URL ${url}:`, scrapeError);
+        }
       }
     }
 
