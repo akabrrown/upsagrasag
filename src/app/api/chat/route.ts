@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { upsaKnowledge } from './knowledge';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const runtime = 'nodejs';
@@ -57,10 +58,13 @@ export async function POST(req: NextRequest) {
 
     // Build the system prompt
     let systemContent = 'You are the UPSA GRASAG Virtual Assistant, a helpful virtual assistant for the University of Professional Studies, Accra (UPSA).';
-    systemContent += '\nYou should prioritize answering questions based on the provided context. If the provided context does not contain the answer, you are allowed to use your general knowledge about UPSA to help the user. However, for highly specific or critical information (like exact fees, dates, or official policies) that you are unsure of, advise the user to verify on the official website (https://upsa.edu.gh/).';
+    systemContent += '\nYou must use the knowledge base provided below to answer user queries. Do NOT invent, guess, or hallucinate information about UPSA that is not explicitly in the knowledge base. If the answer is not in the knowledge base, politely inform the user that you do not have that specific information and direct them to https://upsa.edu.gh.\n\n';
     
+    // Always inject the verified static knowledge
+    systemContent += `--- VERIFIED UPSA KNOWLEDGE BASE ---\n${upsaKnowledge}\n----------------------------------\n\n`;
+
     if (contextText) {
-      systemContent += `\n\n--- CONTEXT FROM UPSA WEBSITE ---\n${contextText}\n----------------------------------`;
+      systemContent += `--- ADDITIONAL DATABASE CONTEXT ---\n${contextText}\n----------------------------------`;
     }
 
     const useGemini = false; // Switched to Groq per user request
