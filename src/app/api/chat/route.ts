@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
 
     // Build the system prompt
     let systemContent = 'You are the UPSA GRASAG Virtual Assistant, a helpful virtual assistant for the University of Professional Studies, Accra (UPSA).';
-    systemContent += '\nYou must fetch all information strictly from the University of Professional Studies, Accra official website (https://upsa.edu.gh/). If you are unable to verify the answer from upsa.edu.gh or the provided context below, politely decline to answer and direct the user to visit https://upsa.edu.gh.';
+    systemContent += '\nYou should prioritize answering questions based on the provided context. If the provided context does not contain the answer, you are allowed to use your general knowledge about UPSA to help the user. However, for highly specific or critical information (like exact fees, dates, or official policies) that you are unsure of, advise the user to verify on the official website (https://upsa.edu.gh/).';
     
     if (contextText) {
       systemContent += `\n\n--- CONTEXT FROM UPSA WEBSITE ---\n${contextText}\n----------------------------------`;
