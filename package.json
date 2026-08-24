@@ -36,6 +36,7 @@
     "next-auth": "^4.24.14",
     "next-axiom": "^1.10.0",
     "next-connect": "^1.0.0",
+    "openai": "^7.5.0",
     "radix-ui": "^1.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
