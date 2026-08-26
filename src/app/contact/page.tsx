@@ -37,14 +37,15 @@ export default function ContactPage() {
     const fetchRoleOptions = async () => {
       try {
         const { data, error } = await supabaseClient
-          .from('executives')
-          .select('title, name, email')
-          .not('email', 'is', null)
-          .order('id', { ascending: true });
+          .from('leadership')
+          .select('role, name, contact_info')
+          .eq('type', 'executive')
+          .order('display_order', { ascending: true });
         if (!error && data) {
           const unique = data.reduce<{ role: string; name: string; email: string }[]>((acc, cur) => {
-            if (cur.email && !acc.find(r => r.role === cur.title)) {
-              acc.push({ role: cur.title, name: cur.name, email: cur.email });
+            const email = cur.contact_info?.email;
+            if (email && !acc.find(r => r.role === cur.role)) {
+              acc.push({ role: cur.role, name: cur.name, email });
             }
             return acc;
           }, []);
