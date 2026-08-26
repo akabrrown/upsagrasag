@@ -8,7 +8,7 @@ export default function CalendarTabs({ events }: { events: any[] }) {
   const [studentType, setStudentType] = useState("Continuing Students");
 
   const filteredEvents = events.filter(e => 
-    e.program_type === programTab && e.student_type === studentType
+    e.program_type === programTab && (e.student_type === studentType || e.student_type === 'All Students')
   );
 
   const semesters = ["First Semester", "Second Semester", "Public Holidays"];
@@ -79,7 +79,7 @@ export default function CalendarTabs({ events }: { events: any[] }) {
                         <th className="px-6 py-4 w-1/2">Date</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-gray-100 hidden md:table-row-group">
                       {semesterEvents.map((ev) => (
                         <tr key={ev.id} className="hover:bg-blue-50/30 transition-colors group">
                           <td className="px-6 py-5">
@@ -105,6 +105,27 @@ export default function CalendarTabs({ events }: { events: any[] }) {
                       ))}
                     </tbody>
                   </table>
+                  
+                  {/* Mobile layout (Cards) */}
+                  <div className="md:hidden divide-y divide-gray-100">
+                    {semesterEvents.map((ev) => (
+                      <div key={ev.id} className="p-5 hover:bg-blue-50/30 transition-colors">
+                        <div className="font-semibold text-gray-900 text-base mb-3 leading-snug">{ev.activity}</div>
+                        <div className="flex flex-col gap-2.5">
+                          <div className="flex items-start gap-2 text-sm text-gray-600 font-medium leading-tight">
+                            <CalendarIcon className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+                            <span>{ev.date_description}</span>
+                          </div>
+                          {ev.duration_weeks && (
+                            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 text-gray-700 text-xs font-medium w-fit border border-gray-200/60">
+                              <Clock className="w-3.5 h-3.5" />
+                              {ev.duration_weeks} week{ev.duration_weeks !== '1' ? 's' : ''}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
