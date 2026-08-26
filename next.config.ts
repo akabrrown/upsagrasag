@@ -9,10 +9,10 @@ const cspHeader = `
     object-src 'none';
     base-uri 'self';
     form-action 'self';
-    frame-src 'self' https://vercel.live;
+    frame-src 'self' https://vercel.live https://maps.google.com https://www.google.com;
     frame-ancestors 'none';
     upgrade-insecure-requests;
-    connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vercel.live wss://ws-us3.pusher.com https://api.cloudinary.com;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co https://vercel.live wss://ws-us3.pusher.com https://api.cloudinary.com https://translate.googleapis.com;
     media-src 'self' https://res.cloudinary.com;
 `.replace(/\n/g, '');
 
