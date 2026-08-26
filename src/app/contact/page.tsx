@@ -15,7 +15,7 @@ export default function ContactPage() {
   const [successMsg, setSuccessMsg] = useState('');
   const [contactData, setContactData] = useState<any>(null);
   const [selectedRole, setSelectedRole] = useState('');
-  const [roleOptions, setRoleOptions] = useState<{ role: string; email: string }[]>([]);
+  const [roleOptions, setRoleOptions] = useState<{ role: string; name: string; email: string }[]>([]);
 
   useEffect(() => {
     const fetchContactData = async () => {
@@ -38,13 +38,13 @@ export default function ContactPage() {
       try {
         const { data, error } = await supabaseClient
           .from('executives')
-          .select('title, email')
+          .select('title, name, email')
           .not('email', 'is', null)
           .order('id', { ascending: true });
         if (!error && data) {
-          const unique = data.reduce<{ role: string; email: string }[]>((acc, cur) => {
+          const unique = data.reduce<{ role: string; name: string; email: string }[]>((acc, cur) => {
             if (cur.email && !acc.find(r => r.role === cur.title)) {
-              acc.push({ role: cur.title, email: cur.email });
+              acc.push({ role: cur.title, name: cur.name, email: cur.email });
             }
             return acc;
           }, []);
@@ -252,15 +252,17 @@ export default function ContactPage() {
               {/* Role Dropdown */}
               {roleOptions.length > 0 && (
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-semibold text-primary">Send To (Role)</label>
+                  <label className="text-xs font-semibold text-primary">Send To</label>
                   <select
                     value={selectedRole}
                     onChange={(e) => setSelectedRole(e.target.value)}
                     className="w-full rounded-xl border border-neutral-200 px-4 py-3 text-sm focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all bg-neutral-50/50 appearance-none"
                   >
-                    <option value="">General Inquiry (President)</option>
+                    <option value="">General Inquiry</option>
                     {roleOptions.map((opt) => (
-                      <option key={opt.role} value={opt.role}>{opt.role}</option>
+                      <option key={opt.role} value={opt.role}>
+                        {opt.name} ({opt.role})
+                      </option>
                     ))}
                   </select>
                 </div>
