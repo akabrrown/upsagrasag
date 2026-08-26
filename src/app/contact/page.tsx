@@ -38,13 +38,13 @@ export default function ContactPage() {
       try {
         const { data, error } = await supabaseClient
           .from('executives')
-          .select('role, email')
+          .select('title, email')
           .not('email', 'is', null)
           .order('id', { ascending: true });
         if (!error && data) {
           const unique = data.reduce<{ role: string; email: string }[]>((acc, cur) => {
-            if (cur.email && !acc.find(r => r.role === cur.role)) {
-              acc.push({ role: cur.role, email: cur.email });
+            if (cur.email && !acc.find(r => r.role === cur.title)) {
+              acc.push({ role: cur.title, email: cur.email });
             }
             return acc;
           }, []);
@@ -182,7 +182,7 @@ export default function ContactPage() {
           <div className="bg-white rounded-3xl p-8 lg:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100 relative overflow-hidden h-full">
             {/* Decorative icon top right */}
             <div className="absolute top-6 right-6 opacity-20 hidden sm:block">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z" /><path d="M18 9h2a2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1" /></svg>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z" /><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1" /></svg>
             </div>
             <h2 className="text-xl font-bold text-accent flex items-center gap-2 mb-6">
               <MessageSquare className="h-5 w-5 text-accent" /> Send an Email Message
