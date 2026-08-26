@@ -3,7 +3,7 @@ import { academicCalendarService } from '@/lib/supabase/admin';
 
 export async function GET(req: Request) {
   try {
-    const data = await academicCalendarService.list('event_date', true);
+    const data = await academicCalendarService.list('sort_order', true);
     return NextResponse.json(data);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

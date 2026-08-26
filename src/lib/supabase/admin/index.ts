@@ -643,7 +643,7 @@ export class AdminUserCrudService extends AdminCrudService<AdminUser> {
 export const adminUserService = new AdminUserCrudService();
 export const presidentService = new AdminCrudService<President>('homepage_president');
 
-export const academicCalendarService = new AdminCrudService<AcademicCalendarRecord>('academic_calendar');
+export const academicCalendarService = new AdminCrudService<any>('academic_calendar_events');
 export const partnerService = new AdminCrudService<Partner>('partners');
 export const constitutionService = new AdminCrudService<ConstitutionFile>('constitution_files');
 class LeadershipCrudService extends AdminCrudService<Leadership> {
