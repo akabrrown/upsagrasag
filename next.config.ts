@@ -4,7 +4,7 @@ const cspHeader = `
     default-src 'self' https://vercel.live;
     script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com https://www.gstatic.com;
     style-src 'self' 'unsafe-inline' https://translate.googleapis.com https://www.gstatic.com https://vercel.live;
-    img-src 'self' blob: data: https://images.unsplash.com https://cdn.simpleicons.org https://res.cloudinary.com https://translate.google.com https://translate.googleapis.com https://fonts.gstatic.com https://www.gstatic.com https://www.google.com https://vercel.live https://vercel.com;
+    img-src 'self' blob: data: https://images.unsplash.com https://cdn.simpleicons.org https://res.cloudinary.com https://img.youtube.com https://translate.google.com https://translate.googleapis.com https://fonts.gstatic.com https://www.gstatic.com https://www.google.com https://vercel.live https://vercel.com;
     font-src 'self' https://db.onlinewebfonts.com https://vercel.live https://assets.vercel.com;
     object-src 'none';
     base-uri 'self';
@@ -78,6 +78,11 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "res.cloudinary.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "img.youtube.com",
         pathname: "/**",
       },
     ],
