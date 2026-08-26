@@ -262,7 +262,7 @@ export default function ContactPage() {
                     <option value="">General Inquiry</option>
                     {roleOptions.map((opt) => (
                       <option key={opt.role} value={opt.role}>
-                        {opt.name} ({opt.role})
+                        {opt.role}
                       </option>
                     ))}
                   </select>
