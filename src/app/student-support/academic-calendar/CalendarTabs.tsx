@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Calendar as CalendarIcon, Clock, ChevronRight } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, ChevronRight, Download } from 'lucide-react';
 
 export default function CalendarTabs({ events }: { events: any[] }) {
   const [programTab, setProgramTab] = useState("Master's Degree");
@@ -51,6 +51,17 @@ export default function CalendarTabs({ events }: { events: any[] }) {
               {type}
             </button>
           ))}
+        </div>
+
+        {/* Download PDF Button */}
+        <div className="w-full md:w-auto">
+          <button
+            onClick={() => window.print()}
+            className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold text-white bg-[#2563eb] hover:bg-blue-700 transition-colors shadow-sm shadow-blue-500/30"
+          >
+            <Download className="w-4 h-4" />
+            Download PDF
+          </button>
         </div>
       </div>
 
