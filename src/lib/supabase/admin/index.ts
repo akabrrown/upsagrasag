@@ -1,6 +1,7 @@
 import { createServerSupabaseClient } from '../server';
 import { createClient } from '@supabase/supabase-js';
 import { AcademicCalendarRecord } from '@/types/admin';
+import { sendPushNotificationToAll } from '@/lib/notifications';
 
 // Dedicated admin client that runs with service role privileges, bypassing RLS.
 // This is safe because all admin API routes are pre-validated using requireAdmin().
@@ -118,6 +119,16 @@ export class AdminCrudService<T extends { id?: string | number }> {
       console.error(`[AdminCrudService create ${this.tableName}] error:`, error);
       throw new Error(error.message);
     }
+    
+    // Check for push notification flag in the raw item (before it was filtered)
+    if ((item as any)._send_notification) {
+      const title = (item as any).title || (item as any).name || 'New Item';
+      const formattedTableName = this.tableName.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      
+      // Fire and forget so we don't block the request
+      sendPushNotificationToAll(`New ${formattedTableName} Added: ${title}`, 'Click to view the latest updates on the GRASAG-UPSA portal.');
+    }
+
     return data as T;
   }
 
