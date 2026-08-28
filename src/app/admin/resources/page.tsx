@@ -282,7 +282,6 @@ export default function AdminResourcesPage() {
                 <p className="text-xs text-gray-500 mt-2">Link to an external website, Google Drive, or Dropbox file.</p>
               </div>
             </div>
-            </div>
           </div>
           
           {view === 'add' && (
