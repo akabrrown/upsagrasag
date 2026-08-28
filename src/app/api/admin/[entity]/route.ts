@@ -51,6 +51,24 @@ export async function POST(
     const validatedData = schema.parse(body);
     const data = await service.create(validatedData);
     revalidatePath('/', 'layout');
+    
+    // Check if push notification was requested
+    if (body._send_notification) {
+      const title = `New ${entity.replace('_', ' ')}`;
+      const message = body.title || body.name || `A new ${entity.replace('_', ' ')} has been posted.`;
+      
+      // Determine URL based on entity
+      let url = '/';
+      if (entity === 'news_updates') url = `/news-updates/${data[0]?.id || ''}`;
+      else if (entity === 'opportunities') url = `/opportunities`;
+      else if (entity === 'resources') url = `/resources`;
+      
+      // Send notification asynchronously
+      import('@/lib/notifications').then(({ sendPushNotificationToAll }) => {
+        sendPushNotificationToAll(title, message, url);
+      }).catch(err => console.error("Failed to load notifications module", err));
+    }
+    
     return NextResponse.json(data, { status: 201 });
   } catch (error: any) {
     if (error instanceof ZodError) {

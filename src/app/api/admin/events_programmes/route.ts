@@ -35,6 +35,13 @@ export async function POST(request: Request) {
   if (!parse.success) return NextResponse.json({ error: parse.error.format() }, { status: 400 });
   const { data, error } = await supabase.from('events_programmes').insert([parse.data]).select();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  
+  if (body._send_notification) {
+    import('@/lib/notifications').then(({ sendPushNotificationToAll }) => {
+      sendPushNotificationToAll('New Event or Programme', body.title || 'A new event has been posted.', `/events/${data?.[0]?.id || ''}`);
+    }).catch(err => console.error(err));
+  }
+  
   return NextResponse.json(data ? data[0] : null);
 }
 

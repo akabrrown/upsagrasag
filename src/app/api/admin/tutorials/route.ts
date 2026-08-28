@@ -28,6 +28,13 @@ export async function POST(request: NextRequest) {
   if (!validation.success) return NextResponse.json({ error: validation.error.message }, { status: 400 });
   const { data, error } = await supabaseAdmin.from('tutorials').insert(validation.data).select();
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  
+  if (body._send_notification) {
+    import('@/lib/notifications').then(({ sendPushNotificationToAll }) => {
+      sendPushNotificationToAll('New Tutorial', body.title || 'A new tutorial has been posted.', '/academics/tutorials');
+    }).catch(err => console.error(err));
+  }
+  
   return NextResponse.json(data);
 }
 
