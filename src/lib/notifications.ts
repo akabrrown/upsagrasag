@@ -4,7 +4,7 @@ import { supabaseAdminClient } from '@/lib/supabase/admin/index';
 // Initialize web-push safely (to avoid crashing during build when env vars might be missing)
 if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
   webpush.setVapidDetails(
-    'mailto:grasagpresident@upsamail.edu.gh',
+    'mailto:Grasagupsa2026@gmail.com',
     process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
     process.env.VAPID_PRIVATE_KEY
   );
