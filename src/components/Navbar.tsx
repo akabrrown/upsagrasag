@@ -22,14 +22,18 @@ import {
   ShoppingBag,
   Scale,
   Globe,
-  Image as LucideImage
+  Image as LucideImage,
+  Search
 } from 'lucide-react';
+
+import GlobalSearch from './GlobalSearch';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [hoveredDropdown, setHoveredDropdown] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const pathname = usePathname();
   const isHomePage = pathname === '/';
 
@@ -107,7 +111,7 @@ export default function Navbar() {
           { name: 'Academic Calendar', href: '/student-support/academic-calendar', icon: Calendar }
         ] },
     { name: 'Events & Programmes', href: '/events', icon: Calendar },
-    { name: 'Opportunities', href: '/opportunities', icon: Bot },
+    // { name: 'Opportunities', href: '/opportunities', icon: Bot }, // Hidden per user request until AI is configured
     { name: 'News & Updates', href: '/news-updates', icon: Info },
   ];
 
@@ -119,6 +123,8 @@ export default function Navbar() {
 
   return (
     <>
+      <GlobalSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+
       {/* Page Blur Overlay Backdrop (for desktop Mega Menu hover) */}
       <div 
         className={`hidden lg:block fixed inset-0 bg-black/30 backdrop-blur-md z-40 transition-all duration-300 ${
@@ -132,10 +138,22 @@ export default function Navbar() {
       <header className={headerClass} onMouseLeave={() => setHoveredDropdown(null)}>
         {/* Top Bar */}
         <div className="hidden lg:flex h-10 w-full items-center justify-between px-8 border-b border-white/5 text-xs text-neutral-300 font-medium">
-          {/* Left Side: Google Translate Select dropdown */}
-          <div className="flex items-center gap-1.5 hover:text-[#B8860B] transition-colors text-neutral-300">
-            <Globe className="h-3.5 w-3.5 text-[#B8860B] flex-shrink-0" />
-            <div id="google_translate_element" className="google-translate-container"></div>
+          {/* Left Side: Google Translate Select dropdown & Search */}
+          <div className="flex items-center gap-4 text-neutral-300">
+            <button 
+              onClick={() => setIsSearchOpen(true)}
+              className="flex items-center gap-1.5 hover:text-[#B8860B] transition-colors bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-full"
+            >
+              <Search className="h-3.5 w-3.5 text-[#B8860B]" />
+              <span>Search</span>
+              <kbd className="hidden lg:inline-flex items-center gap-1 bg-white/10 px-1.5 rounded text-[10px] font-sans ml-2 text-neutral-400">
+                <span className="text-xs">⌘</span>K
+              </kbd>
+            </button>
+            <div className="flex items-center gap-1.5 hover:text-[#B8860B] transition-colors border-l border-white/10 pl-4">
+              <Globe className="h-3.5 w-3.5 text-[#B8860B] flex-shrink-0" />
+              <div id="google_translate_element" className="google-translate-container"></div>
+            </div>
           </div>
 
           {/* Right Side: Contact & Socials */}
@@ -215,8 +233,14 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Mobile menu button */}
-          <div className="flex lg:hidden items-center gap-4">
+          {/* Mobile menu buttons */}
+          <div className="flex lg:hidden items-center gap-2">
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className="rounded-lg p-2.5 text-neutral-200 hover:bg-white/5 focus:outline-none"
+            >
+              <Search className="h-5 w-5" />
+            </button>
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="rounded-lg p-2.5 text-neutral-200 hover:bg-white/5 focus:outline-none"
