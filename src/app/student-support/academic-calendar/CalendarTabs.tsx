@@ -101,7 +101,7 @@ export default function CalendarTabs({ events }: { events: any[] }) {
 
               <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-sm border border-white overflow-hidden ring-1 ring-gray-100 print:shadow-none print:ring-0 print:border-none print:rounded-none">
                 <div className="overflow-x-auto print:overflow-visible">
-                  <table className="w-full text-left border-collapse min-w-[600px] print:min-w-full">
+                  <table className="hidden md:table print:table w-full text-left border-collapse min-w-[600px] print:min-w-full">
                     <thead>
                       <tr className="bg-gray-50/50 text-xs font-semibold text-gray-500 uppercase tracking-wider print:bg-[#003366] print:text-white print:border print:border-[#003366]">
                         <th className="px-6 py-4 w-1/3 print:py-3 print:font-bold">Activity</th>
