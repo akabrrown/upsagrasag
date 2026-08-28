@@ -57,12 +57,20 @@ export default function CalendarTabs({ events }: { events: any[] }) {
         <div className="w-full md:w-auto">
           <button
             onClick={() => window.print()}
-            className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold text-white bg-[#2563eb] hover:bg-blue-700 transition-colors shadow-sm shadow-blue-500/30"
+            className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold text-white bg-[#2563eb] hover:bg-blue-700 transition-colors shadow-sm shadow-blue-500/30 print:hidden"
           >
             <Download className="w-4 h-4" />
             Download PDF
           </button>
         </div>
+      </div>
+
+      {/* Print-only Header */}
+      <div className="hidden print:block text-center mb-10 pt-4">
+        <h1 className="text-4xl font-black uppercase text-[#003366]">GRASAG-UPSA</h1>
+        <h2 className="text-2xl font-bold text-[#B8860B] mt-2">{programTab} Academic Calendar</h2>
+        <p className="text-[#003366] font-semibold mt-1 text-lg">{studentType} - 2026/2027 Academic Year</p>
+        <div className="h-1 w-full bg-gradient-to-r from-[#003366] via-[#B8860B] to-[#003366] mt-4 opacity-80"></div>
       </div>
 
       {/* Calendar Content */}
@@ -73,42 +81,42 @@ export default function CalendarTabs({ events }: { events: any[] }) {
 
           return (
             <div key={semester} className="space-y-4">
-              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                <span className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
-                  <CalendarIcon className="w-4 h-4" />
+              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2 print:text-[#003366] print:border-b-2 print:border-[#B8860B] print:pb-2 print:mb-2">
+                <span className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center print:bg-transparent print:text-[#B8860B]">
+                  <CalendarIcon className="w-4 h-4 print:w-6 print:h-6" />
                 </span>
                 {semester}
               </h2>
 
-              <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-sm border border-white overflow-hidden ring-1 ring-gray-100">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse min-w-[600px]">
+              <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-sm border border-white overflow-hidden ring-1 ring-gray-100 print:shadow-none print:ring-0 print:border-none print:rounded-none">
+                <div className="overflow-x-auto print:overflow-visible">
+                  <table className="w-full text-left border-collapse min-w-[600px] print:min-w-full">
                     <thead>
-                      <tr className="bg-gray-50/50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                        <th className="px-6 py-4 w-1/3">Activity</th>
-                        <th className="px-6 py-4 w-1/6">Duration</th>
-                        <th className="px-6 py-4 w-1/2">Date</th>
+                      <tr className="bg-gray-50/50 text-xs font-semibold text-gray-500 uppercase tracking-wider print:bg-[#003366] print:text-white print:border print:border-[#003366]">
+                        <th className="px-6 py-4 w-1/3 print:py-3 print:font-bold">Activity</th>
+                        <th className="px-6 py-4 w-1/6 print:py-3 print:font-bold">Duration</th>
+                        <th className="px-6 py-4 w-1/2 print:py-3 print:font-bold">Date</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100 hidden md:table-row-group">
-                      {semesterEvents.map((ev) => (
-                        <tr key={ev.id} className="hover:bg-blue-50/30 transition-colors group">
-                          <td className="px-6 py-5">
-                            <div className="font-semibold text-gray-900">{ev.activity}</div>
+                    <tbody className="divide-y divide-gray-100 hidden md:table-row-group print:table-row-group print:divide-y-0">
+                      {semesterEvents.map((ev, index) => (
+                        <tr key={ev.id} className={`hover:bg-blue-50/30 transition-colors group print:border print:border-gray-200 ${index % 2 === 0 ? 'print:bg-gray-50/50' : 'print:bg-white'}`}>
+                          <td className="px-6 py-5 print:py-3 print:border-r print:border-gray-200">
+                            <div className="font-semibold text-gray-900 print:text-[#003366] print:text-sm">{ev.activity}</div>
                           </td>
-                          <td className="px-6 py-5">
+                          <td className="px-6 py-5 print:py-3 print:border-r print:border-gray-200">
                             {ev.duration_weeks ? (
-                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 text-gray-700 text-xs font-medium">
-                                <Clock className="w-3.5 h-3.5" />
+                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 text-gray-700 text-xs font-medium print:bg-transparent print:px-0 print:text-gray-800">
+                                <Clock className="w-3.5 h-3.5 print:hidden" />
                                 {ev.duration_weeks} week{ev.duration_weeks !== '1' ? 's' : ''}
                               </div>
                             ) : (
-                              <span className="text-gray-400">-</span>
+                              <span className="text-gray-400 print:text-gray-800">-</span>
                             )}
                           </td>
-                          <td className="px-6 py-5">
-                            <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
-                              <ChevronRight className="w-4 h-4 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          <td className="px-6 py-5 print:py-3">
+                            <div className="flex items-center gap-2 text-sm text-gray-600 font-medium print:text-gray-900">
+                              <ChevronRight className="w-4 h-4 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity print:hidden" />
                               {ev.date_description}
                             </div>
                           </td>
@@ -118,7 +126,7 @@ export default function CalendarTabs({ events }: { events: any[] }) {
                   </table>
                   
                   {/* Mobile layout (Cards) */}
-                  <div className="md:hidden divide-y divide-gray-100">
+                  <div className="md:hidden print:hidden divide-y divide-gray-100">
                     {semesterEvents.map((ev) => (
                       <div key={ev.id} className="p-5 hover:bg-blue-50/30 transition-colors">
                         <div className="font-semibold text-gray-900 text-base mb-3 leading-snug">{ev.activity}</div>
