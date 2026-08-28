@@ -668,7 +668,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Floating Chatbot Indicator */}
+      {/* Floating Chatbot Indicator (Hidden until configured) */}
+      {/* 
       <div className="fixed bottom-6 right-6 z-40">
         <button
           onClick={() => setIsChatOpen(true)}
@@ -677,8 +678,10 @@ export default function HomePage() {
           <Bot className="h-6 w-6" />
         </button>
       </div>
-      {/* Chat Modal */}
-      <ChatModal open={isChatOpen} onClose={() => setIsChatOpen(false)} />
+      */}
+      
+      {/* Chat Modal (Hidden until configured) */}
+      {/* <ChatModal open={isChatOpen} onClose={() => setIsChatOpen(false)} /> */}
     </div>
   );
 }
