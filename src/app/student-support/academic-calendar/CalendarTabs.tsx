@@ -13,6 +13,17 @@ export default function CalendarTabs({ events }: { events: any[] }) {
 
   const semesters = ["First Semester", "Second Semester", "Public Holidays"];
 
+  const handlePrint = () => {
+    const originalTitle = document.title;
+    // Set a clean, descriptive title for the PDF filename
+    document.title = `GRASAG_UPSA_${programTab.replace(/[^a-zA-Z0-9]/g, '')}_Academic_Calendar`;
+    window.print();
+    // Restore the original title after the print dialog opens
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 500);
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       
@@ -56,7 +67,7 @@ export default function CalendarTabs({ events }: { events: any[] }) {
         {/* Download PDF Button */}
         <div className="w-full md:w-auto">
           <button
-            onClick={() => window.print()}
+            onClick={handlePrint}
             className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold text-white bg-[#2563eb] hover:bg-blue-700 transition-colors shadow-sm shadow-blue-500/30 print:hidden"
           >
             <Download className="w-4 h-4" />
