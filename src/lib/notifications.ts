@@ -1,12 +1,16 @@
 import webpush from 'web-push';
 import { supabaseAdminClient } from '@/lib/supabase/admin/index';
 
-// Initialize web-push
-webpush.setVapidDetails(
-  'mailto:grasagpresident@upsamail.edu.gh',
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '',
-  process.env.VAPID_PRIVATE_KEY || ''
-);
+// Initialize web-push safely (to avoid crashing during build when env vars might be missing)
+if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+  webpush.setVapidDetails(
+    'mailto:grasagpresident@upsamail.edu.gh',
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+    process.env.VAPID_PRIVATE_KEY
+  );
+} else {
+  console.warn('VAPID keys not set, skipping web-push initialization during build.');
+}
 
 export async function sendPushNotificationToAll(title: string, body: string, url: string = '/') {
   if (!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
