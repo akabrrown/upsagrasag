@@ -23,15 +23,15 @@ export default function AdminResourcesPage() {
   const [activeTab, setActiveTab] = useState('All Resources');
   const [selectedRecord, setSelectedRecord] = useState<Resource | null>(null);
 
-  const { register, handleSubmit, reset, setValue, formState: { errors, isSubmitting } } = useForm<Resource>({
+  const { register, handleSubmit, reset, setValue, formState: { errors, isSubmitting } } = useForm<Resource & { _send_notification?: boolean }>({
     resolver: zodResolver(resourceSchema),
-    defaultValues: { title: '', description: '', file_url: '', link_url: '' }
+    defaultValues: { title: '', description: '', file_url: '', link_url: '', _send_notification: true }
   });
 
   // --- Handlers ---
   
   const handleOpenAdd = () => {
-    reset({ title: '', description: '', file_url: '', link_url: '' });
+    reset({ title: '', description: '', file_url: '', link_url: '', _send_notification: true });
     setSelectedRecord(null);
     setView('add');
   };
@@ -282,7 +282,22 @@ export default function AdminResourcesPage() {
                 <p className="text-xs text-gray-500 mt-2">Link to an external website, Google Drive, or Dropbox file.</p>
               </div>
             </div>
+            </div>
           </div>
+          
+          {view === 'add' && (
+            <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
+              <input 
+                type="checkbox" 
+                id="_send_notification" 
+                {...register('_send_notification' as any)} 
+                className="w-4 h-4 text-[#2563eb] border-gray-300 rounded focus:ring-[#2563eb]"
+              />
+              <label htmlFor="_send_notification" className="text-sm text-gray-700 font-medium">
+                Send Push Notification to all users
+              </label>
+            </div>
+          )}
         </div>
       </form>
     </div>

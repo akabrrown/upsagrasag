@@ -27,9 +27,9 @@ export default function AdminNewsPage() {
   const [activeTab, setActiveTab] = useState('All Articles');
   const [selectedArticle, setSelectedArticle] = useState<NewsUpdate | null>(null);
 
-  const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<NewsUpdate>({
+  const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<NewsUpdate & { _send_notification?: boolean }>({
     resolver: zodResolver(newsUpdateSchema),
-    defaultValues: { title: '', content: '', category: 'news', image_url: '', published_at: '' }
+    defaultValues: { title: '', content: '', category: 'news', image_url: '', published_at: '', _send_notification: true }
   });
 
   const imageUrl = useWatch({ control, name: 'image_url' });
@@ -37,7 +37,7 @@ export default function AdminNewsPage() {
   // --- Handlers ---
   
   const handleOpenAdd = () => {
-    reset({ title: '', content: '', category: 'news', image_url: '', published_at: new Date().toISOString() });
+    reset({ title: '', content: '', category: 'news', image_url: '', published_at: new Date().toISOString(), _send_notification: true });
     setSelectedArticle(null);
     setView('add');
   };
@@ -360,6 +360,20 @@ export default function AdminNewsPage() {
                 <Calendar className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
               </div>
             </div>
+
+            {view === 'add' && (
+              <div className="flex items-center gap-3 pt-2">
+                <input 
+                  type="checkbox" 
+                  id="_send_notification" 
+                  {...register('_send_notification' as any)} 
+                  className="w-4 h-4 text-[#2563eb] border-gray-300 rounded focus:ring-[#2563eb]"
+                />
+                <label htmlFor="_send_notification" className="text-sm text-gray-700 font-medium">
+                  Send Push Notification to all users
+                </label>
+              </div>
+            )}
           </div>
         </div>
       </form>

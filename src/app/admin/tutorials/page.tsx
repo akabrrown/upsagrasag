@@ -23,15 +23,15 @@ export default function AdminTutorialsPage() {
   const [activeTab, setActiveTab] = useState('All Tutorials');
   const [selectedTutorial, setSelectedTutorial] = useState<Tutorial | null>(null);
 
-  const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<Tutorial>({
+  const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<Tutorial & { _send_notification?: boolean }>({
     resolver: zodResolver(tutorialSchema),
-    defaultValues: { title: '', description: '', video_url: '' }
+    defaultValues: { title: '', description: '', video_url: '', _send_notification: true }
   });
 
   const videoUrl = useWatch<Tutorial>({ control, name: 'video_url' });
 
   const handleOpenAdd = () => {
-    reset({ title: '', description: '', video_url: '' });
+    reset({ title: '', description: '', video_url: '', _send_notification: true });
     setSelectedTutorial(null);
     setView('add');
   };
@@ -289,6 +289,20 @@ export default function AdminTutorialsPage() {
                 </div>
               )}
             </div>
+            
+            {view === 'add' && (
+              <div className="flex items-center gap-3 pt-6 mt-4 border-t border-gray-100">
+                <input 
+                  type="checkbox" 
+                  id="_send_notification" 
+                  {...register('_send_notification' as any)} 
+                  className="w-4 h-4 text-[#2563eb] border-gray-300 rounded focus:ring-[#2563eb]"
+                />
+                <label htmlFor="_send_notification" className="text-sm text-gray-700 font-medium">
+                  Send Push Notification to all users
+                </label>
+              </div>
+            )}
           </div>
         </div>
       </div>

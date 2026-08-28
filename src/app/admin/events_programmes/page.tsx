@@ -33,13 +33,13 @@ export default function EventsManagement() {
     setValue,
     control,
     formState: { errors, isSubmitting },
-  } = useForm<EventProgramme>({
+  } = useForm<EventProgramme & { _send_notification?: boolean }>({
     resolver: zodResolver(eventProgrammeSchema) as any,
     defaultValues: {
       title: '', slug: '', description: '', start_date: '', start_time: '', end_date: '', end_time: '', location: '', 
       image_url: '', url: '', is_featured: false, type: 'Event', 
       display_on_page: true, theme: '', price: 'Free', discount_code: '', 
-      discount_info: '', registration_deadline: '', speaker: ''
+      discount_info: '', registration_deadline: '', speaker: '', _send_notification: true
     }
   });
 
@@ -52,7 +52,7 @@ export default function EventsManagement() {
       title: '', slug: '', description: '', start_date: '', start_time: '', end_date: '', end_time: '', location: '', 
       image_url: '', url: '', is_featured: false, type: 'Event', 
       display_on_page: true, theme: '', price: 'Free', discount_code: '', 
-      discount_info: '', registration_deadline: '', speaker: '' 
+      discount_info: '', registration_deadline: '', speaker: '', _send_notification: true 
     });
     setSelectedEvent(null);
     setView('add');
@@ -530,6 +530,16 @@ export default function EventsManagement() {
                     <p className="text-xs text-gray-500">Show this event on the main homepage banner slider</p>
                   </div>
                </label>
+               
+               {view === 'add' && (
+                 <label className="flex items-center gap-3 cursor-pointer pt-2 border-t border-gray-100 mt-2">
+                    <input type="checkbox" {...register('_send_notification' as any)} className="w-5 h-5 rounded border-gray-300 text-[#2563eb] focus:ring-[#2563eb]" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">Send Push Notification</p>
+                      <p className="text-xs text-gray-500">Notify all users about this event</p>
+                    </div>
+                 </label>
+               )}
             </div>
           </div>
         </div>

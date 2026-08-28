@@ -25,9 +25,9 @@ export default function AdminOpportunitiesPage() {
   const [activeTab, setActiveTab] = useState('All');
   const [selectedOpp, setSelectedOpp] = useState<Opportunity | null>(null);
 
-  const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<Opportunity>({
+  const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<Opportunity & { _send_notification?: boolean }>({
     resolver: zodResolver(opportunitySchema) as any,
-    defaultValues: { title: '', company: '', type: 'Full-time', category: '', image_url: '', apply_url: '', location: '', deadline: '', description: '' }
+    defaultValues: { title: '', company: '', type: 'Job', category: '', location: '', description: '', image_url: '', apply_url: '', deadline: '', start_date: '', end_date: '', _send_notification: true }
   });
 
   const imageUrl = useWatch({ control, name: 'image_url' });
@@ -35,7 +35,7 @@ export default function AdminOpportunitiesPage() {
   // --- Handlers ---
   
   const handleOpenAdd = () => {
-    reset({ title: '', company: '', type: 'Full-time', category: '', image_url: '', apply_url: '', location: '', deadline: '', description: '' });
+    reset({ title: '', company: '', type: 'Job', category: '', location: '', description: '', image_url: '', apply_url: '', deadline: '', start_date: '', end_date: '', _send_notification: true });
     setSelectedOpp(null);
     setView('add');
   };
@@ -378,6 +378,20 @@ export default function AdminOpportunitiesPage() {
                 </div>
               )}
             </div>
+            
+            {view === 'add' && (
+              <div className="flex items-center gap-3 pt-2">
+                <input 
+                  type="checkbox" 
+                  id="_send_notification" 
+                  {...register('_send_notification' as any)} 
+                  className="w-4 h-4 text-[#2563eb] border-gray-300 rounded focus:ring-[#2563eb]"
+                />
+                <label htmlFor="_send_notification" className="text-sm text-gray-700 font-medium">
+                  Send Push Notification to all users
+                </label>
+              </div>
+            )}
           </div>
         </div>
       </form>
