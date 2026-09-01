@@ -108,7 +108,8 @@ export default function Navbar() {
           { name: 'Resources', href: '/resources', icon: FileText },
           { name: 'Past Questions', href: '/academics/past-questions', icon: FileText },
           { name: 'Tutorials', href: '/academics/tutorials', icon: GraduationCap },
-          { name: 'Academic Calendar', href: '/student-support/academic-calendar', icon: Calendar }
+          { name: 'Academic Calendar', href: '/student-support/academic-calendar', icon: Calendar },
+          { name: 'Academic Timetable', href: '/student-support/academic-timetable', icon: Calendar }
         ] },
     { name: 'Events & Programmes', href: '/events', icon: Calendar },
     // { name: 'Opportunities', href: '/opportunities', icon: Bot }, // Hidden per user request until AI is configured
@@ -428,6 +429,13 @@ export default function Navbar() {
                           Academic Calendar
                         </div>
                         <p className="text-xs text-neutral-500 leading-normal pl-5.5">Keep track of registration, lectures, and exams.</p>
+                      </Link>
+                      <Link href="/student-support/academic-timetable" className="group/item block space-y-1" onClick={() => setHoveredDropdown(null)}>
+                        <div className="font-bold text-sm text-neutral-800 group-hover/item:text-[#B8860B] transition-colors flex items-center gap-1.5">
+                          <Calendar className="h-4 w-4 text-[#B8860B]" />
+                          Academic Timetable
+                        </div>
+                        <p className="text-xs text-neutral-500 leading-normal pl-5.5">View your class schedules and lecture venues.</p>
                       </Link>
                     </div>
                   </div>

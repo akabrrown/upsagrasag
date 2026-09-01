@@ -179,7 +179,8 @@ import type {
   NewsUpdate, 
   PlatformSettings,
   MembershipBenefit,
-  AcademicSupport
+  AcademicSupport,
+  AcademicTimetable
 } from '@/types/admin';
 
 // Custom subclasses to handle database mismatches
@@ -719,6 +720,7 @@ export const pastQuestionService = new PastQuestionCrudService();
 export const tutorialService = new AdminCrudService<Tutorial>('tutorials');
 export const membershipBenefitService = new AdminCrudService<MembershipBenefit>('membership_benefits');
 export const academicSupportService = new AdminCrudService<AcademicSupport>('academic_supports');
+export const academicTimetableService = new AdminCrudService<AcademicTimetable>('academic_timetables');
 /* Custom service for events_programmes to safely handle optional fields */
 class EventProgrammeCrudService extends AdminCrudService<EventProgrammeRecord> {
   constructor() {
@@ -783,6 +785,7 @@ export const serviceMap: Record<string, AdminCrudService<any>> = {
   'events_programmes': eventProgrammeService,
   'membership_benefits': membershipBenefitService,
   'academic_supports': academicSupportService,
+  'academic_timetables': academicTimetableService,
 
   'news_updates': newsUpdateService,
 };
@@ -808,7 +811,8 @@ import {
   eventProgrammeSchema,
   newsUpdateSchema,
   membershipBenefitSchema,
-  academicSupportSchema
+  academicSupportSchema,
+  academicTimetableSchema
 } from '@/types/admin';
 
 export const schemaMap: Record<string, any> = {
@@ -827,6 +831,7 @@ export const schemaMap: Record<string, any> = {
   'events_programmes': eventProgrammeSchema,
   'membership_benefits': membershipBenefitSchema,
   'academic_supports': academicSupportSchema,
+  'academic_timetables': academicTimetableSchema,
 
   'news_updates': newsUpdateSchema,
 };

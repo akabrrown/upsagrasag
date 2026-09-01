@@ -37,7 +37,7 @@ export async function sendPushNotificationToAll(title: string, body: string, url
       title,
       body,
       url,
-      icon: '/icon-192x192.png' // Ensure you have this icon in public/
+      icon: '/favicon.png' // Ensure you have this icon in public/
     });
 
     // 2. Send the push notification to all subscriptions in parallel
@@ -53,8 +53,8 @@ export async function sendPushNotificationToAll(title: string, body: string, url
       try {
         await webpush.sendNotification(pushSubscription, payload);
       } catch (err: any) {
-        // If the subscription is no longer valid (e.g., user revoked permission), remove it
-        if (err.statusCode === 404 || err.statusCode === 410) {
+        // If the subscription is no longer valid (e.g., user revoked permission or wrong VAPID), remove it
+        if (err.statusCode === 404 || err.statusCode === 410 || err.statusCode === 403) {
           await supabaseAdminClient
             .from('push_subscriptions')
             .delete()

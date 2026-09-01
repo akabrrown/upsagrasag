@@ -64,6 +64,7 @@ const navGroups = [
     label: 'Academics',
     links: [
       { name: 'Academic Calendar', href: '/admin/academic-calendar', icon: Calendar },
+      { name: 'Academic Timetables', href: '/admin/academic-timetables', icon: Calendar },
       { name: 'Academic Programmes', href: '/admin/academic-programmes', icon: BookOpen },
       { name: 'Events & Programmes', href: '/admin/events_programmes', icon: CalendarCheck },
       { name: 'Leadership', href: '/admin/leadership', icon: Users },

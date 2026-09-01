@@ -328,3 +328,17 @@ export const academicProgrammeSchema = z.object({
   created_at: z.string().optional(),
 });
 export type AcademicProgramme = z.infer<typeof academicProgrammeSchema>;
+
+export const academicTimetableSchema = z.object({
+  id: z.string().uuid().optional(),
+  session_type: z.enum(['Evening Session', 'Weekend Session', 'Distance Session']),
+  program: z.string().min(1, "Program is required"),
+  level_semester_group: z.string().min(1, "Level/Semester/Group is required"),
+  day: z.string().min(1, "Day is required"),
+  time: z.string().min(1, "Time is required"),
+  subject_lecturer: z.string().min(1, "Subject and Lecturer is required"),
+  venue: z.string().min(1, "Venue/Link is required"),
+  created_at: z.string().optional(),
+  updated_at: z.string().optional()
+});
+export type AcademicTimetable = z.infer<typeof academicTimetableSchema>;
