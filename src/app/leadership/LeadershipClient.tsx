@@ -34,6 +34,10 @@ interface LeadershipClientProps {
   executives: Leader[];
   pastExecutives?: PastExecutive[];
   patrons?: Leader[];
+  stats?: {
+    executivesCount: number;
+    eventsCount: number;
+  };
 }
 
 // Custom Counter Component for animated statistics
@@ -77,13 +81,8 @@ const AnimatedCounter: React.FC<{ target: number; suffix?: string }> = ({ target
   );
 };
 
-export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives, pastExecutives = [], patrons = [] }) => {
-  const [showPresidentModal, setShowPresidentModal] = useState(false);
+export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives, pastExecutives = [], patrons = [], stats }) => {
 
-  // Find President
-  const president = executives.find(
-    (l) => l.role.toLowerCase().includes("president") && !l.role.toLowerCase().includes("vice")
-  ) || executives[0];
 
   // Generate timeline leaders dynamically from past executives
   const timelineLeaders = [...pastExecutives].sort((a, b) => {
@@ -97,152 +96,26 @@ export const LeadershipClient: React.FC<LeadershipClientProps> = ({ executives, 
       <section className="relative overflow-hidden rounded-3xl bg-neutral-50 border border-neutral-200 p-8 sm:p-12 shadow-xl text-center">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 -z-10 h-64 w-full max-w-2xl rounded-full bg-primary/5 blur-[100px]" />
         
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 max-w-2xl mx-auto gap-8">
           <div className="space-y-2">
             <div className="flex items-center justify-center text-primary mb-2">
               <Users className="w-8 h-8" />
             </div>
-            <AnimatedCounter target={12} />
+            <AnimatedCounter target={stats?.executivesCount || 12} />
             <p className="text-xs uppercase tracking-widest text-neutral-600 font-bold">Executive Members</p>
           </div>
           
           <div className="space-y-2">
             <div className="flex items-center justify-center text-primary mb-2">
-              <Award className="w-8 h-8" />
-            </div>
-            <AnimatedCounter target={10} suffix="+" />
-            <p className="text-xs uppercase tracking-widest text-neutral-600 font-bold">Committees</p>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-center text-primary mb-2">
-              <GraduationCap className="w-8 h-8" />
-            </div>
-            <AnimatedCounter target={300} suffix="+" />
-            <p className="text-xs uppercase tracking-widest text-neutral-600 font-bold">Graduate Members</p>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-center text-primary mb-2">
               <Calendar className="w-8 h-8" />
             </div>
-            <AnimatedCounter target={25} />
+            <AnimatedCounter target={stats?.eventsCount || 25} />
             <p className="text-xs uppercase tracking-widest text-neutral-600 font-bold">Events Organised</p>
           </div>
         </div>
       </section>
 
-      {/* 2. Featured President Section */}
-      {president && (
-        <section 
-          onClick={() => setShowPresidentModal(true)}
-          className="relative cursor-pointer overflow-hidden rounded-3xl bg-white border border-neutral-200 shadow-xl flex flex-col md:flex-row min-h-[420px] transition-all duration-300 hover:shadow-2xl hover:border-primary/20"
-        >
-          {/* Left: Grayscale Portrait with exact bleed fit */}
-          <div className="relative w-full md:w-[35%] min-h-[300px] md:min-h-full overflow-hidden bg-neutral-100">
-            <Image 
-              src={optimizeCloudinaryUrl(president.image_url) ?? "/default-avatar.png"} 
-              alt={president.name} 
-              fill
-              className="absolute inset-0 w-full h-full object-cover object-top grayscale transition-transform duration-750 hover:scale-[1.03]"
-            />
-          </div>
 
-          {/* Right: Message Content */}
-          <div className="w-full md:w-[65%] p-8 sm:p-12 flex flex-col justify-center space-y-6 text-left">
-            <div className="space-y-1">
-              <span className="text-xs font-bold uppercase tracking-widest text-primary">
-                Featured Leader
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-neutral-900 tracking-tight leading-tight">
-                {president.name}
-              </h2>
-              <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">
-                {president.role}
-              </p>
-            </div>
-
-            <p className="text-neutral-600 leading-relaxed text-base whitespace-pre-wrap">
-              {president.bio}
-            </p>
-
-            {/* Badges / Tags */}
-            <div className="flex flex-wrap gap-2 pt-2">
-              <span className="px-3 py-1 text-xs font-semibold text-neutral-700 bg-neutral-100 border border-neutral-250/50 rounded-full">
-                Organizational Leadership
-              </span>
-              <span className="px-3 py-1 text-xs font-semibold text-neutral-700 bg-neutral-100 border border-neutral-250/50 rounded-full">
-                Youth Development
-              </span>
-              <span className="px-3 py-1 text-xs font-semibold text-neutral-700 bg-neutral-100 border border-neutral-250/50 rounded-full">
-                Strategic Partnerships
-              </span>
-              <span className="px-3 py-1 text-xs font-semibold text-neutral-700 bg-neutral-100 border border-neutral-250/50 rounded-full">
-                Student Advocacy
-              </span>
-            </div>
-
-            <div className="pt-2">
-              <span className="inline-flex items-center gap-2 text-primary font-bold text-sm hover:underline">
-                <span>View Profile</span>
-                <ArrowRight className="w-4 h-4" />
-              </span>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* President message modal */}
-      {showPresidentModal && president && (
-        <ModalOverlay onClose={() => setShowPresidentModal(false)}>
-          <div className="flex flex-col md:flex-row w-full h-full max-w-4xl bg-white text-neutral-800">
-            <div className="relative w-full md:w-2/5 min-h-[300px] md:min-h-full">
-              <Image src={optimizeCloudinaryUrl(president.image_url) ?? "/default-avatar.png"} alt={president.name} fill className="absolute inset-0 w-full h-full object-cover object-top" />
-              <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/20 to-transparent" />
-              <div className="absolute bottom-6 left-6 right-6">
-                <span className="inline-block rounded-full bg-accent px-3 py-1 text-xs font-bold uppercase tracking-wider text-neutral-950 mb-2">
-                  Executive President
-                </span>
-                <h3 className="text-3xl font-extrabold text-white leading-none">{president.name}</h3>
-              </div>
-            </div>
-
-            <div className="w-full md:w-3/5 p-8 flex flex-col justify-between bg-white overflow-y-auto">
-              <div className="space-y-6">
-                <div>
-                  <h4 className="text-xs uppercase tracking-widest text-primary font-semibold mb-2">President's Biography</h4>
-                  <p className="text-neutral-350 leading-relaxed text-sm md:text-base mb-6 max-w-xl whitespace-pre-wrap">
-                    {president.bio}
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-8 pt-6 border-t border-neutral-250 flex items-center justify-between flex-wrap gap-4">
-                <div className="flex flex-col gap-2">
-                  {president.email && (
-                    <a href={`mailto:${president.email}`} className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-primary transition-colors duration-200">
-                      <Mail className="w-5 h-5 text-primary" />
-                      <span>{president.email}</span>
-                    </a>
-                  )}
-                  {president.phone && (
-                    <a href={`tel:${president.phone}`} className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-primary transition-colors duration-200">
-                      <span className="flex items-center justify-center w-5 h-5 text-primary">📞</span>
-                      <span>{president.phone}</span>
-                    </a>
-                  )}
-                </div>
-                <button
-                  onClick={() => setShowPresidentModal(false)}
-                  className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-sm font-semibold rounded-lg transition-colors duration-200"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </ModalOverlay>
-      )}
 
       {/* 3. Leadership Timeline (Past Leaders — Scroll animation) */}
       {timelineLeaders.length > 0 && (

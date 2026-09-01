@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { supabaseAdminClient } from '@/lib/supabase/admin/index';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
@@ -11,30 +13,35 @@ export async function GET(request: Request) {
     }
 
     const searchTerm = `%${query.trim()}%`;
-    const supabase = await createServerSupabaseClient();
+    const supabase = supabaseAdminClient;
 
     // Fetch from News
-    const { data: newsData } = await supabase
+    const { data: newsData, error: newsError } = await supabase
       .from('news_updates')
       .select('id, title, slug, content, created_at')
       .or(`title.ilike.${searchTerm},content.ilike.${searchTerm}`)
-      .eq('status', 'published')
       .limit(5);
 
+    if (newsError) console.error('News Error:', newsError);
+
     // Fetch from Events
-    const { data: eventsData } = await supabase
+    const { data: eventsData, error: eventsError } = await supabase
       .from('events_programmes')
       .select('id, title, description, start_date')
       .or(`title.ilike.${searchTerm},description.ilike.${searchTerm}`)
       .eq('display_on_page', true)
       .limit(5);
 
+    if (eventsError) console.error('Events Error:', eventsError);
+
     // Fetch from Resources
-    const { data: resourcesData } = await supabase
+    const { data: resourcesData, error: resourcesError } = await supabase
       .from('resources')
-      .select('id, title, description, url')
+      .select('id, title, description, file_url, link_url')
       .or(`title.ilike.${searchTerm},description.ilike.${searchTerm}`)
       .limit(3);
+
+    if (resourcesError) console.error('Resources Error:', resourcesError);
 
     // Format results
     const formattedResults = [
@@ -58,7 +65,7 @@ export async function GET(request: Request) {
         id: `resource-${item.id}`,
         title: item.title,
         description: item.description?.substring(0, 100) + '...',
-        url: item.url || `/resources`,
+        url: item.link_url || item.file_url || `/resources`,
         type: 'Resource',
         date: null,
       }))
