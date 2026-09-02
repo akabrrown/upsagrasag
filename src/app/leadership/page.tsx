@@ -1,6 +1,6 @@
 import React from 'react';
 import { LeadershipClient } from './LeadershipClient';
-import { leadershipService } from '@/lib/supabase/admin';
+import { leadershipService, pastExecutiveService, supabaseAdminClient } from '@/lib/supabase/admin';
 
 export const revalidate = 60; // Revalidate every 60 seconds
 
@@ -11,7 +11,7 @@ const MOCK_EXECUTIVES = [
     name: "Samuel Sasu Adonteng",
     role: "President",
     email: "president@grasagupsa.org",
-    bio: "Samuel Sasu Adonteng is a youth development practitioner, policy advocate, and emerging academic with experience in project management, public policy, entrepreneurship, education, and students’ rights. He is currently affiliated with the University of Professional Studies, Accra, supporting work across the Media and Website Unit and the UPSA Enterprise and Innovation Centre, where he contributes to programme design, research, communications, innovation, and student enterprise development. He is also the Head of the Technical Division at the All-Africa Students Union, where he has coordinated major initiatives including digital inclusion, girls’ education, youth empowerment, and student participation in education governance. Samuel is a first-year PhD student at UPSA with interests in education, public policy, leadership, entrepreneurship, and social change, and remains committed to advancing opportunities that empower young people, strengthen institutions, and promote inclusive development across Africa. Currently, Samuel serves as President of GRASAG UPSA for the 2026/2027 Academic Year.",
+    bio: "Samuel Sasu Adonteng is a youth development practitioner, policy advocate, and emerging academic with experience in project management, public policy, entrepreneurship, education, and students’ rights...",
     type: "executive",
     display_order: 1,
     image_url: "/Sasu.jpeg"
@@ -51,7 +51,7 @@ const MOCK_EXECUTIVES = [
     name: "Kelvin Saka",
     role: "Organising Secretary",
     email: "organising@grasagupsa.org",
-    bio: "Kelvin Nii Adotey Saka is an emerging quality management professional, researcher, and student leader dedicated to advancing excellence in higher education, organizational development, and institutional governance. With a growing track record in quality assurance, stakeholder engagement, and policy support, he is passionate about driving continuous improvement and promoting meaningful student participation in decisionmaking processes. He is currently pursuing a Master of Business Administration (MBA) in Total Quality Management at the University of Professional Studies, Accra (UPSA), where he previously earned a Bachelor of Business Administration. Kelvin has gained professional experience through his work with the All-Africa Students Union (AASU) and the Global Student Forum, contributing to organizational coordination, membership engagement, and strategic initiatives across diverse contexts. His research interests include quality assurance systems, higher education governance, process improvement, and student engagement. He remains committed to fostering innovation, accountability, and sustainable institutional growth.",
+    bio: "Kelvin Nii Adotey Saka is an emerging quality management professional...",
     type: "executive",
     display_order: 5,
     image_url: "/WhatsApp Image 2026-06-04 at 6.14.58 PM (1).jpeg"
@@ -67,9 +67,14 @@ const MOCK_EXECUTIVES = [
     image_url: "/Secretary.jpeg"
   }
 ];
-type Executive = { id: string; name: string; role: string; email: string; bio: string; type: string; display_order: number; image_url: string; };
+type Executive = { id: string; name: string; role: string; email: string; phone: string; bio: string; type: string; display_order: number; image_url: string; };
+
 export default async function LeadershipPage() {
   let executives: Executive[] = [];
+  let patrons: Executive[] = [];
+  let pastExecutives: any[] = [];
+  let eventsCount = 0;
+  
   try {
     const allLeaders = await leadershipService.list();
     executives = allLeaders
@@ -78,9 +83,25 @@ export default async function LeadershipPage() {
         id: l.id ?? '',
         name: l.name ?? '',
         role: l.role ?? '',
-        email: l.email ?? '',
+        email: (l as any).email ?? '',
+        phone: (l as any).phone ?? '',
         bio: l.bio ?? '',
         type: l.type ?? 'executive',
+        display_order: l.display_order ?? 0,
+        image_url: l.image_url ?? ''
+      }))
+      .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
+
+    patrons = allLeaders
+      .filter(l => l.type === 'patron')
+      .map(l => ({
+        id: l.id ?? '',
+        name: l.name ?? '',
+        role: l.role ?? '',
+        email: (l as any).email ?? '',
+        phone: (l as any).phone ?? '',
+        bio: l.bio ?? '',
+        type: l.type ?? 'patron',
         display_order: l.display_order ?? 0,
         image_url: l.image_url ?? ''
       }))
@@ -89,8 +110,32 @@ export default async function LeadershipPage() {
     console.error("Error fetching leaders from Supabase, using mock fallback data:", error);
   }
 
+  try {
+    pastExecutives = await pastExecutiveService.list();
+  } catch (error) {
+    console.error("Error fetching past executives from Supabase:", error);
+  }
+
+  try {
+    const { count, error } = await supabaseAdminClient
+      .from('events_programmes')
+      .select('id', { count: 'exact', head: true });
+    
+    if (!error && count !== null) {
+      eventsCount = count;
+    }
+  } catch (error) {
+    console.error("Error fetching events count from Supabase:", error);
+  }
+
   // Fall back to high-quality mock data if database has no executives or connection failed
   const displayExecutives = executives.length > 0 ? executives : MOCK_EXECUTIVES;
+  const displayPatrons = patrons;
+  
+  const stats = {
+    executivesCount: displayExecutives.length,
+    eventsCount: eventsCount || 25, // Fallback to 25 if error/0 for UI gracefully
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -108,7 +153,7 @@ export default async function LeadershipPage() {
           </p>
         </div>
 
-        <LeadershipClient executives={displayExecutives} />
+        <LeadershipClient executives={displayExecutives} pastExecutives={pastExecutives} patrons={displayPatrons} stats={stats} />
       </div>
     </div>
   );

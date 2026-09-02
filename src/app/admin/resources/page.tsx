@@ -10,6 +10,7 @@ import {
   ArrowLeft, Copy, FileText, Link as LinkIcon, Download
 } from 'lucide-react';
 import CloudinaryUpload from '@/components/CloudinaryUpload';
+import { AdminTableSkeleton } from '@/components/admin/AdminTableSkeleton';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -22,20 +23,21 @@ export default function AdminResourcesPage() {
   const [activeTab, setActiveTab] = useState('All Resources');
   const [selectedRecord, setSelectedRecord] = useState<Resource | null>(null);
 
-  const { register, handleSubmit, reset, setValue, formState: { errors, isSubmitting } } = useForm<Resource>({
+  const { register, handleSubmit, reset, setValue, formState: { errors, isSubmitting } } = useForm<Resource & { _send_notification?: boolean }>({
     resolver: zodResolver(resourceSchema),
-    defaultValues: { title: '', description: '', file_url: '', link_url: '' }
+    defaultValues: { title: '', description: '', file_url: '', link_url: '', _send_notification: true }
   });
 
   // --- Handlers ---
   
   const handleOpenAdd = () => {
-    reset({ title: '', description: '', file_url: '', link_url: '' });
+    reset({ title: '', description: '', file_url: '', link_url: '', _send_notification: true });
     setSelectedRecord(null);
     setView('add');
   };
 
-  const handleOpenEdit = (item: Resource) => {
+  const handleOpenEdit = (raw_item: Resource) => {
+    const item = Object.fromEntries(Object.entries(raw_item).map(([k, v]) => [k, v === null ? '' : v])) as any;
     reset(item);
     setSelectedRecord(item);
     setView('edit');
@@ -76,7 +78,7 @@ export default function AdminResourcesPage() {
 
   const tabs = ['All Resources', 'Documents', 'External Links'];
   
-  const filteredRecords = (Array.isArray(records) ? records : []).filter(r => {
+  const filteredRecords = (records || []).filter(r => {
     if (activeTab === 'All Resources') return true;
     if (activeTab === 'Documents') return !!r.file_url;
     if (activeTab === 'External Links') return !!r.link_url && !r.file_url;
@@ -142,7 +144,7 @@ export default function AdminResourcesPage() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {isLoading ? (
-                <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">Loading resources...</td></tr>
+                <AdminTableSkeleton columns={4} />
               ) : filteredRecords.length === 0 ? (
                 <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">No resources found.</td></tr>
               ) : (
@@ -281,6 +283,20 @@ export default function AdminResourcesPage() {
               </div>
             </div>
           </div>
+          
+          {view === 'add' && (
+            <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
+              <input 
+                type="checkbox" 
+                id="_send_notification" 
+                {...register('_send_notification' as any)} 
+                className="w-4 h-4 text-[#2563eb] border-gray-300 rounded focus:ring-[#2563eb]"
+              />
+              <label htmlFor="_send_notification" className="text-sm text-gray-700 font-medium">
+                Send Push Notification to all users
+              </label>
+            </div>
+          )}
         </div>
       </form>
     </div>

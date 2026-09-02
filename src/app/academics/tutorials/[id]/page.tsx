@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import { ChevronLeft, Video, BookOpen } from 'lucide-react';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 
@@ -68,7 +69,7 @@ export default async function TutorialDetailPage({ params }: { params: Promise<P
                 />
               )
             ) : displayImage ? (
-              <img src={displayImage} alt={tutorial.title} className="w-full h-full absolute inset-0 object-cover" />
+              <Image src={displayImage} alt={tutorial.title} fill className="w-full h-full absolute inset-0 object-cover" />
             ) : (
               <div className="text-white opacity-50 flex flex-col items-center">
                 <BookOpen className="h-16 w-16 mb-4" />

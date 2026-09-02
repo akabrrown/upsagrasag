@@ -2,14 +2,19 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Bot, Landmark, GraduationCap, Play } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import ChatModal from '@/components/ChatModal';
-import PartnerCarousel from '@/components/PartnerCarousel';
-import { supabaseClient } from '@/lib/supabaseClient';
 import Image from 'next/image';
-import { CongressEvent } from '@/types/admin';
+import { Bot, Landmark, GraduationCap, Play, MapPin } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
+import { FocusAreas } from '@/components/FocusAreas';
+import { motion, AnimatePresence } from 'framer-motion';
+import dynamic from 'next/dynamic';
+
+const ChatModal = dynamic(() => import('@/components/ChatModal'), { ssr: false });
+const PartnerCarousel = dynamic(() => import('@/components/PartnerCarousel'), { ssr: false });
+import { supabaseClient } from '@/lib/supabaseClient';
+
+import { EventProgrammeRecord } from '@/types/admin';
+import { optimizeCloudinaryUrl } from '@/lib/optimizeImage';
 
 
 export default function HomePage() {
@@ -17,7 +22,7 @@ export default function HomePage() {
   // Countdown timer state
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
-  const [events, setEvents] = useState<CongressEvent[]>([]);
+  const [events, setEvents] = useState<EventProgrammeRecord[]>([]);
   const [currentEventIndex, setCurrentEventIndex] = useState(0);
   const currentEvent = events[currentEventIndex] || null;
 
@@ -55,45 +60,7 @@ export default function HomePage() {
   // News updates state
   const [newsUpdates, setNewsUpdates] = useState<{ id: string; title: string; content: string; image_url: string; created_at: string; category: string }[]>([]);
 
-  // Quick Links state
-  interface QuickLink {
-    id: string;
-    title: string;
-    subtitle?: string;
-    icon_name: string;
-    url: string;
-    display_order: number;
-  }
-  const [quickLinks, setQuickLinks] = useState<QuickLink[]>([
-    { id: '1', title: 'Volunteer with Us', subtitle: '', icon_name: 'Heart', url: '/volunteer', display_order: 1 },
-    { id: '2', title: 'Reach Out', subtitle: 'Report A Case', icon_name: 'AlertCircle', url: '/report', display_order: 2 },
-    { id: '3', title: 'Apply for a Job', subtitle: 'Upload a Job Opportunity', icon_name: 'Briefcase', url: '/jobs', display_order: 3 },
-    { id: '4', title: 'Reports and Publications', subtitle: '', icon_name: 'FileText', url: '/reports', display_order: 4 },
-  ]);
-  useEffect(() => {
-    const fetchQuickLinks = async () => {
-      const { data, error } = await supabaseClient
-        .from('quick_links')
-        .select('*')
-        .order('display_order', { ascending: true });
-      // Log meaningful errors only
-      if (error && typeof (error as any).message === 'string' && (error as any).message.length > 0) {
-        console.error('Error fetching quick links:', error);
-      }
-      if (!error && data && data.length > 0) {
-        setQuickLinks(data);
-      } else {
-        // Fallback sample links in case of error or empty data
-        setQuickLinks([
-          { id: '1', title: 'Volunteer with Us', subtitle: '', icon_name: 'Heart', url: '/volunteer', display_order: 1 },
-          { id: '2', title: 'Reach Out', subtitle: 'Report A Case', icon_name: 'AlertCircle', url: '/report', display_order: 2 },
-          { id: '3', title: 'Apply for a Job', subtitle: 'Upload a Job Opportunity', icon_name: 'Briefcase', url: '/jobs', display_order: 3 },
-          { id: '4', title: 'Reports and Publications', subtitle: '', icon_name: 'FileText', url: '/reports', display_order: 4 },
-        ]);
-      }
-    };
-    fetchQuickLinks();
-  }, []);
+
   useEffect(() => {
     const fetchNews = async () => {
       const { data, error } = await supabaseClient
@@ -113,14 +80,15 @@ export default function HomePage() {
     const fetchCongress = async () => {
       const today = new Date().toISOString().split('T')[0];
       const { data, error } = await supabaseClient
-        .from('congress_events')
-        .select('title, description, event_date, image_url, location, is_featured, theme')
+        .from('events_programmes')
+        .select('id, title, description, start_date, end_date, image_url, location, is_featured, type')
         .eq('is_featured', true)
-        .gte('event_date', today)
-        .order('event_date', { ascending: true })
+        .gte('start_date', today)
+        .order('start_date', { ascending: true })
         .limit(5);
+
       if (!error && data) {
-        setEvents(data);
+        setEvents(data as any);
       }
     };
     fetchCongress();
@@ -137,19 +105,19 @@ export default function HomePage() {
 
   // Consolidated countdown timer – parses date safely and updates every second
   useEffect(() => {
-    if (!currentEvent?.event_date) {
+    if (!currentEvent?.start_date) {
       setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       return;
     }
     // Attempt to parse the date string directly; fallback to replace space with 'T' for Safari/iOS
-    let parsed = Date.parse(currentEvent.event_date);
+    let parsed = Date.parse(currentEvent.start_date);
     if (isNaN(parsed)) {
-      const safe = currentEvent.event_date.replace(' ', 'T');
+      const safe = currentEvent.start_date.replace(' ', 'T');
       parsed = Date.parse(safe);
     }
     const targetTime = parsed;
     if (isNaN(targetTime)) {
-      console.warn('Invalid event_date format:', currentEvent.event_date);
+      console.warn('Invalid start_date format:', currentEvent.start_date);
       setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       return;
     }
@@ -173,7 +141,7 @@ export default function HomePage() {
     update();
     timerId = setInterval(update, 1000);
     return () => clearInterval(timerId);
-  }, [currentEvent?.event_date]);
+  }, [currentEvent?.start_date]);
 
 
   // Hero section state
@@ -264,7 +232,7 @@ export default function HomePage() {
   // Slides will be defined after hero defaults
   // Updated hero defaults for fallback when slide has no custom data
   const heroTitle = hero.title || 'Inspiring Students To Uncover Their True Potential';
-  const heroSubtitle = hero.subtitle || 'Lorem ipsum dolor sit amet consectetur. Vel imperdiet quam nisl vehicula nec blandit orci. Cras laoreet urna in dui nisl et. Vestibulum fermentum.';
+  const heroSubtitle = hero.subtitle || 'Empowering postgraduate students through academic excellence, leadership opportunities and a supportive community that prepares them to thrive.';
   const heroCtaText = hero.ctaText || 'Explore Academics';
   const heroCtaLink = hero.ctaLink || '/opportunities';
 
@@ -367,7 +335,7 @@ export default function HomePage() {
                   : 'border-white/20 opacity-60 hover:opacity-100'
                   }`}
               >
-                <Image src={slide.imagePath} alt={`Slide ${idx + 1} preview`} fill className="object-contain" />
+                <Image src={slide.imagePath} alt={`Slide ${idx + 1} preview`} fill sizes="110px" className="object-contain" />
               </button>
             ))}
           </div>
@@ -497,193 +465,103 @@ export default function HomePage() {
       </section>
 
       {/* Our Focus Areas – Horizontally Scrolling Cards */}
-      <section className="bg-neutral-50 border-y border-neutral-100 py-20 overflow-hidden">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8 mb-12">
-          <p className="text-sm font-bold text-[#B8860B] uppercase tracking-widest mb-2">Our Agenda</p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
-            Our Focus Areas,<br />
-            <span className="text-neutral-500">Championing Graduate Excellence</span>
-          </h2>
-        </div>
-
-        {/* Scrolling marquee container */}
-        <div className="relative w-full overflow-hidden py-4">
-          {/* Fade gradient overlays on the sides */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-neutral-50 to-transparent z-10" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 md:w-32 bg-gradient-to-l from-neutral-50 to-transparent z-10" />
-
-          <div className="animate-marquee flex gap-6">
-            {(() => {
-              const cardList = [
-                {
-                  title: 'Good Governance, Representation and Accountability',
-                  description: 'GRASAG-UPSA promotes transparent, accountable and responsive leadership through effective representation, timely communication, responsible resource management and constitutional governance.',
-                  image: '/president-speech.png',
-                  icon_name: 'Scale',
-                  link: '/about',
-                },
-                {
-                  title: 'Student Welfare, Support and Wellbeing',
-                  description: 'GRASAG-UPSA prioritises the welfare and wellbeing of graduate students, including mental health, psychosocial support, student-parent support, campus services and emergency support systems.',
-                  image: '/dsdsee.jpg',
-                  icon_name: 'HeartHandshake',
-                  link: '/welfare',
-                },
-                {
-                  title: 'Research, Academic Excellence and Innovation',
-                  description: 'GRASAG-UPSA supports research, academic excellence and innovation through thesis support, research capacity-building, academic publishing, peer learning and scholarly engagement.',
-                  image: '/researchhh.png',
-                  icon_name: 'GraduationCap',
-                  link: '/research-and-opportunities',
-                },
-                {
-                  title: 'Access, Equity, Inclusion and Digital Transformation',
-                  description: 'GRASAG-UPSA promotes equal access, inclusion and non-discrimination for all graduate students, regardless of gender, religion, ethnicity, disability, nationality or social background.',
-                  image: '/inclusive.png',
-                  icon_name: 'Globe',
-                  link: '/about',
-                },
-                {
-                  title: 'Graduate Community, Identity and Engagement',
-                  description: 'GRASAG-UPSA builds a united and active graduate community through student engagement, social interaction, leadership development, recognition programmes, sports, culture and volunteerism.',
-                  image: '/communittty.jpg',
-                  icon_name: 'Users',
-                  link: '/about',
-                },
-                {
-                  title: 'Advancement, Employability, Entrepreneurship and Partnerships',
-                  description: 'GRASAG-UPSA connects graduate education to career growth, entrepreneurship and national development through employability initiatives, mentorship, alumni engagement and strategic partnerships.',
-                  image: '/WhatsApp Image 2026-06-20 at 3.52.26 AM.jpeg',
-                  icon_name: 'Briefcase',
-                  link: '/opportunities',
-                },
-              ];
-
-              // Triplicate the cards to guarantee smooth loop even on wide displays
-              const triplicatedCards = [...cardList, ...cardList, ...cardList];
-
-              return triplicatedCards.map((card, idx) => {
-                const IconComponent = (LucideIcons as any)[card.icon_name] || LucideIcons.HelpCircle;
-                return (
-                  <div
-                    key={idx}
-                    className="flex-shrink-0 flex w-[520px] sm:w-[600px] md:w-[660px] h-[280px] sm:h-[320px] md:h-[350px] bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-[1.01]"
-                  >
-                    {/* Left Side: Content */}
-                    <div className="w-[55%] p-5 sm:p-6 md:p-8 flex flex-col justify-between text-left">
-                      <div>
-                        {/* Icon Wrapper */}
-                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#FAF6EC] border border-[#F5EAD2] flex items-center justify-center mb-3 sm:mb-4">
-                          <IconComponent className="w-6 h-6 sm:w-7 sm:h-7 text-[#B8860B]" strokeWidth={1.5} />
-                        </div>
-                        <h3 className="text-lg sm:text-xl font-extrabold text-neutral-900 leading-snug mb-1.5 sm:mb-2.5 line-clamp-2">
-                          {card.title}
-                        </h3>
-                        <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed line-clamp-3">
-                          {card.description}
-                        </p>
-                      </div>
-                      <Link
-                        href={card.link}
-                        className="text-sm sm:text-base font-bold text-[#B8860B] hover:text-primary transition-colors flex items-center gap-1 mt-2 w-fit"
-                      >
-                        Explore More <span className="text-sm font-normal">→</span>
-                      </Link>
-                    </div>
-                    {/* Right Side: Image */}
-                    <div className="w-[45%] relative h-full">
-                      <Image
-                        src={card.image}
-                        alt={card.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 30vw, 20vw"
-                      />
-                    </div>
-                  </div>
-                );
-              });
-            })()}
-          </div>
-        </div>
-      </section>
+      <FocusAreas />
 
       {/* Featured Upcoming Events Banner Section */}
       {events.length > 0 && (
-        <section className="w-full relative overflow-hidden bg-slate-950 h-[405px] sm:h-[486px] flex flex-col justify-end">
-          <div className="absolute inset-0">
-            {events.map((event, idx) => (
-              <div
-                key={idx}
-                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${currentEventIndex === idx ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
-              >
-                <Image src={event.image_url || '/bkg-grasag.jpg'} alt={event.title || 'Event Image'} fill className="object-contain object-right md:object-center opacity-40 md:opacity-90" />
-                <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-transparent md:bg-gradient-to-r md:from-slate-950 md:via-slate-950/80 md:to-transparent" />
-              </div>
-            ))}
-          </div>
+        <section className="w-full relative bg-slate-950 py-12 md:py-20 flex flex-col justify-center overflow-hidden">
+          {/* Subtle background glow */}
+          <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#B8860B]/20 rounded-full blur-[120px] pointer-events-none" />
 
-          {/* Content overlay positioned to stay visible */}
-          <div className="absolute inset-0 z-20 flex flex-col justify-center p-6 sm:p-12 max-w-7xl mx-auto text-left">
-            <div>
-              <span className="inline-block rounded-full bg-[#B8860B]/20 px-4 py-1 text-xs sm:text-sm font-semibold text-[#B8860B] uppercase tracking-widest border border-[#B8860B]/30">
-                Featured Event
-              </span>
-            </div>
+          <div className="relative z-20 px-6 sm:px-12 max-w-7xl w-full mx-auto">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16">
+              
+              {/* Left Column: Content */}
+              <div className="w-full lg:w-1/2 text-left space-y-6">
+                <div>
+                  <span className="inline-block rounded-full bg-[#B8860B]/20 px-3 py-1 text-[10px] sm:text-xs font-semibold text-[#B8860B] uppercase tracking-widest border border-[#B8860B]/30 mb-4">
+                    Featured Event
+                  </span>
+                  
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight line-clamp-3">
+                    {currentEvent?.title}
+                  </h2>
+                </div>
 
-            <div className="mt-8 flex flex-col md:flex-row md:items-end justify-between gap-8">
-              <div className="max-w-2xl space-y-4">
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
-                  {currentEvent?.title}
-                </h2>
                 {currentEvent?.location && (
-                  <h3 className="text-base sm:text-lg font-bold text-[#B8860B]">
-                    Location: {currentEvent.location}
-                  </h3>
+                  <div className="flex items-center gap-2 text-[#B8860B] font-semibold text-sm sm:text-base">
+                    <MapPin className="w-5 h-5 shrink-0" />
+                    <span>{currentEvent.location}</span>
+                  </div>
                 )}
-                <p className="text-sm sm:text-base text-white/80 leading-relaxed font-medium">
+
+                <p className="text-sm sm:text-base text-white/80 leading-relaxed font-medium line-clamp-4">
                   {currentEvent?.description}
                 </p>
-                <div className="pt-2">
+                
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 pt-4">
                   <Link
                     href="/events"
-                    className="inline-block bg-[#B8860B] hover:bg-[#9A7C1C] text-white font-bold px-6 py-3 rounded-lg transition shadow-lg hover:scale-[1.02] transform duration-200 uppercase text-xs tracking-wider"
+                    className="inline-block bg-[#B8860B] hover:bg-[#9A7C1C] text-white font-bold px-8 py-4 rounded-xl transition-all shadow-lg shadow-[#B8860B]/20 hover:shadow-[#B8860B]/40 hover:-translate-y-1 transform duration-300 uppercase text-xs tracking-wider shrink-0"
                   >
                     Learn More
                   </Link>
-                </div>
-              </div>
 
-              {currentEvent?.event_date && (
-                <div className="flex flex-wrap gap-4 items-center justify-start md:justify-end">
-                  {[
-                    { label: 'Days', value: timeLeft.days },
-                    { label: 'Hours', value: timeLeft.hours },
-                    { label: 'Min', value: timeLeft.minutes },
-                    { label: 'Sec', value: timeLeft.seconds }
-                  ].map(item => (
-                    <div key={item.label} className="min-w-[65px] rounded-2xl bg-white/10 backdrop-blur-md px-3 py-2.5 border border-white/10 text-center shadow-lg">
-                      <div className="text-xl sm:text-2xl font-black text-white">{item.value}</div>
-                      <div className="text-[10px] font-bold uppercase tracking-wider text-white/60">{item.label}</div>
+                  {currentEvent?.start_date && (
+                    <div className="flex gap-3 items-center">
+                      {[
+                        { label: 'Days', value: timeLeft.days },
+                        { label: 'Hours', value: timeLeft.hours },
+                        { label: 'Min', value: timeLeft.minutes },
+                        { label: 'Sec', value: timeLeft.seconds }
+                      ].map(item => (
+                        <div key={item.label} className="min-w-[56px] rounded-xl bg-white/5 border border-white/10 backdrop-blur-md px-2 py-2 text-center shadow-inner">
+                          <div className="text-lg sm:text-xl font-black text-white leading-none">{item.value.toString().padStart(2, '0')}</div>
+                          <div className="text-[9px] font-bold uppercase tracking-wider text-white/50 mt-1">{item.label}</div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </div>
-              )}
-            </div>
 
-            {events.length > 1 && (
-              <div className="flex gap-2.5 mt-8 justify-start">
-                {events.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setCurrentEventIndex(idx)}
-                    className={`h-2 rounded-full transition-all duration-300 ${currentEventIndex === idx ? 'w-8 bg-[#B8860B]' : 'w-2 bg-white/40 hover:bg-white/70'
-                      }`}
-                    aria-label={`Go to slide ${idx + 1}`}
-                  />
-                ))}
+                {events.length > 1 && (
+                  <div className="flex gap-2.5 pt-8 justify-start">
+                    {events.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setCurrentEventIndex(idx)}
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          currentEventIndex === idx ? 'w-8 bg-[#B8860B]' : 'w-2 bg-white/20 hover:bg-white/40'
+                        }`}
+                        aria-label={`Go to slide ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+
+              {/* Right Column: Visuals (The Poster) */}
+              <div className="w-full lg:w-1/2 flex justify-center lg:justify-end">
+                <div className="relative w-full max-w-[450px] aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10 group transform transition-transform duration-500 hover:rotate-1">
+                  {/* We map through events to keep the fade transition for the image as well */}
+                  {events.map((event, idx) => (
+                    <Image
+                      key={idx}
+                      src={optimizeCloudinaryUrl(event.image_url) || '/bkg-grasag.jpg'}
+                      alt={event.title}
+                      fill
+                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
+                        currentEventIndex === idx ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                      }`}
+                    />
+                  ))}
+                  
+                  {/* Subtle inner shadow overlay for premium feel */}
+                  <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-white/10 z-20 pointer-events-none" />
+                </div>
+              </div>
+
+            </div>
           </div>
         </section>
       )}
@@ -762,17 +640,13 @@ export default function HomePage() {
                   <div className="absolute bottom-0 left-0 w-full p-6 flex flex-col justify-end">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="bg-white/20 backdrop-blur-md text-white text-xs font-bold px-2.5 py-1 rounded-sm shadow-sm border border-white/10 uppercase">
-                        {new Date(ev.event_date).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                        {new Date(ev.start_date).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                        {ev.end_date && ` - ${new Date(ev.end_date).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}`}
                       </span>
                     </div>
                     <h3 className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight">
                       {ev.title}
                     </h3>
-                    {ev.theme && (
-                      <p className="text-accent text-sm font-semibold italic mb-3">
-                        {ev.theme}
-                      </p>
-                    )}
                     <div className="mt-2 mb-4 text-white/70 text-xs font-bold uppercase tracking-wider bg-white/10 inline-block px-2 py-0.5 rounded border border-white/10 w-max">
                       Event
                     </div>
@@ -794,30 +668,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Quick Links Section (moved before footer) */}
-      <section className="mx-auto max-w-5xl px-4 py-16">
-        <h2 className="text-2xl font-bold text-accent mb-6">Quick Links</h2>
-        {quickLinks.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-            {quickLinks.map((link) => {
-              const IconComponent = (LucideIcons as any)[link.icon_name] || LucideIcons.Link;
-              return (
-                <Link key={link.id} href={link.url} className="flex items-start gap-5 p-4 rounded-2xl bg-gray-50 border border-gray-200 hover:bg-white hover:shadow-sm transition-all group">
-                  <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-white shadow-sm border border-neutral-100 flex items-center justify-center group-hover:border-accent/30 group-hover:shadow-md transition-all">
-                    <IconComponent className="w-6 h-6 text-primary" strokeWidth={2} />
-                  </div>
-                  <div className="flex flex-col justify-center min-h-[3.5rem]">
-                    <h3 className="text-lg font-extrabold text-neutral-800 group-hover:text-primary transition-colors">{link.title}</h3>
-                    {link.subtitle && <p className="text-sm font-medium text-neutral-500 mt-0.5">{link.subtitle}</p>}
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        )}
-      </section>
-
-      {/* Floating Chatbot Indicator */}
+      {/* Floating Chatbot Indicator (Hidden until configured) */}
+      {/* 
       <div className="fixed bottom-6 right-6 z-40">
         <button
           onClick={() => setIsChatOpen(true)}
@@ -826,8 +678,10 @@ export default function HomePage() {
           <Bot className="h-6 w-6" />
         </button>
       </div>
-      {/* Chat Modal */}
-      <ChatModal open={isChatOpen} onClose={() => setIsChatOpen(false)} />
+      */}
+      
+      {/* Chat Modal (Hidden until configured) */}
+      {/* <ChatModal open={isChatOpen} onClose={() => setIsChatOpen(false)} /> */}
     </div>
   );
 }

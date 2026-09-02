@@ -2,18 +2,21 @@
 
 import React, { useState } from "react";
 import { ModalOverlay } from "./ui";
-import { ArrowRight, Mail } from "lucide-react";
 import Image from "next/image";
+import { ArrowRight, Mail } from "lucide-react";
+import { optimizeCloudinaryUrl } from "@/lib/optimizeImage";
 
 interface ProfileProps {
   name: string;
   role: string;
   image: string;
-  email: string;
+  email?: string;
+  phone?: string;
   bio?: string;
+  term?: string;
 }
 
-export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email, bio }) => {
+export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email, phone, bio, term }) => {
   const [showInfo, setShowInfo] = useState(false);
 
   return (
@@ -25,10 +28,10 @@ export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email, 
         {/* Large Portrait Image */}
         <div className="absolute inset-0 z-0 h-full w-full overflow-hidden">
           <Image 
-            src={image} 
-            alt={name}
-            fill 
-            className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-110 grayscale-[30%] group-hover:grayscale-0"
+            src={optimizeCloudinaryUrl(image, { width: 400 })} 
+            alt={name} 
+            fill
+            className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-110 grayscale-[30%] group-hover:grayscale-0"
           />
           {/* Magazine overlay gradients */}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-85 transition-opacity duration-500 group-hover:opacity-90" />
@@ -37,11 +40,16 @@ export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email, 
 
         {/* Card Contents */}
         <div className="relative z-10 p-6 flex flex-col justify-end h-full">
-          {/* Role Badge */}
-          <div className="mb-2 self-start">
+          {/* Role & Term Badge */}
+          <div className="mb-2 self-start flex gap-2 flex-wrap">
             <span className="inline-block rounded-full bg-accent/20 border border-accent/35 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-accent transition-all duration-300 group-hover:bg-accent group-hover:text-neutral-950">
               {role}
             </span>
+            {term && (
+              <span className="inline-block rounded-full bg-white/10 border border-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white transition-all duration-300 group-hover:bg-white group-hover:text-neutral-950">
+                {term}
+              </span>
+            )}
           </div>
 
           {/* Name */}
@@ -51,7 +59,7 @@ export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email, 
 
           {/* Bio / Message (Short excerpt) */}
           <p className="text-sm text-neutral-350 line-clamp-2 mb-4 leading-relaxed opacity-90 group-hover:opacity-100 transition-opacity duration-300">
-            {bio || `Dedicated to advancing the academic, professional, and social interests of all graduate students.`}
+            {bio}
           </p>
 
           {/* Button (Slides in / fades in) */}
@@ -67,12 +75,19 @@ export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email, 
           <div className="flex flex-col md:flex-row w-full h-full max-w-4xl bg-white border border-neutral-200 rounded-2xl shadow-2xl overflow-hidden">
             {/* Left Side: Large Portrait & Basic Info */}
             <div className="relative w-full md:w-2/5 min-h-[350px] md:min-h-full">
-              <Image src={image} alt={name} fill className="object-cover object-top" />
+              <Image src={optimizeCloudinaryUrl(image)} alt={name} fill className="absolute inset-0 w-full h-full object-cover object-top" />
               <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/20 to-transparent" />
               <div className="absolute bottom-6 left-6 right-6">
-                <span className="inline-block rounded-full bg-accent px-3 py-1 text-xs font-bold uppercase tracking-wider text-neutral-950 mb-2">
-                  {role}
-                </span>
+                <div className="flex gap-2 flex-wrap mb-2">
+                  <span className="inline-block rounded-full bg-accent px-3 py-1 text-xs font-bold uppercase tracking-wider text-neutral-950">
+                    {role}
+                  </span>
+                  {term && (
+                    <span className="inline-block rounded-full bg-white/20 border border-white/30 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
+                      {term}
+                    </span>
+                  )}
+                </div>
                 <h3 className="text-3xl font-extrabold text-white leading-none">{name}</h3>
               </div>
             </div>
@@ -82,20 +97,27 @@ export const ProfileCard: React.FC<ProfileProps> = ({ name, role, image, email, 
               <div className="space-y-6">
                 <div>
                   <h4 className="text-xs uppercase tracking-widest text-primary font-semibold mb-2">Biography</h4>
-                  <p className="text-neutral-600 leading-relaxed text-base">
-                    {bio || `${name} is an active executive member of the GRASAG-UPSA team, working tirelessly to execute initiatives that support academic excellence, career development, and graduate student welfare.`}
+                  <p className="text-neutral-600 leading-relaxed text-base whitespace-pre-wrap">
+                    {bio}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-neutral-250 flex items-center justify-between">
-                <a 
-                  href={`mailto:${email}`} 
-                  className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-primary transition-colors duration-200"
-                >
-                  <Mail className="w-5 h-5 text-primary" />
-                  <span>{email}</span>
-                </a>
+              <div className="mt-8 pt-6 border-t border-neutral-250 flex items-center justify-between flex-wrap gap-4">
+                <div className="flex flex-col gap-2">
+                  {email && (
+                    <a href={`mailto:${email}`} className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-primary transition-colors duration-200">
+                      <Mail className="w-5 h-5 text-primary" />
+                      <span>{email}</span>
+                    </a>
+                  )}
+                  {phone && (
+                    <a href={`tel:${phone}`} className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-primary transition-colors duration-200">
+                      <span className="flex items-center justify-center w-5 h-5 text-primary">📞</span>
+                      <span>{phone}</span>
+                    </a>
+                  )}
+                </div>
                 <button
                   onClick={() => setShowInfo(false)}
                   className="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-sm font-semibold rounded-lg transition-colors duration-200"
