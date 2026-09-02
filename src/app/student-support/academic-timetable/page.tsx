@@ -18,10 +18,28 @@ function extractGroupLabel(levelGroupStr: string): string {
   return levelGroupStr;
 }
 
+// Helper to extract clean semester label from a record
+function extractSemester(record: any): string {
+  // If record has an explicit semester column
+  if (record.semester) {
+    if (/second|sem\s*2|2nd/i.test(record.semester)) return 'Second Semester';
+    if (/first|sem\s*1|1st/i.test(record.semester)) return 'First Semester';
+    return record.semester;
+  }
+  // Check level_semester_group (e.g., "YEAR TWO (2) - SEMESTER ONE-GROUP ONE (1)")
+  const str = record.level_semester_group || '';
+  if (/semester\s*(two|2|second)/i.test(str)) return 'Second Semester';
+  if (/semester\s*(one|1|first)/i.test(str)) return 'First Semester';
+  
+  // Default to First Semester for current academic year records
+  return 'First Semester';
+}
+
 export default function AcademicTimetablePage() {
   const [timetables, setTimetables] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
+  const [activeSemester, setActiveSemester] = useState('First Semester');
   const [activeSession, setActiveSession] = useState('Evening Session');
   const [activeProgram, setActiveProgram] = useState('All');
   const [activeGroup, setActiveGroup] = useState('All');
@@ -42,19 +60,34 @@ export default function AcademicTimetablePage() {
     fetchTimetables();
   }, []);
 
+  const semesters = ['First Semester', 'Second Semester'];
   const sessions = ['Evening Session', 'Weekend Session', 'Distance Session'];
   
-  // Filter by session first
-  const sessionTimetables = useMemo(() => {
-    return activeSession === 'All' ? timetables : timetables.filter(t => t.session_type === activeSession);
-  }, [timetables, activeSession]);
+  // Check available semesters in the dataset (or fallback to First Semester)
+  const availableSemesters = useMemo(() => {
+    const semSet = new Set<string>();
+    timetables.forEach(t => semSet.add(extractSemester(t)));
+    // Always ensure First Semester is present
+    if (semSet.size === 0) semSet.add('First Semester');
+    return Array.from(semSet);
+  }, [timetables]);
 
-  // Distinct programs available in this session
+  // Filter by Semester first
+  const semesterTimetables = useMemo(() => {
+    return timetables.filter(t => extractSemester(t) === activeSemester);
+  }, [timetables, activeSemester]);
+
+  // Filter by Session
+  const sessionTimetables = useMemo(() => {
+    return activeSession === 'All' ? semesterTimetables : semesterTimetables.filter(t => t.session_type === activeSession);
+  }, [semesterTimetables, activeSession]);
+
+  // Distinct programs available in this semester and session
   const programs = useMemo(() => {
     return ['All', ...Array.from(new Set(sessionTimetables.map(t => t.program))).filter(Boolean)];
   }, [sessionTimetables]);
 
-  // Distinct groups available for the selected program (if specific program chosen)
+  // Distinct groups available for the selected program
   const programGroups = useMemo(() => {
     if (activeProgram === 'All') return [];
     const proRecords = sessionTimetables.filter(t => t.program === activeProgram);
@@ -62,7 +95,7 @@ export default function AcademicTimetablePage() {
     return groups;
   }, [sessionTimetables, activeProgram]);
 
-  // Filtered records based on session, program, and group
+  // Filtered records based on semester, session, program, and group
   const filteredRecords = useMemo(() => {
     return sessionTimetables.filter(r => {
       if (activeProgram !== 'All' && r.program !== activeProgram) return false;
@@ -71,7 +104,7 @@ export default function AcademicTimetablePage() {
     });
   }, [sessionTimetables, activeProgram, activeGroup]);
 
-  // Group records by Day for the actual visual timetable layout
+  // Group records by Day for the schedule grid
   const recordsByDay = useMemo(() => {
     const map: Record<string, any[]> = {};
     filteredRecords.forEach(rec => {
@@ -93,11 +126,12 @@ export default function AcademicTimetablePage() {
 
   const handlePrint = () => {
     const originalTitle = document.title;
+    const semPart = activeSemester.replace(/\s+/g, '_');
     const progPart = activeProgram === 'All' ? 'All_Programs' : activeProgram.replace(/[^a-zA-Z0-9]/g, '_');
     const groupPart = activeGroup === 'All' ? '' : `_${extractGroupLabel(activeGroup).replace(/\s+/g, '_')}`;
     const sessPart = activeSession.replace(/[^a-zA-Z0-9]/g, '_');
     
-    document.title = `GRASAG_UPSA_${progPart}${groupPart}_${sessPart}_Timetable`;
+    document.title = `GRASAG_UPSA_${progPart}${groupPart}_${sessPart}_${semPart}_2026_2027_Timetable`;
     window.print();
     setTimeout(() => {
       document.title = originalTitle;
@@ -116,13 +150,13 @@ export default function AcademicTimetablePage() {
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center space-y-5">
           <span className="inline-flex items-center rounded-full bg-white/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-white ring-1 ring-inset ring-white/20 backdrop-blur-sm shadow-sm">
-            <Calendar className="w-3.5 h-3.5 mr-1.5 text-[#B8860B]" /> Official Lecture Schedule
+            <Calendar className="w-3.5 h-3.5 mr-1.5 text-[#B8860B]" /> 2026/2027 Academic Year
           </span>
           <h1 className="text-4xl font-black tracking-tight text-white sm:text-6xl drop-shadow-sm">
             Academic <span className="text-[#B8860B]">Timetable</span>
           </h1>
           <p className="mx-auto max-w-2xl text-base sm:text-lg text-blue-100/90 font-normal">
-            View, filter by program &amp; group, and download the official 2026/2027 graduate course timetable.
+            Browse course schedules, venues, and lecturer details by semester, session, and group for the 2026/2027 academic year.
           </p>
         </div>
       </section>
@@ -133,34 +167,58 @@ export default function AcademicTimetablePage() {
         {/* Controls Bar (Hidden during Print) */}
         <div className="space-y-4 mb-8 print:hidden">
           
-          {/* Top Row: Session Selector & Download Button */}
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl p-4 shadow-sm border border-gray-200/80 flex flex-col md:flex-row gap-4 items-center justify-between">
-            {/* Session Tabs */}
-            <div className="flex bg-gray-100/80 p-1.5 rounded-xl border border-gray-200/60 w-full md:w-auto overflow-x-auto scrollbar-hide">
-              {sessions.map(session => (
-                <button
-                  key={session}
-                  onClick={() => {
-                    setActiveSession(session);
-                    setActiveProgram('All');
-                    setActiveGroup('All');
-                  }}
-                  className={`flex-1 md:flex-none px-5 py-2 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
-                    activeSession === session 
-                      ? 'bg-white text-[#001a54] shadow-sm ring-1 ring-black/5 font-bold' 
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/50'
-                  }`}
-                >
-                  {session}
-                </button>
-              ))}
+          {/* Top Row: Semester Tabs, Session Tabs & Download Button */}
+          <div className="bg-white/80 backdrop-blur-md rounded-2xl p-4 shadow-sm border border-gray-200/80 flex flex-col xl:flex-row gap-4 items-center justify-between">
+            
+            <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
+              {/* Semester Selector Tabs */}
+              <div className="flex bg-gray-100/80 p-1.5 rounded-xl border border-gray-200/60 w-full sm:w-auto">
+                {semesters.map(sem => (
+                  <button
+                    key={sem}
+                    onClick={() => {
+                      setActiveSemester(sem);
+                      setActiveProgram('All');
+                      setActiveGroup('All');
+                    }}
+                    className={`flex-1 sm:flex-none px-5 py-2 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
+                      activeSemester === sem 
+                        ? 'bg-[#001a54] text-white shadow-sm ring-1 ring-black/5 font-bold' 
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/50'
+                    }`}
+                  >
+                    {sem}
+                  </button>
+                ))}
+              </div>
+
+              {/* Session Tabs */}
+              <div className="flex bg-gray-100/80 p-1.5 rounded-xl border border-gray-200/60 w-full sm:w-auto overflow-x-auto scrollbar-hide">
+                {sessions.map(session => (
+                  <button
+                    key={session}
+                    onClick={() => {
+                      setActiveSession(session);
+                      setActiveProgram('All');
+                      setActiveGroup('All');
+                    }}
+                    className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
+                      activeSession === session 
+                        ? 'bg-white text-[#001a54] shadow-sm ring-1 ring-black/5 font-bold' 
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/50'
+                    }`}
+                  >
+                    {session}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="w-full md:w-auto flex items-center gap-3 justify-end">
+            {/* Download Button */}
+            <div className="w-full xl:w-auto flex items-center justify-end">
               <button
                 onClick={handlePrint}
-                className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#001a54] hover:bg-[#002880] transition-all duration-200 shadow-sm shadow-blue-950/20 active:scale-95"
+                className="w-full xl:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#001a54] hover:bg-[#002880] transition-all duration-200 shadow-sm shadow-blue-950/20 active:scale-95"
               >
                 <Download className="w-4 h-4 text-[#B8860B]" />
                 Download PDF Timetable
@@ -194,7 +252,7 @@ export default function AcademicTimetablePage() {
             </div>
           </div>
 
-          {/* Group Filter (Shown when a program has multiple groups, such as MBA Accounting & Finance) */}
+          {/* Group Filter (Shown when a program has multiple groups, e.g. MBA Accounting & Finance) */}
           {programGroups.length > 1 && (
             <div className="bg-gradient-to-r from-amber-50/70 via-blue-50/50 to-white p-4 rounded-2xl border border-amber-200/70 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -249,9 +307,14 @@ export default function AcademicTimetablePage() {
             </h1>
           </div>
           <h2 className="text-lg font-bold text-[#B8860B] tracking-wide uppercase">
-            SCHOOL OF GRADUATE STUDIES — GRASAG TIMETABLE
+            SCHOOL OF GRADUATE STUDIES — GRASAG ACADEMIC TIMETABLE
           </h2>
-          <div className="mt-2 inline-flex flex-wrap items-center justify-center gap-3 text-xs font-bold text-gray-800 uppercase bg-gray-100 px-4 py-1.5 rounded border border-gray-300">
+          <p className="text-sm font-black text-[#001a54] uppercase tracking-wider mt-1">
+            {activeSemester.toUpperCase()} — 2026/2027 ACADEMIC YEAR
+          </p>
+          <div className="mt-2.5 inline-flex flex-wrap items-center justify-center gap-3 text-xs font-bold text-gray-800 uppercase bg-gray-100 px-4 py-1.5 rounded border border-gray-300">
+            <span>SEMESTER: <strong className="text-[#001a54]">{activeSemester.toUpperCase()}</strong></span>
+            <span>•</span>
             <span>SESSION: <strong className="text-[#001a54]">{activeSession}</strong></span>
             <span>•</span>
             <span>PROGRAM: <strong className="text-[#001a54]">{activeProgram === 'All' ? 'ALL PROGRAMS' : activeProgram}</strong></span>
@@ -262,7 +325,7 @@ export default function AcademicTimetablePage() {
               </>
             )}
             <span>•</span>
-            <span>ACADEMIC YEAR: <strong>2026/2027</strong></span>
+            <span>YEAR: <strong>2026/2027</strong></span>
           </div>
         </div>
 
@@ -274,8 +337,14 @@ export default function AcademicTimetablePage() {
         ) : filteredRecords.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm">
             <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">No Timetable Records Found</h3>
-            <p className="text-gray-500 text-sm">There are no lecture records matching the selected session, program, and group.</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              No Timetable Records for {activeSemester}
+            </h3>
+            <p className="text-gray-500 text-sm max-w-md mx-auto">
+              {activeSemester === 'Second Semester' 
+                ? 'The Second Semester timetable has not yet been published by the academic board. Check back closer to the start of the semester.'
+                : 'There are currently no uploaded timetables matching the selected session, program, and group for this semester.'}
+            </p>
           </div>
         ) : (
           <>
@@ -385,8 +454,8 @@ export default function AcademicTimetablePage() {
             </div>
 
             {/* Print Official Footer Stamp */}
-            <div className="hidden print:flex items-center justify-between text-[10px] text-gray-500 border-t border-gray-300 mt-6 pt-3">
-              <span>Official Academic Timetable • University of Professional Studies, Accra (UPSA)</span>
+            <div className="hidden print:flex items-center justify-between text-[10px] text-gray-600 border-t border-gray-300 mt-6 pt-3">
+              <span>Official Academic Timetable • {activeSemester}, 2026/2027 Academic Year • University of Professional Studies, Accra (UPSA)</span>
               <span>Generated on {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} • GRASAG Portal</span>
             </div>
           </>
