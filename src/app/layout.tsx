@@ -38,20 +38,24 @@ export const metadata: Metadata = {
 };
 
 import { AxiomWebVitals } from 'next-axiom';
+import FrontendAccessGate from '@/components/FrontendAccessGate';
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className="h-full antialiased font-sans" suppressHydrationWarning>
-      <body suppressHydrationWarning className="min-h-full flex flex-col bg-background text-foreground">
+      <body suppressHydrationWarning className="min-h-full flex flex-col bg-[#000c24] text-foreground">
         <AxiomWebVitals />
         <PushNotificationManager />
         <AnnouncementModal />
         <ConditionalNavbar />
-        <main className="flex-1">{children}</main>
+        <FrontendAccessGate>
+          <main className="flex-1">{children}</main>
+        </FrontendAccessGate>
         <ConditionalFooter />
       </body>
     </html>
   );
 }
+
