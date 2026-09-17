@@ -44,10 +44,10 @@ export default function LaunchingSoonCover() {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col justify-between overflow-hidden font-sans text-white select-none">
+    <div className="relative min-h-[100dvh] w-full flex flex-col justify-between overflow-x-hidden font-sans text-white select-none">
       
-      {/* Fullscreen Video Background with Cinematic Dark Overlay */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
+      {/* Fullscreen Video Background with Cinematic Overlay */}
+      <div className="fixed inset-0 w-full h-full z-0 overflow-hidden pointer-events-none">
         <video
           autoPlay
           loop
@@ -56,13 +56,13 @@ export default function LaunchingSoonCover() {
           preload="auto"
           poster="/IMG_5241.jpg"
           aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none transform scale-105"
+          className="w-full h-full object-cover object-center"
         >
           <source src="/anticipate.mp4" type="video/mp4" />
         </video>
         {/* Layered dark vignette and readability overlay */}
-        <div className="absolute inset-0 bg-black/60 md:bg-black/55 backdrop-blur-[0.5px]" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-black/80" />
+        <div className="absolute inset-0 bg-black/55 md:bg-black/50 backdrop-blur-[0.5px]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/35 to-black/80" />
       </div>
 
       {/* Top Header / Brand Crest */}
