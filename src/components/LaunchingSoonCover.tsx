@@ -46,18 +46,23 @@ export default function LaunchingSoonCover() {
   return (
     <div className="relative min-h-screen w-full flex flex-col justify-between overflow-hidden font-sans text-white select-none">
       
-      {/* Fullscreen Background Image with Cinematic Dark Overlay */}
-      <div className="absolute inset-0 z-0">
-        <Image 
-          src="/IMG_5241.jpg" 
-          alt="UPSA Abednego F.O. Amartey Towers" 
-          fill 
-          priority 
-          className="object-cover object-center transform scale-105"
-        />
+      {/* Fullscreen Video Background with Cinematic Dark Overlay */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          poster="/IMG_5241.jpg"
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none transform scale-105"
+        >
+          <source src="/anticipate.mp4" type="video/mp4" />
+        </video>
         {/* Layered dark vignette and readability overlay */}
-        <div className="absolute inset-0 bg-black/65 md:bg-black/60 backdrop-blur-[1px]" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/80" />
+        <div className="absolute inset-0 bg-black/60 md:bg-black/55 backdrop-blur-[0.5px]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-black/80" />
       </div>
 
       {/* Top Header / Brand Crest */}
