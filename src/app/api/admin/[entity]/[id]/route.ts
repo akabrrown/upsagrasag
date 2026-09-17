@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { serviceMap, schemaMap } from '@/lib/supabase/admin/index';
 import { requireAdmin } from '@/lib/authHelpers';
 import { ZodError } from 'zod';
@@ -45,6 +46,7 @@ export async function PATCH(
     const body = await request.json();
     const validated = partialSchema.parse(body);
     const updated = await service.update(id, validated);
+    revalidatePath('/', 'layout');
     return NextResponse.json(updated);
   } catch (error: unknown) {
     if (error instanceof ZodError) {
@@ -70,6 +72,7 @@ export async function DELETE(
 
   try {
     await service.delete(id);
+    revalidatePath('/', 'layout');
     // Return 204 No Content – clean, lightweight response
     return new Response(null, { status: 204 });
   } catch (error: unknown) {

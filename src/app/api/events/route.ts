@@ -6,7 +6,7 @@ export async function GET() {
     const { data: events, error } = await supabase
       .from('events_programmes')
       .select('*, sub_events(*)')
-      .order('event_date', { ascending: true });
+      .order('start_date', { ascending: true });
     if (error) throw error;
     return NextResponse.json(events);
   } catch (error) {

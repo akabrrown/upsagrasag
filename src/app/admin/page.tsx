@@ -1,9 +1,11 @@
-import { Image, ListChecks, Users, BarChart2, Settings } from 'lucide-react';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { Image, ListChecks, Users, BarChart2, Settings, Activity } from 'lucide-react';
 import QuickActionCard from '@/components/admin/ui/QuickActionCard';
 import ActivityItem from '@/components/admin/ui/ActivityItem';
-import InfiniteScrollWrapper from '@/components/admin/ui/InfiniteScrollWrapper';
+import { createClient } from '@/lib/supabase';
 
-// Sample data for quick action cards
 const quickActions = [
   { name: 'Gallery', href: '/admin/gallery', icon: 'Image', desc: 'Manage images and media' },
   { name: 'Opportunities', href: '/admin/opportunities', icon: 'ListChecks', desc: 'Create and edit opportunities' },
@@ -12,20 +14,96 @@ const quickActions = [
   { name: 'Partners', href: '/admin/partners', icon: 'Settings', desc: 'Partners and collaborations' },
 ] as const;
 
-// Mock activity data (replace with real API in production)
-const mockActivities = [
-  { user: 'Admin', action: 'uploaded', target: 'new gallery image', time: '2 mins ago' },
-  { user: 'Editor', action: 'published', target: 'news article', time: '1 hour ago' },
-  { user: 'Admin', action: 'updated', target: 'partner info', time: 'Yesterday' },
+// Tables to monitor for activity
+const MONITORED_TABLES = [
+  'gallery', 'opportunities', 'news_updates', 'partners', 'leadership',
+  'events_programmes', 'resources', 'tutorials', 'page_contents',
+  'academic_calendar', 'past_questions', 'homepage_president', 'admin_users'
 ];
 
+type ActivityEntry = {
+  user: string;
+  action: string;
+  target: string;
+  time: string;
+};
+
+function formatTimeAgo(date: Date): string {
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (seconds < 60) return 'Just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
+function eventToAction(eventType: string): string {
+  switch (eventType) {
+    case 'INSERT': return 'created';
+    case 'UPDATE': return 'updated';
+    case 'DELETE': return 'deleted';
+    default: return 'modified';
+  }
+}
+
+function tableToLabel(table: string): string {
+  return table.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
 export default function AdminDashboardPage() {
+  const [activities, setActivities] = useState<ActivityEntry[]>([]);
+  const [userEmail, setUserEmail] = useState('');
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    // Get current user email for display
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user?.email) setUserEmail(user.email.split('@')[0]);
+    });
+
+    // Subscribe to real-time changes across all monitored tables
+    const channel = supabase
+      .channel('dashboard-activity-feed')
+      .on('postgres_changes', { event: '*', schema: 'public' }, (payload) => {
+        const table = payload.table;
+        if (!MONITORED_TABLES.includes(table)) return;
+
+        const record = (payload.new || payload.old) as any;
+        const itemName = record?.name || record?.title || record?.email || table;
+
+        const entry: ActivityEntry = {
+          user: 'System',
+          action: eventToAction(payload.eventType),
+          target: `${itemName} (${tableToLabel(table)})`,
+          time: formatTimeAgo(new Date()),
+        };
+
+        setActivities(prev => [entry, ...prev].slice(0, 50));
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  // Re-render times every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActivities(prev => [...prev]);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="admin-layout">
       <main className="admin-main">
         {/* Hero Section */}
         <section className="admin-hero">
-          <h1>Welcome to the UPSA Admin Dashboard</h1>
+          <h1>Welcome{userEmail ? `, ${userEmail}` : ''}</h1>
           <p>Manage site content, partners, news, and more.</p>
         </section>
 
@@ -42,14 +120,30 @@ export default function AdminDashboardPage() {
           ))}
         </section>
 
-        {/* Recent Activity Feed */}
+        {/* Real-time Activity Feed */}
         <section className="mt-8">
-          <h2 className="text-xl font-bold mb-4">Recent Activity</h2>
-          <InfiniteScrollWrapper>
-            {mockActivities.map((act, idx) => (
-              <ActivityItem key={idx} activity={act} isLast={idx === mockActivities.length - 1} />
-            ))}
-          </InfiniteScrollWrapper>
+          <div className="flex items-center gap-2 mb-4">
+            <Activity className="w-5 h-5 text-[#004080]" />
+            <h2 className="text-xl font-bold">Live Activity</h2>
+            <span className="relative flex h-2.5 w-2.5 ml-1">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+          </div>
+
+          {activities.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
+              <p className="text-gray-400 text-sm font-medium">
+                No activity yet. Changes made across the system will appear here in real time.
+              </p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-5">
+              {activities.map((act, idx) => (
+                <ActivityItem key={`${idx}-${act.time}`} activity={act} isLast={idx === activities.length - 1} />
+              ))}
+            </div>
+          )}
         </section>
       </main>
     </div>

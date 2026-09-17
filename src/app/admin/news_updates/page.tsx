@@ -5,6 +5,7 @@ import useSWR from 'swr';
 import { useForm, useWatch, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { newsUpdateSchema, NewsUpdate } from '@/types/admin';
+import Image from 'next/image';
 import { 
   Plus, Search, Filter, Calendar, Eye, Pencil, Trash2, 
   ArrowLeft, Copy, CheckCircle2, Image as ImageIcon, X
@@ -12,6 +13,7 @@ import {
 import CloudinaryUpload from '@/components/CloudinaryUpload';
 import dynamic from 'next/dynamic';
 import 'react-quill-new/dist/quill.snow.css';
+import { AdminTableSkeleton } from '@/components/admin/AdminTableSkeleton';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
 const fetcher = (url: string) => fetch(url).then(r => r.json());
@@ -25,9 +27,9 @@ export default function AdminNewsPage() {
   const [activeTab, setActiveTab] = useState('All Articles');
   const [selectedArticle, setSelectedArticle] = useState<NewsUpdate | null>(null);
 
-  const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<NewsUpdate>({
+  const { register, handleSubmit, reset, setValue, control, formState: { errors, isSubmitting } } = useForm<NewsUpdate & { _send_notification?: boolean }>({
     resolver: zodResolver(newsUpdateSchema),
-    defaultValues: { title: '', content: '', category: 'news', image_url: '', published_at: '' }
+    defaultValues: { title: '', content: '', category: 'news', image_url: '', published_at: '', _send_notification: true }
   });
 
   const imageUrl = useWatch({ control, name: 'image_url' });
@@ -35,12 +37,13 @@ export default function AdminNewsPage() {
   // --- Handlers ---
   
   const handleOpenAdd = () => {
-    reset({ title: '', content: '', category: 'news', image_url: '', published_at: new Date().toISOString() });
+    reset({ title: '', content: '', category: 'news', image_url: '', published_at: new Date().toISOString(), _send_notification: true });
     setSelectedArticle(null);
     setView('add');
   };
 
-  const handleOpenEdit = (item: NewsUpdate) => {
+  const handleOpenEdit = (raw_item: NewsUpdate) => {
+    const item = Object.fromEntries(Object.entries(raw_item).map(([k, v]) => [k, v === null ? '' : v])) as any;
     const formattedItem = { ...item };
     if (formattedItem.published_at) {
       const d = new Date(formattedItem.published_at);
@@ -96,7 +99,7 @@ export default function AdminNewsPage() {
 
   const tabs = ['All Articles', 'Published', 'Drafts', 'News', 'Announcements'];
   
-  const filteredRecords = (Array.isArray(records) ? records : []).filter(r => {
+  const filteredRecords = records?.filter(r => {
     if (activeTab === 'All Articles') return true;
     if (activeTab === 'Published') return isPublished(r.published_at);
     if (activeTab === 'Drafts') return !isPublished(r.published_at);
@@ -165,7 +168,7 @@ export default function AdminNewsPage() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {isLoading ? (
-                <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">Loading articles...</td></tr>
+                <AdminTableSkeleton columns={5} />
               ) : filteredRecords.length === 0 ? (
                 <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">No articles found.</td></tr>
               ) : (
@@ -175,9 +178,9 @@ export default function AdminNewsPage() {
                     <tr key={record.id} className="hover:bg-gray-50/50 transition-colors group">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-4">
-                          <div className="w-16 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
+                          <div className="relative w-16 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
                             {record.image_url ? (
-                              <img src={record.image_url} alt="" className="w-full h-full object-cover" />
+                              <Image src={record.image_url} alt="" width={800} height={800} className="w-full h-full object-cover" />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center text-gray-400"><ImageIcon className="w-5 h-5"/></div>
                             )}
@@ -292,7 +295,15 @@ export default function AdminNewsPage() {
                       theme="snow"
                       value={field.value || ''}
                       onChange={field.onChange}
-                      modules={{ toolbar: [['bold', 'italic', 'underline'], [{ 'header': [1, 2, 3, false] }], [{ 'list': 'ordered' }, { 'list': 'bullet' }], ['link', 'image', 'blockquote']] }}
+                      modules={{ 
+                        toolbar: [
+                          ['bold', 'italic', 'underline', 'strike'], 
+                          [{ 'header': [1, 2, 3, false] }], 
+                          [{ 'list': 'ordered' }, { 'list': 'bullet' }], 
+                          ['link', 'image', 'video', 'blockquote'],
+                          ['clean']
+                        ] 
+                      }}
                       className="bg-white border-none min-h-[400px]"
                     />
                   )}
@@ -311,7 +322,7 @@ export default function AdminNewsPage() {
               <CloudinaryUpload onUpload={(url: string) => setValue('image_url', url, { shouldValidate: true })} />
               {imageUrl && (
                 <div className="mt-4 w-full aspect-video rounded-lg overflow-hidden border border-gray-200 relative">
-                  <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                  <Image src={imageUrl} alt="Preview" width={800} height={800} className="w-full h-full object-cover" />
                   <button type="button" onClick={() => setValue('image_url', '')} className="absolute top-2 right-2 p-1 bg-white/90 rounded-full text-red-500 hover:bg-white shadow-sm">
                     <X className="w-4 h-4" />
                   </button>
@@ -329,9 +340,12 @@ export default function AdminNewsPage() {
                 {...register('category')}
                 className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] transition-all text-sm"
               >
-                <option value="news">News</option>
+                <option value="news">Campus News</option>
                 <option value="announcements">Announcement</option>
-                <option value="articles">Article</option>
+                <option value="articles">Student Story</option>
+                <option value="press">Press Release</option>
+                <option value="grasag-updates">GRASAG Update</option>
+                <option value="events-recaps">Events Recap</option>
               </select>
             </div>
 
@@ -346,6 +360,20 @@ export default function AdminNewsPage() {
                 <Calendar className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
               </div>
             </div>
+
+            {view === 'add' && (
+              <div className="flex items-center gap-3 pt-2">
+                <input 
+                  type="checkbox" 
+                  id="_send_notification" 
+                  {...register('_send_notification' as any)} 
+                  className="w-4 h-4 text-[#2563eb] border-gray-300 rounded focus:ring-[#2563eb]"
+                />
+                <label htmlFor="_send_notification" className="text-sm text-gray-700 font-medium">
+                  Send Push Notification to all users
+                </label>
+              </div>
+            )}
           </div>
         </div>
       </form>
@@ -375,7 +403,7 @@ export default function AdminNewsPage() {
             {/* Poster */}
             {selectedArticle.image_url && (
               <div className="w-full aspect-video bg-gray-100 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0">
-                 <img src={selectedArticle.image_url} alt={selectedArticle.title} className="w-full h-full object-cover" />
+                 <Image src={selectedArticle.image_url} alt={selectedArticle.title} width={800} height={800} className="w-full h-full object-cover" />
               </div>
             )}
 

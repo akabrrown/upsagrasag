@@ -8,7 +8,7 @@ interface CloudinaryUploadProps {
   accept?: string;
 }
 
-export default function CloudinaryUpload({ onUpload, accept = 'image/*,video/*' }: CloudinaryUploadProps) {
+export default function CloudinaryUpload({ onUpload, accept = 'image/*,video/*,application/pdf' }: CloudinaryUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 

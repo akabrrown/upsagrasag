@@ -120,9 +120,23 @@ export default function PastQuestionsPage() {
 
       {/* Questions List Body */}
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-20 gap-3">
-          <Loader2 className="h-8 w-8 text-accent animate-spin" />
-          <p className="text-sm font-semibold text-neutral-500">Loading Past Questions...</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl border border-neutral-200 p-6 space-y-4 animate-pulse">
+              <div className="flex items-start justify-between gap-4">
+                <div className="h-10 w-10 rounded-lg bg-gray-200 flex-shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-5 w-3/4 bg-gray-200 rounded" />
+                  <div className="h-4 w-1/2 bg-gray-200 rounded" />
+                </div>
+              </div>
+              <div className="space-y-2 pt-2">
+                <div className="h-3 w-1/3 bg-gray-200 rounded" />
+                <div className="h-3 w-1/4 bg-gray-200 rounded" />
+              </div>
+              <div className="h-10 w-full bg-gray-200 rounded-lg" />
+            </div>
+          ))}
         </div>
       ) : filteredQuestions.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 rounded-2xl border border-dashed border-neutral-300 bg-white">

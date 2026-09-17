@@ -10,6 +10,8 @@ import {
   ArrowLeft, FileText
 } from 'lucide-react';
 import CloudinaryUpload from '@/components/CloudinaryUpload';
+import { AdminTableSkeleton } from '@/components/admin/AdminTableSkeleton';
+import Image from 'next/image';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -35,7 +37,8 @@ export default function AdminPageContentsPage() {
     setView('add');
   };
 
-  const handleOpenEdit = (item: PageContent) => {
+  const handleOpenEdit = (raw_item: PageContent) => {
+    const item = Object.fromEntries(Object.entries(raw_item).map(([k, v]) => [k, v === null ? '' : v])) as any;
     reset(item);
     setSelectedRecord(item);
     setView('edit');
@@ -129,14 +132,7 @@ export default function AdminPageContentsPage() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {isLoading ? (
-                <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-[#2563eb] border-t-transparent rounded-full animate-spin"></div>
-                      Loading contents...
-                    </div>
-                  </td>
-                </tr>
+                <AdminTableSkeleton columns={4} />
               ) : recordsArray.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
@@ -152,7 +148,7 @@ export default function AdminPageContentsPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
                         {record.image_url ? (
-                          <img src={record.image_url} alt={record.slug} className="w-12 h-12 rounded-lg object-cover bg-gray-100 border border-gray-200" />
+                          <Image src={record.image_url} alt={record.slug} width={400} height={400} className="w-12 h-12 rounded-lg object-cover bg-gray-100 border border-gray-200" />
                         ) : (
                           <div className="w-12 h-12 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center">
                             <FileText className="w-5 h-5 text-gray-400" />
@@ -280,7 +276,7 @@ export default function AdminPageContentsPage() {
               <CloudinaryUpload onUpload={(url) => setValue('image_url', url, { shouldValidate: true })} />
               {imageUrl ? (
                 <div className="mt-4 relative rounded-lg overflow-hidden border border-gray-200 group aspect-video">
-                  <img src={imageUrl} alt="preview" className="w-full h-full object-cover" />
+                  <Image src={imageUrl} alt="preview" width={800} height={800} className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <span className="text-white text-sm font-medium">Click above to replace</span>
                   </div>

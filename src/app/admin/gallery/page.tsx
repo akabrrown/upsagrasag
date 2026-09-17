@@ -109,10 +109,10 @@ export default function AdminGalleryPage() {
 
   const ListView = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 border-b border-gray-200">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Media Library</h1>
-          <p className="text-sm text-gray-500 mt-1">Dashboard &gt; Gallery</p>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Media Library</h1>
+          <p className="text-sm text-gray-500 mt-1">Manage your platform's visual assets.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
@@ -120,28 +120,28 @@ export default function AdminGalleryPage() {
             <input 
               type="text" 
               placeholder="Search images..." 
-              className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] w-64"
+              className="pl-9 pr-4 py-2 bg-gray-50 border border-transparent rounded-md text-sm focus:outline-none focus:bg-white focus:border-gray-300 focus:ring-0 w-64 transition-all"
             />
           </div>
           <button 
             onClick={handleOpenAdd}
-            className="flex items-center gap-2 px-4 py-2 bg-[#2563eb] text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm shadow-blue-500/30"
+            className="flex items-center gap-2 px-4 py-2 bg-[#001a54] text-white rounded-md text-sm font-medium hover:bg-[#001a54]/90 transition-colors shadow-sm"
           >
-            <Plus className="w-4 h-4" /> Add New Image
+            <Plus className="w-4 h-4" /> Add Image
           </button>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="flex border-b border-gray-100 px-2">
+      <div className="bg-white">
+        <div className="flex border-b border-gray-100 px-6">
           {tabs.map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab 
-                  ? 'border-[#2563eb] text-[#2563eb]' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200'
+                  ? 'border-[#001a54] text-[#001a54]' 
+                  : 'border-transparent text-gray-500 hover:text-gray-900 hover:border-gray-300'
               }`}
             >
               {tab}
@@ -151,40 +151,54 @@ export default function AdminGalleryPage() {
 
         <div className="p-6">
           {loading ? (
-            <div className="flex items-center justify-center py-12 gap-2 text-gray-500">
-              <div className="w-4 h-4 border-2 border-[#2563eb] border-t-transparent rounded-full animate-spin"></div>
-              Loading images...
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="aspect-square bg-gray-100 rounded-lg animate-pulse" />
+              ))}
             </div>
           ) : filteredImages.length === 0 ? (
-            <div className="text-center py-12">
-              <ImageIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500">No images found in the gallery.</p>
+            <div className="text-center py-24 border border-dashed border-gray-200 rounded-lg bg-gray-50/50">
+              <ImageIcon className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+              <p className="text-gray-900 font-medium">Your library is empty</p>
+              <p className="text-gray-500 text-sm mt-1">Upload images to start building your gallery.</p>
+              <button 
+                onClick={handleOpenAdd}
+                className="mt-6 px-4 py-2 border border-gray-300 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors"
+              >
+                Upload first image
+              </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-              {filteredImages.map((img) => (
-                <div key={img.url} className="group flex flex-col bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-all">
-                  <div className="relative aspect-square overflow-hidden bg-gray-100">
+            <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
+              {filteredImages.map((img, idx) => {
+                const hasTitle = img.title && img.title.trim().toLowerCase() !== 'untitled';
+                
+                return (
+                  <div 
+                    key={img.url + idx} 
+                    className="group relative rounded-lg overflow-hidden bg-gray-100 break-inside-avoid shadow-sm border border-black/5"
+                  >
                     <Image 
                       src={img.url} 
-                      alt={img.title || 'Gallery image'} 
-                      fill 
-                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 20vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-500" 
+                      alt={hasTitle ? img.title : 'Library image'} 
+                      width={600}
+                      height={800}
+                      className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-[1.02]" 
+                      unoptimized
                     />
+                    
+                    {/* Minimalist Hover State */}
+                    {hasTitle && (
+                      <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <p className="text-white text-sm font-medium line-clamp-1">{img.title}</p>
+                        {img.description && (
+                          <p className="text-white/80 text-xs line-clamp-1 mt-0.5">{img.description}</p>
+                        )}
+                      </div>
+                    )}
                   </div>
-                  <div className="p-4 flex-1 flex flex-col justify-between">
-                    <div>
-                      <h3 className="font-semibold text-gray-900 text-sm line-clamp-1" title={img.title}>{img.title || 'Untitled'}</h3>
-                      {img.description && <p className="text-xs text-gray-500 mt-1 line-clamp-2" title={img.description}>{img.description}</p>}
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs text-gray-400 mt-3 pt-3 border-t border-gray-50">
-                      <Calendar className="w-3.5 h-3.5" />
-                      <span>{new Date(img.uploaded_at).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -271,7 +285,7 @@ export default function AdminGalleryPage() {
                 <div className="grid grid-cols-2 gap-2">
                   {uploadedUrls.map((url, idx) => (
                     <div key={idx} className="relative group rounded-md overflow-hidden border border-gray-200 aspect-square">
-                      <Image src={url} alt="Staged upload" fill className="object-cover" />
+                      <Image src={url} alt="Staged upload" width={800} height={800} className="object-cover" />
                       <button 
                         type="button"
                         onClick={() => handleRemoveUrl(url)}

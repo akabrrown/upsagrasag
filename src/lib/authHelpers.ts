@@ -22,12 +22,12 @@ export async function requireAdmin() {
     // Fallback: Treat as admin if authenticated (since there's no public sign up)
     'admin';
 
-  if (possibleRole !== 'admin') {
+  if (possibleRole !== 'admin' && possibleRole !== 'editor') {
     // In development allow any authenticated user for faster iteration
     if (process.env.NODE_ENV === 'development') {
       return null;
     }
-    return NextResponse.json({ error: 'Forbidden: Admins only' }, { status: 403 });
+    return NextResponse.json({ error: 'Forbidden: Admins and Editors only' }, { status: 403 });
   }
   // All good, allow request to continue
   return null;

@@ -4,6 +4,8 @@ import React from 'react';
 import { Edit, Trash2, Inbox } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+import { Skeleton } from '@/components/ui/Skeleton';
+
 interface Column<T> {
   header: string;
   accessor: keyof T | ((row: T) => React.ReactNode);
@@ -26,8 +28,35 @@ export default function CrudTable<T extends { id?: string | number }>({
 }: CrudTableProps<T>) {
   if (isLoading) {
     return (
-      <div className="w-full bg-white rounded-xl border border-slate-200 shadow-sm p-12 flex justify-center items-center min-h-[300px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="w-full bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="text-xs text-slate-500 uppercase tracking-wider bg-slate-50/80 border-b border-slate-200">
+              <tr>
+                {columns.map((col, idx) => (
+                  <th key={idx} className="px-6 py-4 font-semibold">{col.header}</th>
+                ))}
+                {(onEdit || onDelete) && <th className="px-6 py-4 font-semibold text-right">Actions</th>}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {Array.from({ length: 5 }).map((_, rowIdx) => (
+                <tr key={rowIdx}>
+                  {columns.map((_, colIdx) => (
+                    <td key={colIdx} className="px-6 py-4">
+                      <Skeleton className={`h-4 ${colIdx === 0 ? 'w-3/4' : 'w-1/2'}`} />
+                    </td>
+                  ))}
+                  {(onEdit || onDelete) && (
+                    <td className="px-6 py-4 text-right">
+                      <Skeleton className="h-4 w-16 ml-auto" />
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     );
   }

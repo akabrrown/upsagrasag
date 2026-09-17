@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { platformSettingsSchema, PlatformSettings } from '@/types/admin';
 import { Save, ShieldAlert, CheckCircle2, Globe, Settings as SettingsIcon, Lock, KeyRound, Construction, ChevronRight } from 'lucide-react';
-import { supabaseClient } from '@/lib/supabaseClient';
+import { createClient } from '@/lib/supabase';
 import './settings.css';
 import { cn } from '@/lib/utils';
 
@@ -15,7 +15,7 @@ const fetcher = (url: string) => fetch(url, { credentials: 'include' }).then(r =
 export default function AdminSettingsPage() {
   const { data: settings, error, isLoading, mutate } = useSWR<PlatformSettings>('/api/admin/settings', fetcher);
   
-  const [activeTab, setActiveTab] = useState<'general' | 'security'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'contact' | 'security'>('general');
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   
@@ -76,7 +76,8 @@ export default function AdminSettingsPage() {
     }
 
     try {
-      const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+      const supabase = createClient();
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) throw error;
       setPwdSuccess('Password changed successfully!');
       (e.target as HTMLFormElement).reset();
@@ -128,6 +129,19 @@ export default function AdminSettingsPage() {
               <Globe className="w-4 h-4" />
               <span className="flex-1">General Preferences</span>
               {activeTab === 'general' && <ChevronRight className="w-4 h-4 opacity-50 hidden md:block" />}
+            </button>
+            <button
+              onClick={() => setActiveTab('contact')}
+              className={cn(
+                "flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap text-left",
+                activeTab === 'contact' 
+                  ? "bg-[#004080] text-white shadow-md shadow-[#004080]/20" 
+                  : "bg-white text-gray-600 hover:bg-gray-50 hover:text-gray-900 border border-gray-100"
+              )}
+            >
+              <Globe className="w-4 h-4" />
+              <span className="flex-1">Contact Details</span>
+              {activeTab === 'contact' && <ChevronRight className="w-4 h-4 opacity-50 hidden md:block" />}
             </button>
             <button
               onClick={() => setActiveTab('security')}
@@ -222,6 +236,68 @@ export default function AdminSettingsPage() {
                     >
                       <Save className="w-4 h-4" /> 
                       {isSubmitting ? 'Applying...' : 'Apply Changes'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {/* Contact Settings Tab */}
+            {activeTab === 'contact' && (
+              <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+                <div className="mb-8">
+                  <h2 className="text-xl font-bold text-gray-900 tracking-tight">Contact Information</h2>
+                  <p className="text-sm text-gray-500 mt-1 font-medium">Update the official contact details displayed on the public site.</p>
+                </div>
+                
+                <form onSubmit={handleSubmit(onSubmitSettings)} className="space-y-6 max-w-2xl">
+                  
+                  <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Official Email</label>
+                        <input 
+                          {...register('contact_email')}
+                          type="email"
+                          placeholder="e.g. info@grasag-upsa.edu.gh"
+                          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#004080] focus:ring-1 focus:ring-[#004080] font-medium text-sm text-gray-900 transition-colors"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Telephone Number</label>
+                        <input 
+                          {...register('contact_phone')}
+                          type="text"
+                          placeholder="e.g. +233 24 123 4567"
+                          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#004080] focus:ring-1 focus:ring-[#004080] font-medium text-sm text-gray-900 transition-colors"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Office Location / Address</label>
+                        <textarea 
+                          {...register('contact_address')}
+                          rows={3}
+                          placeholder="e.g. University of Professional Studies Accra, First floor..."
+                          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#004080] focus:ring-1 focus:ring-[#004080] font-medium text-sm text-gray-900 transition-colors resize-y"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex items-center justify-between border-t border-gray-100">
+                    <div>
+                      {successMsg && <p className="text-sm text-emerald-600 font-bold flex items-center gap-1"><CheckCircle2 className="w-4 h-4"/> {successMsg}</p>}
+                      {errorMsg && <p className="text-sm text-red-600 font-bold">{errorMsg}</p>}
+                    </div>
+                    <button 
+                      type="submit" 
+                      disabled={isSubmitting}
+                      className="flex items-center gap-2 bg-[#004080] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#003060] transition-all shadow-md hover:shadow-lg disabled:opacity-50"
+                    >
+                      <Save className="w-4 h-4" /> 
+                      {isSubmitting ? 'Saving...' : 'Save Contact Info'}
                     </button>
                   </div>
                 </form>

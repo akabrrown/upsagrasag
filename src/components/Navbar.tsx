@@ -22,14 +22,18 @@ import {
   ShoppingBag,
   Scale,
   Globe,
-  Image as LucideImage
+  Image as LucideImage,
+  Search
 } from 'lucide-react';
+
+import GlobalSearch from './GlobalSearch';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [hoveredDropdown, setHoveredDropdown] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const pathname = usePathname();
   const isHomePage = pathname === '/';
 
@@ -60,17 +64,24 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (!isHomePage) return;
     const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
+      if (isHomePage) {
+        if (window.scrollY > 50) {
+          setIsScrolled(true);
+        } else {
+          setIsScrolled(false);
+        }
+      }
+      
+      // Close mobile menu on scroll
+      if (isOpen) {
+        setIsOpen(false);
+        setActiveDropdown(null);
       }
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isHomePage]);
+  }, [isHomePage, isOpen]);
 
   const toggleDropdown = (name: string) => {
     if (activeDropdown === name) {
@@ -97,10 +108,11 @@ export default function Navbar() {
           { name: 'Resources', href: '/resources', icon: FileText },
           { name: 'Past Questions', href: '/academics/past-questions', icon: FileText },
           { name: 'Tutorials', href: '/academics/tutorials', icon: GraduationCap },
-          { name: 'Academic Calendar', href: '/student-support/academic-calendar', icon: Calendar }
+          { name: 'Academic Calendar', href: '/student-support/academic-calendar', icon: Calendar },
+          { name: 'Academic Timetable', href: '/student-support/academic-timetable', icon: Calendar }
         ] },
     { name: 'Events & Programmes', href: '/events', icon: Calendar },
-    { name: 'Research & Opportunities', href: '/research-and-opportunities', icon: Bot },
+    // { name: 'Opportunities', href: '/opportunities', icon: Bot }, // Hidden per user request until AI is configured
     { name: 'News & Updates', href: '/news-updates', icon: Info },
   ];
 
@@ -112,6 +124,8 @@ export default function Navbar() {
 
   return (
     <>
+      <GlobalSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+
       {/* Page Blur Overlay Backdrop (for desktop Mega Menu hover) */}
       <div 
         className={`hidden lg:block fixed inset-0 bg-black/30 backdrop-blur-md z-40 transition-all duration-300 ${
@@ -125,10 +139,22 @@ export default function Navbar() {
       <header className={headerClass} onMouseLeave={() => setHoveredDropdown(null)}>
         {/* Top Bar */}
         <div className="hidden lg:flex h-10 w-full items-center justify-between px-8 border-b border-white/5 text-xs text-neutral-300 font-medium">
-          {/* Left Side: Google Translate Select dropdown */}
-          <div className="flex items-center gap-1.5 hover:text-[#B8860B] transition-colors text-neutral-300">
-            <Globe className="h-3.5 w-3.5 text-[#B8860B] flex-shrink-0" />
-            <div id="google_translate_element" className="google-translate-container"></div>
+          {/* Left Side: Google Translate Select dropdown & Search */}
+          <div className="flex items-center gap-4 text-neutral-300">
+            <button 
+              onClick={() => setIsSearchOpen(true)}
+              className="flex items-center gap-1.5 hover:text-[#B8860B] transition-colors bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-full"
+            >
+              <Search className="h-3.5 w-3.5 text-[#B8860B]" />
+              <span>Search</span>
+              <kbd className="hidden lg:inline-flex items-center gap-1 bg-white/10 px-1.5 rounded text-[10px] font-sans ml-2 text-neutral-400">
+                <span className="text-xs">⌘</span>K
+              </kbd>
+            </button>
+            <div className="flex items-center gap-1.5 hover:text-[#B8860B] transition-colors border-l border-white/10 pl-4">
+              <Globe className="h-3.5 w-3.5 text-[#B8860B] flex-shrink-0" />
+              <div id="google_translate_element" className="google-translate-container"></div>
+            </div>
           </div>
 
           {/* Right Side: Contact & Socials */}
@@ -156,29 +182,30 @@ export default function Navbar() {
         </div>
 
         {/* Main Navbar */}
-        <div className="h-20 w-full flex items-center justify-between px-6 lg:px-8">
+        <div className="h-20 w-full flex items-center justify-between px-4 xl:px-8">
           {/* Logo */}
-          <Link href="/" className="flex items-center" onMouseEnter={() => setHoveredDropdown(null)}>
-            <div className="relative h-12 w-auto flex items-center justify-center">
+          <Link href="/" className="flex items-center shrink-0" onMouseEnter={() => setHoveredDropdown(null)}>
+            <div className="relative h-11 xl:h-12 w-auto flex items-center justify-center">
               <Image src="/GRASAG-LOGO-white-text.png" alt="GRASAG UPSA Logo" className="object-contain h-full w-auto" width={272} height={80} priority />
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
             {navItems.map((item) => {
               if (item.dropdown) {
                 return (
                   <div 
                     key={item.name} 
-                    className="relative"
+                    className="relative group/nav"
                     onMouseEnter={() => setHoveredDropdown(item.name)}
                   >
                     <button
-                      className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold text-neutral-200 hover:text-white transition-all duration-200 animate-none"
+                      className="relative flex items-center gap-1 rounded-lg px-2.5 xl:px-3.5 py-2 text-sm font-semibold text-neutral-200 hover:text-[#B8860B] transition-colors duration-200"
                     >
-                      {item.name}
-                      <ChevronDown className={`h-4 w-4 transition-transform duration-200 text-neutral-400 ${hoveredDropdown === item.name ? 'rotate-180' : ''}`} />
+                      <span>{item.name}</span>
+                      <ChevronDown className={`h-4 w-4 transition-transform duration-250 text-neutral-400 group-hover/nav:text-[#B8860B] ${hoveredDropdown === item.name ? 'rotate-180' : 'group-hover/nav:rotate-180'}`} />
+                      <span className="absolute bottom-0 left-2.5 right-2.5 h-[2px] bg-[#B8860B] scale-x-0 group-hover/nav:scale-x-100 transition-transform duration-300 origin-left" />
                     </button>
                   </div>
                 );
@@ -188,16 +215,17 @@ export default function Navbar() {
                   key={item.name}
                   href={item.href}
                   onMouseEnter={() => setHoveredDropdown(null)}
-                  className="rounded-lg px-3 py-2 text-sm font-semibold text-neutral-200 hover:text-white transition-all duration-200"
+                  className="relative group/nav rounded-lg px-2.5 xl:px-3.5 py-2 text-sm font-semibold text-neutral-200 hover:text-[#B8860B] transition-colors duration-200"
                 >
-                  {item.name}
+                  <span>{item.name}</span>
+                  <span className="absolute bottom-0 left-2.5 right-2.5 h-[2px] bg-[#B8860B] scale-x-0 group-hover/nav:scale-x-100 transition-transform duration-300 origin-left" />
                 </Link>
               );
             })}
           </nav>
 
           {/* Right Side: CTA Button */}
-          <div className="hidden lg:flex items-center gap-4" onMouseEnter={() => setHoveredDropdown(null)}>
+          <div className="hidden lg:flex items-center gap-4 shrink-0" onMouseEnter={() => setHoveredDropdown(null)}>
             <Link
               href="/contact"
               className="bg-[#B8860B] hover:bg-[#9A7C1C] text-white px-5 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all shadow-md active:scale-95"
@@ -206,8 +234,14 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Mobile menu button */}
-          <div className="flex lg:hidden items-center gap-4">
+          {/* Mobile menu buttons */}
+          <div className="flex lg:hidden items-center gap-2">
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className="rounded-lg p-2.5 text-neutral-200 hover:bg-white/5 focus:outline-none"
+            >
+              <Search className="h-5 w-5" />
+            </button>
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="rounded-lg p-2.5 text-neutral-200 hover:bg-white/5 focus:outline-none"
@@ -358,16 +392,16 @@ export default function Navbar() {
                       <Link href="/welfare" className="group/item block space-y-1" onClick={() => setHoveredDropdown(null)}>
                         <div className="font-bold text-sm text-neutral-800 group-hover/item:text-[#B8860B] transition-colors flex items-center gap-1.5">
                           <Heart className="h-4 w-4 text-[#B8860B]" />
-                          Welfare
+                          Welfare & Wellbeing
                         </div>
-                        <p className="text-xs text-neutral-500 leading-normal pl-5.5">Discover counseling services, emergency support, and packages.</p>
+                        <p className="text-xs text-neutral-500 leading-normal pl-5.5">Access counselling, health, emergency financial and general welfare support.</p>
                       </Link>
                       <Link href="/resources" className="group/item block space-y-1" onClick={() => setHoveredDropdown(null)}>
                         <div className="font-bold text-sm text-neutral-800 group-hover/item:text-[#B8860B] transition-colors flex items-center gap-1.5">
                           <FileText className="h-4 w-4 text-[#B8860B]" />
-                          Resources
+                          Student Resources
                         </div>
-                        <p className="text-xs text-neutral-500 leading-normal pl-5.5">Get official publications, forms, and constitutions.</p>
+                        <p className="text-xs text-neutral-500 leading-normal pl-5.5">Find official documents, forms, academic tools and frequently used UPSA platforms.</p>
                       </Link>
                     </div>
                   </div>
@@ -396,6 +430,13 @@ export default function Navbar() {
                         </div>
                         <p className="text-xs text-neutral-500 leading-normal pl-5.5">Keep track of registration, lectures, and exams.</p>
                       </Link>
+                      <Link href="/student-support/academic-timetable" className="group/item block space-y-1" onClick={() => setHoveredDropdown(null)}>
+                        <div className="font-bold text-sm text-neutral-800 group-hover/item:text-[#B8860B] transition-colors flex items-center gap-1.5">
+                          <Calendar className="h-4 w-4 text-[#B8860B]" />
+                          Academic Timetable
+                        </div>
+                        <p className="text-xs text-neutral-500 leading-normal pl-5.5">View your class schedules and lecture venues.</p>
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -415,7 +456,7 @@ export default function Navbar() {
                       Access physical and mental wellbeing services, parental support, and other campus facilities.
                     </p>
                     <Link href="/welfare" onClick={() => setHoveredDropdown(null)} className="inline-flex items-center gap-1 text-xs font-bold text-[#B8860B] hover:text-primary transition-colors mt-2">
-                      Get Welfare Support →
+                      Explore Welfare Support →
                     </Link>
                   </div>
                 </div>

@@ -5,11 +5,13 @@ import useSWR from 'swr';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { partnerSchema, Partner } from '@/types/admin';
+import Image from 'next/image';
 import { 
   Plus, Search, Filter, Eye, Pencil, Trash2, 
   ArrowLeft, Copy, Building2
 } from 'lucide-react';
 import CloudinaryUpload from '@/components/CloudinaryUpload';
+import { AdminTableSkeleton } from '@/components/admin/AdminTableSkeleton';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -44,7 +46,8 @@ export default function AdminPartnersPage() {
     setView('add');
   };
 
-  const handleOpenEdit = (item: Partner) => {
+  const handleOpenEdit = (raw_item: Partner) => {
+    const item = Object.fromEntries(Object.entries(raw_item).map(([k, v]) => [k, v === null ? '' : v])) as any;
     const unified = { ...item, logo_url: item.logo_url || (item as any).image_url || (item as any).photo_url || '' };
     reset(unified);
     setSelectedPartner(unified);
@@ -88,7 +91,7 @@ export default function AdminPartnersPage() {
 
   const tabs = ['All Partners', 'Active', 'Archived'];
   
-  const sortedRecords = (Array.isArray(records) ? records : []).map(r => ({ ...r, logo_url: r.logo_url || (r as any).image_url || (r as any).photo_url || '' })).sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
+  const sortedRecords = (records || []).map(r => ({ ...r, logo_url: r.logo_url || (r as any).image_url || (r as any).photo_url || '' })).sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
 
   const ListView = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -147,7 +150,7 @@ export default function AdminPartnersPage() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {isLoading ? (
-                <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">Loading partners...</td></tr>
+                <AdminTableSkeleton columns={4} />
               ) : sortedRecords.length === 0 ? (
                 <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">No partners found.</td></tr>
               ) : (
@@ -157,7 +160,7 @@ export default function AdminPartnersPage() {
                       <div className="flex items-center gap-4">
                         <div className="w-14 h-14 rounded-lg bg-white border border-gray-200 overflow-hidden flex-shrink-0 flex items-center justify-center p-2">
                           {record.logo_url ? (
-                            <img src={record.logo_url} alt="" className="w-full h-full object-contain" />
+                            <Image src={record.logo_url} alt="" width={800} height={800} className="w-full h-full object-contain" />
                           ) : (
                             <Building2 className="w-6 h-6 text-gray-400" />
                           )}
@@ -261,7 +264,7 @@ export default function AdminPartnersPage() {
               <CloudinaryUpload onUpload={(url: string) => setValue('logo_url', url, { shouldValidate: true })} />
               {logoUrl && (
                 <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200 shadow-sm flex items-center justify-center">
-                  <img src={logoUrl} alt="Preview" className="h-20 object-contain" />
+                  <Image src={logoUrl} alt="Preview" width={400} height={400} className="h-20 object-contain" />
                 </div>
               )}
             </div>
@@ -291,7 +294,7 @@ export default function AdminPartnersPage() {
         <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center text-center">
            <div className="w-32 h-32 rounded-2xl bg-white border border-gray-200 shadow-sm flex flex-col items-center justify-center p-4 mb-6">
              {selectedPartner.logo_url ? (
-                <img src={selectedPartner.logo_url} alt={selectedPartner.name} className="w-full h-full object-contain" />
+                <Image src={selectedPartner.logo_url} alt={selectedPartner.name} width={800} height={800} className="w-full h-full object-contain" />
              ) : (
                 <Building2 className="w-12 h-12 text-gray-400" />
              )}

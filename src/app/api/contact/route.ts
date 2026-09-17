@@ -5,7 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY || 're_placeholder');
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, subject, message } = await req.json();
+    const { name, email, subject, message, targetEmail } = await req.json();
 
     if (!name || !email || !subject || !message) {
       return NextResponse.json({ error: 'All fields (name, email, subject, message) are required' }, { status: 400 });
@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
 
     const emailResponse = await resend.emails.send({
       from: 'GRASAG Portal <onboarding@resend.dev>',
-      to: 'grasagpresident@upsamail.edu.gh',
+      to: (targetEmail && typeof targetEmail === 'string' && targetEmail.includes('@')) ? targetEmail : 'grasagpresident@upsamail.edu.gh',
       subject: `[GRASAG Portal Contact] - ${subject}`,
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
