@@ -3,6 +3,38 @@ import { supabaseAdminClient } from '@/lib/supabase/admin/index';
 
 export const dynamic = 'force-dynamic';
 
+interface SearchNewsItem {
+  id: string | number;
+  title: string;
+  slug: string;
+  content: string | null;
+  created_at: string;
+}
+
+interface SearchEventItem {
+  id: string | number;
+  title: string;
+  description: string | null;
+  start_date: string;
+}
+
+interface SearchResourceItem {
+  id: string | number;
+  title: string;
+  description: string | null;
+  file_url: string | null;
+  link_url: string | null;
+}
+
+interface FormattedSearchResult {
+  id: string;
+  title: string;
+  description: string;
+  url: string;
+  type: string;
+  date: string | null;
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -44,27 +76,27 @@ export async function GET(request: Request) {
     if (resourcesError) console.error('Resources Error:', resourcesError);
 
     // Format results
-    const formattedResults = [
-      ...(newsData || []).map((item) => ({
+    const formattedResults: FormattedSearchResult[] = [
+      ...((newsData as SearchNewsItem[] | null) || []).map((item: SearchNewsItem) => ({
         id: `news-${item.id}`,
         title: item.title,
-        description: item.content?.substring(0, 100).replace(/<[^>]+>/g, '') + '...',
+        description: item.content ? item.content.substring(0, 100).replace(/<[^>]+>/g, '') + '...' : '...',
         url: `/news-updates/${item.slug}`,
         type: 'News',
         date: item.created_at,
       })),
-      ...(eventsData || []).map((item) => ({
+      ...((eventsData as SearchEventItem[] | null) || []).map((item: SearchEventItem) => ({
         id: `event-${item.id}`,
         title: item.title,
-        description: item.description?.substring(0, 100) + '...',
+        description: item.description ? item.description.substring(0, 100) + '...' : '...',
         url: `/events/${item.id}`,
         type: 'Event',
         date: item.start_date,
       })),
-      ...(resourcesData || []).map((item) => ({
+      ...((resourcesData as SearchResourceItem[] | null) || []).map((item: SearchResourceItem) => ({
         id: `resource-${item.id}`,
         title: item.title,
-        description: item.description?.substring(0, 100) + '...',
+        description: item.description ? item.description.substring(0, 100) + '...' : '...',
         url: item.link_url || item.file_url || `/resources`,
         type: 'Resource',
         date: null,
@@ -80,7 +112,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ results: formattedResults.slice(0, 10) });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Search API error:', error);
     return NextResponse.json({ error: 'Failed to perform search' }, { status: 500 });
   }

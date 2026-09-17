@@ -17,9 +17,6 @@ const cspHeader = `
 `.replace(/\n/g, '');
 
 const nextConfig: NextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
