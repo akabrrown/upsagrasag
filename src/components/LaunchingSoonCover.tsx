@@ -1,14 +1,46 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Calendar, Clock } from 'lucide-react';
 
+
+// Target Launch Date: Tuesday, 29th September 2026 at 3:00 PM GMT
+const TARGET_LAUNCH_DATE = new Date('2026-09-29T15:00:00Z').getTime();
 
 export default function LaunchingSoonCover() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [statusMsg, setStatusMsg] = useState('');
+  const [mounted, setMounted] = useState(false);
+
+  const calculateTimeLeft = () => {
+    const now = new Date().getTime();
+    const difference = TARGET_LAUNCH_DATE - now;
+
+    if (difference <= 0) {
+      return { days: 0, hours: 0, minutes: 0, seconds: 0, isLaunched: true };
+    }
+
+    return {
+      days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+      minutes: Math.floor((difference / 1000 / 60) % 60),
+      seconds: Math.floor((difference / 1000) % 60),
+      isLaunched: false,
+    };
+  };
+
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+
+  useEffect(() => {
+    setMounted(true);
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,19 +106,72 @@ export default function LaunchingSoonCover() {
             />
           </div>
         </div>
+
+        {/* Launch Date Header Badge */}
+        <div className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 border border-white/20 backdrop-blur-md text-xs font-semibold text-amber-300 shadow-md">
+          <Calendar className="w-3.5 h-3.5 text-amber-400" />
+          <span>Tuesday, 29th Sept @ 3:00 PM GMT</span>
+        </div>
       </header>
 
       {/* Main Center Content: Split Design */}
       <main className="relative z-10 w-full max-w-6xl mx-auto px-6 sm:px-10 py-12 sm:py-20 my-auto">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center">
           
-          {/* Left Column: Big Bold Typography */}
+          {/* Left Column: Big Bold Typography & Live Countdown */}
           <div className="md:col-span-6 flex flex-col justify-center text-left">
+            {/* Mobile Launch Date Badge */}
+            <div className="sm:hidden inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/40 border border-white/20 backdrop-blur-md text-[11px] font-semibold text-amber-300 shadow-md mb-3 w-fit">
+              <Clock className="w-3 h-3 text-amber-400" />
+              <span>Tuesday, 29th Sept @ 3:00 PM</span>
+            </div>
+
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight text-white leading-[1.05] uppercase drop-shadow-lg">
               WE ARE<br />
               COMING<br />
               SOON!
             </h1>
+
+            {/* Real-Time Live Countdown Timer */}
+            <div className="mt-6 sm:mt-8">
+              <p className="text-[11px] sm:text-xs uppercase tracking-widest text-gray-300 font-semibold mb-2.5">
+                Official Portal Launch Countdown
+              </p>
+              <div className="grid grid-cols-4 gap-2 sm:gap-3 max-w-sm">
+                <div className="bg-black/50 backdrop-blur-md border border-white/25 rounded-lg p-2.5 sm:p-3 text-center shadow-xl">
+                  <span className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                    {mounted ? timeLeft.days : '--'}
+                  </span>
+                  <span className="block text-[9px] sm:text-[10px] uppercase tracking-widest text-gray-300 font-semibold mt-0.5">
+                    Days
+                  </span>
+                </div>
+                <div className="bg-black/50 backdrop-blur-md border border-white/25 rounded-lg p-2.5 sm:p-3 text-center shadow-xl">
+                  <span className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                    {mounted ? String(timeLeft.hours).padStart(2, '0') : '--'}
+                  </span>
+                  <span className="block text-[9px] sm:text-[10px] uppercase tracking-widest text-gray-300 font-semibold mt-0.5">
+                    Hours
+                  </span>
+                </div>
+                <div className="bg-black/50 backdrop-blur-md border border-white/25 rounded-lg p-2.5 sm:p-3 text-center shadow-xl">
+                  <span className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                    {mounted ? String(timeLeft.minutes).padStart(2, '0') : '--'}
+                  </span>
+                  <span className="block text-[9px] sm:text-[10px] uppercase tracking-widest text-gray-300 font-semibold mt-0.5">
+                    Mins
+                  </span>
+                </div>
+                <div className="bg-black/50 backdrop-blur-md border border-white/25 rounded-lg p-2.5 sm:p-3 text-center shadow-xl">
+                  <span className="text-2xl sm:text-3xl font-black text-amber-300 tracking-tight">
+                    {mounted ? String(timeLeft.seconds).padStart(2, '0') : '--'}
+                  </span>
+                  <span className="block text-[9px] sm:text-[10px] uppercase tracking-widest text-gray-300 font-semibold mt-0.5">
+                    Secs
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Center Divider: Thin Clean Line (Hidden on small screens) */}
@@ -99,7 +184,7 @@ export default function LaunchingSoonCover() {
             
             {/* Description Paragraph */}
             <p className="text-sm sm:text-base text-gray-200 leading-relaxed font-normal drop-shadow">
-              The official digital portal for graduate students of the University of Professional Studies, Accra is undergoing final deployment. Access timetables, research archives, academic support, and student welfare in one unified space.
+              The official digital portal for graduate students of the University of Professional Studies, Accra is undergoing final deployment and will launch on <strong className="text-white font-semibold">Tuesday, 29th September at 3:00 PM GMT</strong>. Access timetables, research archives, academic support, and student welfare in one unified space.
             </p>
 
             {/* Subscribe Heading */}
