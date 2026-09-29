@@ -5,8 +5,8 @@ import Image from 'next/image';
 import { CheckCircle2, Calendar, Clock } from 'lucide-react';
 
 
-// Target Launch Date: Tuesday, 29th September 2026 at 3:00 PM GMT
-const TARGET_LAUNCH_DATE = new Date('2026-09-29T15:00:00Z').getTime();
+// Target Launch Date: Wednesday, 30th September 2026 at 3:00 PM GMT
+const TARGET_LAUNCH_DATE = new Date('2026-09-30T15:00:00Z').getTime();
 
 export default function LaunchingSoonCover() {
   const [email, setEmail] = useState('');
@@ -110,7 +110,7 @@ export default function LaunchingSoonCover() {
         {/* Launch Date Header Badge */}
         <div className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 border border-white/20 backdrop-blur-md text-xs font-semibold text-amber-300 shadow-md">
           <Calendar className="w-3.5 h-3.5 text-amber-400" />
-          <span>Tuesday, 29th Sept @ 3:00 PM GMT</span>
+          <span>Wednesday, 30th Sept @ 3:00 PM GMT</span>
         </div>
       </header>
 
@@ -184,7 +184,7 @@ export default function LaunchingSoonCover() {
             
             {/* Description Paragraph */}
             <p className="text-sm sm:text-base text-gray-200 leading-relaxed font-normal drop-shadow">
-              The official digital portal for graduate students of the University of Professional Studies, Accra is undergoing final deployment and will launch on <strong className="text-white font-semibold">Tuesday, 29th September at 3:00 PM GMT</strong>. Access timetables, research archives, academic support, and student welfare in one unified space.
+              The official digital portal for graduate students of the University of Professional Studies, Accra is undergoing final deployment and will launch on <strong className="text-white font-semibold">Wednesday, 30th September at 3:00 PM GMT</strong>. Access timetables, research archives, academic support, and student welfare in one unified space.
             </p>
 
             {/* Subscribe Heading */}
