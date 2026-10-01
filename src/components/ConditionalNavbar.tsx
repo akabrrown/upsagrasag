@@ -5,10 +5,15 @@ import Navbar from "@/components/Navbar";
 
 export default function ConditionalNavbar() {
   const pathname = usePathname();
-  // While public frontend is covered with the Launching Soon gateway, hide standard navbar
-  if (!pathname.startsWith("/admin")) {
-    return null;
-  }
-  return null;
+  
+  const isAdminOrAuth = pathname?.startsWith('/admin') || pathname === '/signin' || pathname?.startsWith('/api/');
+  const isLocalhost = process.env.NODE_ENV === 'development';
+
+  if (isAdminOrAuth) return null;
+  
+  // While public frontend is covered with the Launching Soon gateway, hide standard navbar in production
+  if (!isLocalhost) return null;
+
+  return <Navbar />;
 }
 
