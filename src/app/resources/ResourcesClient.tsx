@@ -20,7 +20,6 @@ import {
 
 interface ResourcesClientProps {
   initialResources: Resource[];
-  initialQuickLinks?: any[];
 }
 
 interface CuratedResourceItem {
@@ -37,6 +36,53 @@ interface CuratedResourceItem {
 }
 
 const defaultCuratedResources: CuratedResourceItem[] = [
+  // Frequently Used Platforms
+  {
+    id: 'freq-1',
+    title: 'UPSA Student Portal',
+    category: 'Student Services',
+    description: 'Access course registration, examination results, fee statements and student records.',
+    type: 'Platform',
+    url: 'https://www.upsasip.com',
+    isExternal: true,
+    isFrequentlyUsed: true,
+    icon: Globe
+  },
+  {
+    id: 'freq-2',
+    title: 'UPSA Virtual Learning Platform',
+    category: 'Academic',
+    description: 'Access online lectures, course materials, assignment submissions and academic activities.',
+    type: 'Platform',
+    url: 'https://join.upsavirtual.site/login/',
+    isExternal: true,
+    isFrequentlyUsed: true,
+    icon: BookOpen
+  },
+  {
+    id: 'freq-3',
+    title: 'Academic Calendar 2026/2027',
+    category: 'Academic',
+    description: 'Key dates for semester registration, lectures, revision weeks, and examination periods.',
+    type: 'PDF',
+    fileInfo: 'PDF · Updated Aug 2026 · 1.2 MB',
+    url: '/student-support/academic-calendar',
+    isExternal: false,
+    isFrequentlyUsed: true,
+    icon: Calendar
+  },
+  {
+    id: 'freq-4',
+    title: 'UPSA UFIS (Financial Portal)',
+    category: 'Student Services',
+    description: 'Access financial information, fee breakdown, and approved student finance services.',
+    type: 'Platform',
+    url: 'https://student.upsa-ufis.com/',
+    isExternal: true,
+    isFrequentlyUsed: true,
+    icon: Building
+  },
+
   // Documents & Forms
   {
     id: 'doc-1',
@@ -77,10 +123,30 @@ const defaultCuratedResources: CuratedResourceItem[] = [
     fileInfo: 'PDF · Updated May 2026 · 1.8 MB',
     url: '#',
     isExternal: false
+  },
+
+  // Official UPSA Links
+  {
+    id: 'link-1',
+    title: 'UPSA Official Website',
+    category: 'Student Services',
+    description: 'Main university portal for news, announcements, and university-wide directories.',
+    type: 'Link',
+    url: 'https://upsa.edu.gh',
+    isExternal: true
+  },
+  {
+    id: 'link-2',
+    title: 'School of Graduate Studies',
+    category: 'Academic',
+    description: 'Postgraduate handbook, departmental contacts, and administrative guidelines.',
+    type: 'Link',
+    url: 'https://upsa.edu.gh/academics/graduate-school/',
+    isExternal: true
   }
 ];
 
-export default function ResourcesClient({ initialResources, initialQuickLinks }: ResourcesClientProps) {
+export default function ResourcesClient({ initialResources }: ResourcesClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
@@ -90,36 +156,27 @@ export default function ResourcesClient({ initialResources, initialQuickLinks }:
   const allResources = useMemo(() => {
     let baseResources = [...defaultCuratedResources];
     
-    if (initialQuickLinks && initialQuickLinks.length > 0) {
-      const qlMapped: CuratedResourceItem[] = initialQuickLinks.map(ql => ({
-        id: `ql-${ql.id}`,
-        title: ql.title,
-        category: 'Quick Links',
-        description: ql.description || 'Official student platform.',
-        type: 'Platform',
-        url: ql.url ? (ql.url.startsWith('http') ? ql.url : `https://${ql.url}`) : '#',
-        isExternal: true,
-        isFrequentlyUsed: true,
-        icon: Globe
-      }));
-      baseResources = [...qlMapped, ...baseResources];
-    }
-    
     if (!initialResources || initialResources.length === 0) return baseResources;
     
-    const convertedDB: CuratedResourceItem[] = initialResources.map(r => ({
-      id: r.id || String(Math.random()),
-      title: r.title,
-      category: (r as any).category || (r.file_url ? 'Documents' : 'Student Services'),
-      description: (r as any).description || 'Official student resource provided by GRASAG-UPSA.',
-      type: r.file_url ? (r.file_url.endsWith('.docx') ? 'DOCX' : 'PDF') : 'Link',
-      fileInfo: r.file_url ? `File · Added 2026` : undefined,
-      url: r.file_url || (r.link_url ? (r.link_url.startsWith('http') ? r.link_url : `https://${r.link_url}`) : '#'),
-      isExternal: !!r.link_url
-    }));
+    // Convert DB resources, but filter out the ones that are already in the Frequently Used section by checking URL
+    const freqUrls = baseResources.filter(r => r.isFrequentlyUsed).map(r => r.url);
+    
+    const convertedDB: CuratedResourceItem[] = initialResources.map(r => {
+      const parsedUrl = r.file_url || (r.link_url ? (r.link_url.startsWith('http') ? r.link_url : `https://${r.link_url}`) : '#');
+      return {
+        id: r.id || String(Math.random()),
+        title: r.title,
+        category: (r as any).category || (r.file_url ? 'Documents' : 'Student Services'),
+        description: (r as any).description || 'Official student resource provided by GRASAG-UPSA.',
+        type: r.file_url ? (r.file_url.endsWith('.docx') ? 'DOCX' : 'PDF') : 'Link',
+        fileInfo: r.file_url ? `File · Added 2026` : undefined,
+        url: parsedUrl,
+        isExternal: !!r.link_url
+      };
+    }).filter(r => !freqUrls.includes(r.url));
 
     return [...baseResources, ...convertedDB];
-  }, [initialResources, initialQuickLinks]);
+  }, [initialResources]);
 
   // Filtered resources based on Search and Tab Category
   const filteredResources = useMemo(() => {
