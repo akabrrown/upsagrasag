@@ -164,8 +164,11 @@ export default function Footer() {
           </div>
 
           {/* Legal Disclaimer */}
-          <div className="mt-16 border-t border-neutral-800 pt-8 flex items-center justify-between gap-4">
-            <p className="text-xs text-accent">&copy; {new Date().getFullYear()} GRASAG-UPSA. All rights reserved.</p>
+          <div className="mt-16 border-t border-neutral-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col items-center sm:items-start gap-1">
+              <p className="text-xs text-accent">&copy; {new Date().getFullYear()} GRASAG-UPSA. All rights reserved.</p>
+              <p className="text-xs text-neutral-500">Powered by <span className="font-semibold text-accent/80">Codey Dev</span></p>
+            </div>
             <div className="flex gap-4">
               <Link href="#" className="text-xs text-accent hover:text-accent/80 transition-colors">Privacy Policy</Link>
               <Link href="#" className="text-xs text-accent hover:text-accent/80 transition-colors">Terms of Service</Link>
