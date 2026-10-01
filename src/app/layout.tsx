@@ -38,7 +38,6 @@ export const metadata: Metadata = {
 };
 
 import { AxiomWebVitals } from 'next-axiom';
-import FrontendAccessGate from '@/components/FrontendAccessGate';
 
 export default function RootLayout({
   children,
@@ -50,9 +49,7 @@ export default function RootLayout({
         <PushNotificationManager />
         <AnnouncementModal />
         <ConditionalNavbar />
-        <FrontendAccessGate>
-          <main className="flex-1">{children}</main>
-        </FrontendAccessGate>
+        <main className="flex-1">{children}</main>
         <ConditionalFooter />
       </body>
     </html>
