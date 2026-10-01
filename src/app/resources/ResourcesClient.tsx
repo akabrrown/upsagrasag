@@ -20,12 +20,13 @@ import {
 
 interface ResourcesClientProps {
   initialResources: Resource[];
+  initialQuickLinks?: any[];
 }
 
 interface CuratedResourceItem {
   id: string;
   title: string;
-  category: 'Documents' | 'Forms' | 'Academic' | 'Student Services';
+  category: 'Documents' | 'Forms' | 'Academic' | 'Student Services' | 'Quick Links';
   description: string;
   type: 'PDF' | 'DOCX' | 'Platform' | 'Link';
   fileInfo?: string; // e.g. "PDF · Updated July 2026 · 2.4 MB"
@@ -36,53 +37,6 @@ interface CuratedResourceItem {
 }
 
 const defaultCuratedResources: CuratedResourceItem[] = [
-  // Frequently Used Platforms
-  {
-    id: 'freq-1',
-    title: 'UPSA Student Portal',
-    category: 'Student Services',
-    description: 'Access course registration, examination results, fee statements and student records.',
-    type: 'Platform',
-    url: 'https://upsasis.com/student',
-    isExternal: true,
-    isFrequentlyUsed: true,
-    icon: Globe
-  },
-  {
-    id: 'freq-2',
-    title: 'UPSA Virtual Learning Platform',
-    category: 'Academic',
-    description: 'Access online lectures, course materials, assignment submissions and academic activities.',
-    type: 'Platform',
-    url: 'https://join.upsavirtual.site',
-    isExternal: true,
-    isFrequentlyUsed: true,
-    icon: BookOpen
-  },
-  {
-    id: 'freq-3',
-    title: 'Academic Calendar 2026/2027',
-    category: 'Academic',
-    description: 'Key dates for semester registration, lectures, revision weeks, and examination periods.',
-    type: 'PDF',
-    fileInfo: 'PDF · Updated Aug 2026 · 1.2 MB',
-    url: '/student-support/academic-calendar',
-    isExternal: false,
-    isFrequentlyUsed: true,
-    icon: Calendar
-  },
-  {
-    id: 'freq-4',
-    title: 'UPSA UFIS (Financial Portal)',
-    category: 'Student Services',
-    description: 'Access financial information, fee breakdown, and approved student finance services.',
-    type: 'Platform',
-    url: 'https://ufis.upsa.edu.gh',
-    isExternal: true,
-    isFrequentlyUsed: true,
-    icon: Building
-  },
-
   // Documents & Forms
   {
     id: 'doc-1',
@@ -123,38 +77,35 @@ const defaultCuratedResources: CuratedResourceItem[] = [
     fileInfo: 'PDF · Updated May 2026 · 1.8 MB',
     url: '#',
     isExternal: false
-  },
-
-  // Official UPSA Links
-  {
-    id: 'link-1',
-    title: 'UPSA Official Website',
-    category: 'Student Services',
-    description: 'Main university portal for news, announcements, and university-wide directories.',
-    type: 'Link',
-    url: 'https://upsa.edu.gh',
-    isExternal: true
-  },
-  {
-    id: 'link-2',
-    title: 'School of Graduate Studies',
-    category: 'Academic',
-    description: 'Postgraduate handbook, departmental contacts, and administrative guidelines.',
-    type: 'Link',
-    url: 'https://upsa.edu.gh/academics/graduate-school/',
-    isExternal: true
   }
 ];
 
-export default function ResourcesClient({ initialResources }: ResourcesClientProps) {
+export default function ResourcesClient({ initialResources, initialQuickLinks }: ResourcesClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
-  const categories = ['All', 'Documents', 'Forms', 'Academic', 'Student Services'];
+  const categories = ['All', 'Documents', 'Forms', 'Academic', 'Student Services', 'Quick Links'];
 
   // Map initial DB resources to curated items format if present
   const allResources = useMemo(() => {
-    if (!initialResources || initialResources.length === 0) return defaultCuratedResources;
+    let baseResources = [...defaultCuratedResources];
+    
+    if (initialQuickLinks && initialQuickLinks.length > 0) {
+      const qlMapped: CuratedResourceItem[] = initialQuickLinks.map(ql => ({
+        id: `ql-${ql.id}`,
+        title: ql.title,
+        category: 'Quick Links',
+        description: ql.description || 'Official student platform.',
+        type: 'Platform',
+        url: ql.url ? (ql.url.startsWith('http') ? ql.url : `https://${ql.url}`) : '#',
+        isExternal: true,
+        isFrequentlyUsed: true,
+        icon: Globe
+      }));
+      baseResources = [...qlMapped, ...baseResources];
+    }
+    
+    if (!initialResources || initialResources.length === 0) return baseResources;
     
     const convertedDB: CuratedResourceItem[] = initialResources.map(r => ({
       id: r.id || String(Math.random()),
@@ -167,8 +118,8 @@ export default function ResourcesClient({ initialResources }: ResourcesClientPro
       isExternal: !!r.link_url
     }));
 
-    return [...defaultCuratedResources, ...convertedDB];
-  }, [initialResources]);
+    return [...baseResources, ...convertedDB];
+  }, [initialResources, initialQuickLinks]);
 
   // Filtered resources based on Search and Tab Category
   const filteredResources = useMemo(() => {
