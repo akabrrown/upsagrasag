@@ -172,7 +172,7 @@ export default function AdminResourcesPage() {
                           <Download className="w-4 h-4" /> Download
                         </a>
                       ) : record.link_url ? (
-                        <a href={record.link_url} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800">
+                        <a href={record.link_url.startsWith('http') ? record.link_url : `https://${record.link_url}`} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800">
                           <LinkIcon className="w-4 h-4" /> Visit Link
                         </a>
                       ) : (
@@ -339,7 +339,7 @@ export default function AdminResourcesPage() {
                   <Download className="w-4 h-4" /> Download File
                 </a>
               ) : selectedRecord.link_url ? (
-                <a href={selectedRecord.link_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-900 rounded-lg hover:border-blue-500 hover:text-blue-600 transition-colors shadow-sm font-medium">
+                <a href={selectedRecord.link_url.startsWith('http') ? selectedRecord.link_url : `https://${selectedRecord.link_url}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-900 rounded-lg hover:border-blue-500 hover:text-blue-600 transition-colors shadow-sm font-medium">
                   <LinkIcon className="w-4 h-4" /> Visit External Link
                 </a>
               ) : (

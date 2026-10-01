@@ -163,7 +163,7 @@ export default function ResourcesClient({ initialResources }: ResourcesClientPro
       description: (r as any).description || 'Official student resource provided by GRASAG-UPSA.',
       type: r.file_url ? (r.file_url.endsWith('.docx') ? 'DOCX' : 'PDF') : 'Link',
       fileInfo: r.file_url ? `File · Added 2026` : undefined,
-      url: r.file_url || r.link_url || '#',
+      url: r.file_url || (r.link_url ? (r.link_url.startsWith('http') ? r.link_url : `https://${r.link_url}`) : '#'),
       isExternal: !!r.link_url
     }));
 
