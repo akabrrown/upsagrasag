@@ -599,7 +599,7 @@ export default function HomePage() {
                   <p className="text-sm text-neutral-600 line-clamp-3 mb-4 flex-grow">
                     {item.content ? item.content.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>') : ''}
                   </p>
-                  <Link href={`/news-updates`} className="text-accent text-sm font-bold tracking-wide flex items-center hover:underline uppercase mt-auto">
+                  <Link href={`/news-updates/${item.id}`} className="text-accent text-sm font-bold tracking-wide flex items-center hover:underline uppercase mt-auto">
                     READ MORE <span className="ml-1">›</span>
                   </Link>
                 </div>
