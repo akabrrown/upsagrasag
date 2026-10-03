@@ -43,7 +43,7 @@ const defaultCuratedResources: CuratedResourceItem[] = [
     category: 'Student Services',
     description: 'Access course registration, examination results, fee statements and student records.',
     type: 'Platform',
-    url: 'https://www.upsasip.com',
+    url: 'https://upsasis.com/student',
     isExternal: true,
     isFrequentlyUsed: true,
     icon: Globe
@@ -54,7 +54,7 @@ const defaultCuratedResources: CuratedResourceItem[] = [
     category: 'Academic',
     description: 'Access online lectures, course materials, assignment submissions and academic activities.',
     type: 'Platform',
-    url: 'https://join.upsavirtual.site/login/',
+    url: 'https://join.upsavirtual.site/',
     isExternal: true,
     isFrequentlyUsed: true,
     icon: BookOpen
@@ -77,7 +77,7 @@ const defaultCuratedResources: CuratedResourceItem[] = [
     category: 'Student Services',
     description: 'Access financial information, fee breakdown, and approved student finance services.',
     type: 'Platform',
-    url: 'https://student.upsa-ufis.com/',
+    url: 'https://ufis.upsa.edu.gh/',
     isExternal: true,
     isFrequentlyUsed: true,
     icon: Building
