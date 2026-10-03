@@ -242,49 +242,103 @@ export default function ResourcesClient({ initialResources }: ResourcesClientPro
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {[
               {
                 id: 'guide-1',
-                title: 'Student Resource Guide 1',
-                src: '/images/resources/resource-1.jpg'
+                title: 'Step-by-Step to Pay Your Fees',
+                subtitle: 'FOR FIRST YEARS ONLY (2026/2027)',
+                src: '/images/resources/resource-1.jpg',
+                text: (
+                  <div className="space-y-4 text-sm text-gray-700">
+                    <div>
+                      <h4 className="font-bold text-[#001a54]">1. Mobile Money via USSD</h4>
+                      <ul className="list-disc pl-5 mt-1 space-y-1">
+                        <li>Dial <strong className="text-gray-900">*789*877#</strong></li>
+                        <li>Select Top Up</li>
+                        <li>Enter your Student Index Number</li>
+                        <li>Enter the amount you wish to load into your wallet and confirm transaction</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-[#001a54]">2. Payment at a GCB Bank Branch</h4>
+                      <ul className="list-disc pl-5 mt-1 space-y-1">
+                        <li>Visit any designated GCB Bank Branch</li>
+                        <li>Inform the teller that you would like to fund your UPSA Student Wallet</li>
+                        <li>Provide your Student Index Number and make the payment</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-[#001a54]">3. Online Payment (Mobile Money or Card)</h4>
+                      <ul className="list-disc pl-5 mt-1 space-y-1">
+                        <li>Visit: <a href="https://interpayafrica.com/upsa/student" target="_blank" className="text-blue-600 hover:underline">interpayafrica.com/upsa/student</a></li>
+                        <li>Log in using your index number as your username and password</li>
+                        <li>Select Wallet, click Top Up and choose your preferred payment method</li>
+                        <li>Enter the amount and complete the payment process</li>
+                      </ul>
+                    </div>
+                  </div>
+                )
               },
               {
                 id: 'guide-2',
-                title: 'Student Resource Guide 2',
-                src: '/images/resources/resource-2.jpg'
-              }
-            ].map((img, idx) => (
-              <a 
-                key={img.id}
-                href={img.src}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative block overflow-hidden rounded-2xl border border-gray-200/80 bg-gray-50 aspect-video shadow-sm hover:shadow-xl transition-all duration-500"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img 
-                  src={img.src} 
-                  alt={img.title}
-                  className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
-                />
-                
-                {/* Overlay gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#001a54]/90 via-[#001a54]/20 to-transparent opacity-80 transition-opacity duration-300" />
-                
-                {/* Hover UI */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 flex items-end justify-between translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                  <div>
-                    <h3 className="text-white font-bold text-lg">{img.title}</h3>
-                    <p className="text-blue-200 text-sm font-medium mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
-                      Click to view full image
-                    </p>
+                title: 'Fee Disbursement Guide',
+                subtitle: 'FOR FIRST YEARS ONLY',
+                src: '/images/resources/resource-2.jpg',
+                text: (
+                  <div className="space-y-3 text-sm text-gray-700">
+                    <p className="font-semibold text-gray-900 border-b pb-2">Follow the steps below to disburse your fees after making payment:</p>
+                    <ol className="list-decimal pl-5 space-y-1.5">
+                      <li>Visit the UPSA InterPay portal: <a href="https://interpayafrica.com/upsa/student" target="_blank" className="text-blue-600 hover:underline break-all">interpayafrica.com/upsa/student</a></li>
+                      <li>Login with your Index Number (Username and Password)</li>
+                      <li>Click on the menu bar, then click on <strong>Student</strong></li>
+                      <li>Under Student drop-down options, click on <strong>Pay Mandatory Fee</strong></li>
+                      <li>Select all the fee components reflected on your portal</li>
+                      <li>Click on <strong>Pay</strong> to complete the disbursement</li>
+                      <li>To print your statement, go back to the Student menu and click <strong>Print Statement</strong></li>
+                      <li>Select the applicable date range and download/print your statement</li>
+                      <li>Wait for the payment to reflect fully on the UPSA students&apos; portal</li>
+                      <li>Afterwards, visit <a href="https://upsasip.com" target="_blank" className="text-blue-600 hover:underline">upsasip.com</a> to register your courses</li>
+                    </ol>
                   </div>
-                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-150">
-                    <ArrowUpRight className="w-5 h-5" />
+                )
+              }
+            ].map((img) => (
+              <div key={img.id} className="bg-white rounded-2xl border border-gray-200/80 shadow-sm overflow-hidden flex flex-col">
+                <a 
+                  href={img.src}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative block overflow-hidden bg-gray-50 aspect-video border-b border-gray-100"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img 
+                    src={img.src} 
+                    alt={img.title}
+                    className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                  />
+                  
+                  {/* Overlay gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#001a54]/90 via-[#001a54]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  
+                  {/* Hover UI */}
+                  <div className="absolute inset-0 flex items-center justify-center translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                    <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-full text-[#001a54] font-bold text-sm shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 flex items-center gap-2">
+                      View Full Image <ArrowUpRight className="w-4 h-4" />
+                    </div>
+                  </div>
+                </a>
+                
+                <div className="p-6 flex-1 flex flex-col">
+                  <div className="mb-4">
+                    <h3 className="font-bold text-xl text-[#001a54]">{img.title}</h3>
+                    <p className="text-xs font-semibold text-[#B8860B] mt-1 uppercase tracking-wider">{img.subtitle}</p>
+                  </div>
+                  <div className="bg-blue-50/50 rounded-xl p-5 border border-blue-100/50 flex-1">
+                    {img.text}
                   </div>
                 </div>
-              </a>
+              </div>
             ))}
           </div>
         </section>
