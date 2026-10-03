@@ -2,28 +2,39 @@
 
 import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import type { Opportunity } from '@/types/admin';
-import { 
-  Calendar, 
-  MapPin, 
-  DollarSign, 
-  Clock, 
-  Search, 
-  Filter, 
-  ArrowRight, 
-  ExternalLink, 
-  Briefcase, 
-  GraduationCap, 
-  Globe, 
-  Trophy, 
+import {
+  Calendar,
+  MapPin,
+  DollarSign,
+  Clock,
+  Search,
+  ArrowRight,
+  ExternalLink,
+  Briefcase,
+  GraduationCap,
+  Globe,
+  Trophy,
   BookOpen,
   Mail,
   CheckCircle,
   FileText,
   HelpCircle,
   Building,
-  Compass,
-  Users
+  Users,
+  Flag,
+  Share2,
+  Copy,
+  PlusCircle,
+  X,
+  AlertCircle,
+  Info,
+  Star,
+  Bookmark,
+  BookmarkCheck,
+  ChevronRight,
+  Newspaper
 } from 'lucide-react';
 
 interface OpportunitiesClientProps {
@@ -31,624 +42,623 @@ interface OpportunitiesClientProps {
 }
 
 const categoriesList = [
-  { name: 'All', icon: Compass },
-  { name: 'Scholarships', icon: GraduationCap },
-  { name: 'Jobs', icon: Briefcase },
-  { name: 'Research', icon: BookOpen },
-  { name: 'Fellowships', icon: Globe },
-  { name: 'Competitions', icon: Trophy }
+  { name: 'All', icon: BookOpen, color: 'text-[#001a54]' },
+  { name: 'Jobs & Internships', icon: Briefcase, color: 'text-blue-600' },
+  { name: 'Scholarships', icon: GraduationCap, color: 'text-emerald-600' },
+  { name: 'Research Grants', icon: Star, color: 'text-purple-600' },
+  { name: 'Fellowships', icon: Globe, color: 'text-amber-600' },
+  { name: 'Calls for Papers', icon: Newspaper, color: 'text-red-600' },
+  { name: 'Conferences', icon: Users, color: 'text-cyan-600' },
+  { name: 'Publication Opportunities', icon: FileText, color: 'text-pink-600' },
+  { name: 'Volunteers', icon: Users, color: 'text-indigo-600' },
 ];
+
+// Status badge colours
+const statusColors: Record<string, string> = {
+  'Open': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  'Closing Soon': 'bg-amber-50 text-amber-700 border-amber-200',
+  'Limited Seats': 'bg-orange-50 text-orange-700 border-orange-200',
+  'Sold Out': 'bg-red-50 text-red-700 border-red-200',
+  'Application Closed': 'bg-neutral-100 text-neutral-500 border-neutral-200',
+};
+
+// Category normalizer for DB items
+function normalizeCategory(raw: string): string {
+  const s = (raw || '').toLowerCase();
+  if (s.includes('scholar')) return 'Scholarships';
+  if (s.includes('job') || s.includes('career') || s.includes('intern')) return 'Jobs & Internships';
+  if (s.includes('grant') || s.includes('research')) return 'Research Grants';
+  if (s.includes('fellow')) return 'Fellowships';
+  if (s.includes('call') || s.includes('paper')) return 'Calls for Papers';
+  if (s.includes('conf')) return 'Conferences';
+  if (s.includes('publ')) return 'Publication Opportunities';
+  if (s.includes('volunteer')) return 'Volunteers';
+  return 'Jobs & Internships';
+}
 
 export default function OpportunitiesClient({ initialOpportunities }: OpportunitiesClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [selectedType, setSelectedType] = useState('All');
+  const [selectedDeadline, setSelectedDeadline] = useState('All');
   const [selectedLocation, setSelectedLocation] = useState('All');
+  const [sortBy, setSortBy] = useState('closing-soon');
+  const [statusTab, setStatusTab] = useState<'Open' | 'Closing Soon' | 'Archived'>('Open');
   const [activeOpportunity, setActiveOpportunity] = useState<Opportunity | null>(null);
   const [subscribed, setSubscribed] = useState(false);
   const [email, setEmail] = useState('');
+  const [savedIds, setSavedIds] = useState<string[]>([]);
+  const [isSubmitOpen, setIsSubmitOpen] = useState(false);
+  const [reportId, setReportId] = useState<string | null>(null);
+  const [copiedShareId, setCopiedShareId] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(6);
 
-  // Process opportunities to ensure status & categories match our items
+  // Process DB opportunities
   const processedOpportunities = useMemo(() => {
-    return initialOpportunities.map(opp => {
-      // Clean category to match titles
-      let category = opp.category || 'Jobs';
-      if (category.toLowerCase().includes('scholar')) category = 'Scholarships';
-      else if (category.toLowerCase().includes('job') || category.toLowerCase().includes('career')) category = 'Jobs';
-      else if (category.toLowerCase().includes('research')) category = 'Research';
-      else if (category.toLowerCase().includes('fellow')) category = 'Fellowships';
-      else if (category.toLowerCase().includes('compet')) category = 'Competitions';
-
-      return {
-        ...opp,
-        category
-      };
-    });
+    return initialOpportunities.map(opp => ({
+      ...opp,
+      category: normalizeCategory(opp.category || ''),
+    }));
   }, [initialOpportunities]);
 
-  // Unique list values for filters
+  // Unique locations
   const locations = useMemo(() => {
     const locSet = new Set<string>();
-    processedOpportunities.forEach(opp => {
-      if (opp.location) locSet.add(opp.location);
-    });
+    processedOpportunities.forEach(o => { if (o.location) locSet.add(o.location); });
     return ['All', ...Array.from(locSet)];
   }, [processedOpportunities]);
 
-  const types = useMemo(() => {
-    const typeSet = new Set<string>();
-    processedOpportunities.forEach(opp => {
-      if (opp.type) typeSet.add(opp.type);
-    });
-    return ['All', ...Array.from(typeSet)];
-  }, [processedOpportunities]);
+  const getDaysLeft = (deadlineStr: string): number | null => {
+    const t = Date.parse(deadlineStr);
+    if (isNaN(t)) return null;
+    return Math.ceil((t - Date.now()) / (1000 * 60 * 60 * 24));
+  };
 
-  // Filtering opportunities
+  const getDaysLeftLabel = (deadlineStr?: string): string => {
+    if (!deadlineStr) return 'Deadline not provided';
+    const days = getDaysLeft(deadlineStr);
+    if (days === null) return `Closes ${deadlineStr}`;
+    if (days < 0) return 'Application closed';
+    if (days === 0) return 'Closes today';
+    if (days === 1) return 'Closing tomorrow';
+    if (days <= 7) return `${days} days left`;
+    return `Apply by ${new Date(Date.parse(deadlineStr)).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}`;
+  };
+
+  const getOppStatus = (opp: Opportunity): string => {
+    const d = (opp as any).deadline;
+    if (!d) return 'Open';
+    const days = getDaysLeft(d);
+    if (days === null) return 'Open';
+    if (days < 0) return 'Application Closed';
+    if (days <= 7) return 'Closing Soon';
+    return 'Open';
+  };
+
+  const isArchived = (opp: Opportunity): boolean => {
+    const d = (opp as any).deadline;
+    if (!d) return false;
+    const days = getDaysLeft(d);
+    return days !== null && days < 0;
+  };
+
+  // Tab filter
+  const tabFiltered = useMemo(() => {
+    return processedOpportunities.filter(o => {
+      if (statusTab === 'Open') return !isArchived(o) && getOppStatus(o) !== 'Closing Soon' || getOppStatus(o) === 'Open';
+      if (statusTab === 'Closing Soon') return getOppStatus(o) === 'Closing Soon';
+      if (statusTab === 'Archived') return isArchived(o);
+      return true;
+    });
+  }, [processedOpportunities, statusTab]);
+
+  // Full filtering
   const filteredOpportunities = useMemo(() => {
-    return processedOpportunities.filter(opp => {
-      const matchesSearch = 
+    let result = tabFiltered.filter(opp => {
+      const matchesSearch =
         opp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         opp.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (opp.description || '').toLowerCase().includes(searchQuery.toLowerCase());
-      
+
       const matchesCategory = selectedCategory === 'All' || opp.category === selectedCategory;
-      const matchesType = selectedType === 'All' || opp.type === selectedType;
       const matchesLocation = selectedLocation === 'All' || opp.location === selectedLocation;
 
-      return matchesSearch && matchesCategory && matchesType && matchesLocation;
+      let matchesDeadline = true;
+      if (selectedDeadline === 'This week') {
+        const d = getDaysLeft((opp as any).deadline || '');
+        matchesDeadline = d !== null && d >= 0 && d <= 7;
+      } else if (selectedDeadline === 'This month') {
+        const d = getDaysLeft((opp as any).deadline || '');
+        matchesDeadline = d !== null && d >= 0 && d <= 30;
+      }
+
+      return matchesSearch && matchesCategory && matchesLocation && matchesDeadline;
     });
-  }, [processedOpportunities, searchQuery, selectedCategory, selectedType, selectedLocation]);
 
-  // Featured opportunity: Pick first one flagged as featured, or just the first item
+    // Sort
+    if (sortBy === 'closing-soon') {
+      result = result.sort((a, b) => {
+        const da = (a as any).deadline ? Date.parse((a as any).deadline) : Infinity;
+        const db = (b as any).deadline ? Date.parse((b as any).deadline) : Infinity;
+        return da - db;
+      });
+    } else if (sortBy === 'newest') {
+      result = result.sort((a, b) => {
+        const da = (a as any).created_at ? Date.parse((a as any).created_at) : 0;
+        const db = (b as any).created_at ? Date.parse((b as any).created_at) : 0;
+        return db - da;
+      });
+    }
+
+    return result;
+  }, [tabFiltered, searchQuery, selectedCategory, selectedLocation, selectedDeadline, sortBy]);
+
   const featuredOpportunity = useMemo(() => {
-    if (filteredOpportunities.length === 0) return null;
-    return filteredOpportunities[0];
+    const featured = filteredOpportunities.find((o: any) => o.is_featured && !isArchived(o));
+    return featured || (filteredOpportunities.length > 0 && !isArchived(filteredOpportunities[0]) ? filteredOpportunities[0] : null);
   }, [filteredOpportunities]);
 
-  // Latest Opportunities (excluding featured)
-  const latestOpportunities = useMemo(() => {
-    if (filteredOpportunities.length <= 1) return [];
-    return filteredOpportunities.slice(1);
-  }, [filteredOpportunities]);
+  const gridOpportunities = useMemo(() => {
+    if (statusTab !== 'Open' || !featuredOpportunity) return filteredOpportunities;
+    return filteredOpportunities.filter(o => o.id !== featuredOpportunity.id);
+  }, [filteredOpportunities, featuredOpportunity, statusTab]);
 
-  // Upcoming deadlines (chronological order of opportunities with deadlines)
-  const upcomingDeadlines = useMemo(() => {
-    return processedOpportunities
-      .filter(opp => (opp as any).deadline)
-      .map(opp => {
-        const parsedDate = Date.parse((opp as any).deadline);
-        return {
-          opp,
-          date: isNaN(parsedDate) ? new Date() : new Date(parsedDate)
-        };
-      })
-      .sort((a, b) => a.date.getTime() - b.date.getTime())
-      .slice(0, 4);
-  }, [processedOpportunities]);
+  const visibleGrid = useMemo(() => gridOpportunities.slice(0, visibleCount), [gridOpportunities, visibleCount]);
 
-  // Grouped opportunities by type for sections
-  const scholarships = useMemo(() => processedOpportunities.filter(o => o.category === 'Scholarships').slice(0, 3), [processedOpportunities]);
-  const jobs = useMemo(() => processedOpportunities.filter(o => o.category === 'Jobs').slice(0, 3), [processedOpportunities]);
-  const research = useMemo(() => processedOpportunities.filter(o => o.category === 'Research').slice(0, 3), [processedOpportunities]);
+  const handleSave = (id: string) => {
+    if (!savedIds.includes(id)) {
+      setSavedIds([...savedIds, id]);
+    } else {
+      setSavedIds(savedIds.filter(saved => saved !== id));
+    }
+  };
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleShare = async (opp: Opportunity) => {
+    if (!opp.id) return;
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/opportunities?id=${opp.id}`);
+      setCopiedShareId(opp.id);
+      setTimeout(() => setCopiedShareId(null), 2000);
+    } catch (err) {
+      console.warn('Failed to copy', err);
+    }
+  };
+
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
     setSubscribed(true);
     setEmail('');
   };
 
-  const getDaysLeftLabel = (deadlineStr: string) => {
-    const deadlineTime = Date.parse(deadlineStr);
-    if (isNaN(deadlineTime)) return `Closes ${deadlineStr}`;
-    const diff = deadlineTime - Date.now();
-    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-    if (days < 0) return "Closed";
-    if (days === 0) return "Closes Today";
-    if (days === 1) return "Closing Tomorrow";
-    if (days <= 7) return `${days} Days Left`;
-    return `Closes ${new Date(deadlineTime).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}`;
-  };
-
   return (
     <div className="w-full bg-background text-foreground pb-20">
-      
-      {/* Editorial Header Section */}
-      <section className="relative w-full bg-[#FAF6EC] py-20 px-4 sm:px-6 lg:px-8 border-b border-neutral-100 overflow-hidden">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-          <div className="md:col-span-7 text-left space-y-6">
-            <span className="inline-flex items-center gap-1 rounded-full bg-accent/10 px-4 py-1.5 text-xs font-bold text-accent uppercase tracking-wider">
-              Careers & Grants
-            </span>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-[#001a54] tracking-tight leading-tight">
-              Graduate Opportunities
+
+      {/* ───── 1. HERO ───── */}
+      <section
+        className="relative w-full py-16 px-4 sm:px-6 lg:px-8 overflow-hidden bg-cover bg-center"
+        style={{ backgroundImage: "url('/opportunity-img.jpg')" }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-[#001a54] via-[#001a54]/88 to-transparent z-0" />
+        <div className="relative z-10 max-w-6xl mx-auto">
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-2 text-xs font-semibold text-blue-200/70 mb-4">
+            <Link href="/" className="hover:text-white transition-colors">Home</Link>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-white">Research & Opportunities</span>
+          </nav>
+
+          <div className="max-w-2xl text-left space-y-5">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
+              Research & Opportunities
             </h1>
-            <p className="text-base sm:text-lg font-semibold text-neutral-800 tracking-wide uppercase">
-              Scholarships • Grants • Careers
+            <p className="text-sm sm:text-base text-blue-100/90 leading-relaxed font-medium max-w-xl">
+              Discover scholarships, research grants, jobs, fellowships and academic opportunities selected for graduate students.
             </p>
-            <p className="text-sm sm:text-base text-neutral-600 max-w-xl leading-relaxed font-medium">
-              Discover scholarships, corporate graduate schemes, research grants, internships, and fellowships curated specifically for University of Professional Studies, Accra postgraduate students.
-            </p>
-            <div>
-              <button 
-                onClick={() => handleScrollToSection('opportunities-section')}
-                className="bg-[#001a54] hover:bg-[#0b2b73] text-white font-bold px-8 py-3.5 rounded-full text-sm transition-all duration-300 shadow-sm"
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <button
+                onClick={() => {
+                  const el = document.getElementById('opp-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="bg-[#B8860B] hover:bg-[#a6790a] text-white font-bold px-7 py-3 rounded-full text-xs transition-all shadow-sm"
               >
                 Browse Opportunities
               </button>
+              <button
+                onClick={() => setIsSubmitOpen(true)}
+                className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold px-7 py-3 rounded-full text-xs transition-all"
+              >
+                Submit an Opportunity
+              </button>
             </div>
           </div>
-          <div className="md:col-span-5 relative w-full h-[280px] sm:h-[350px] flex items-center justify-center">
-            <Image 
-              src="/opportunities-hero.png" 
-              alt="Opportunities Illustration" 
-              fill
-              className="object-contain"
-              priority
-            />
-          </div>
         </div>
       </section>
 
-      {/* Category Icons Quick Selector Bar */}
-      <section className="max-w-5xl mx-auto px-4 pt-12">
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
-          {categoriesList.map((cat, idx) => {
-            const CatIcon = cat.icon;
-            const isSelected = selectedCategory === cat.name;
-            return (
-              <button
-                key={idx}
-                onClick={() => {
-                  setSelectedCategory(cat.name);
-                  handleScrollToSection('opportunities-section');
-                }}
-                className={`flex flex-col items-center justify-center p-5 rounded-2xl border transition-all duration-300 ${
-                  isSelected 
-                    ? 'bg-[#001a54] border-[#001a54] text-white shadow-md' 
-                    : 'bg-white border-neutral-100 text-neutral-600 hover:border-neutral-200 hover:shadow-sm'
-                }`}
-              >
-                <CatIcon className={`w-7 h-7 mb-2 ${isSelected ? 'text-[#B8860B]' : 'text-neutral-400'}`} strokeWidth={1.5} />
-                <span className="text-xs font-bold tracking-wide">{cat.name}</span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
+      {/* ───── MAIN CONTENT ───── */}
+      <div id="opp-section" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 space-y-10">
 
-      {/* Filter and Content Controls Section */}
-      <section id="opportunities-section" className="max-w-5xl mx-auto px-4 pt-16 space-y-8">
-        
-        {/* Editorial Title */}
-        <div className="text-left">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#001a54] tracking-tight">
-            Curated Directory
-          </h2>
-          <p className="text-xs sm:text-sm text-neutral-500 font-medium mt-1">
-            Filter by category, funding type, or location to find fellowships aligned to your academic progress.
-          </p>
+        {/* ───── 2. STATUS TABS ───── */}
+        <div className="flex items-center gap-1 border-b border-neutral-200">
+          {(['Open', 'Closing Soon', 'Archived'] as const).map(tab => (
+            <button
+              key={tab}
+              onClick={() => { setStatusTab(tab); setVisibleCount(6); }}
+              className={`pb-3 px-4 text-xs font-extrabold transition-all border-b-2 cursor-pointer ${
+                statusTab === tab
+                  ? 'border-[#001a54] text-[#001a54]'
+                  : 'border-transparent text-neutral-400 hover:text-neutral-700'
+              }`}
+            >
+              {tab === 'Open' ? 'Open Opportunities' : tab === 'Closing Soon' ? 'Closing Soon' : 'Archived'}
+            </button>
+          ))}
         </div>
 
-        {/* Filter bar */}
-        <div className="bg-white border border-neutral-100 p-4 rounded-2xl shadow-sm flex flex-col md:flex-row items-stretch md:items-center gap-4">
+        {/* ───── 3. SEARCH & FILTERS ───── */}
+        <div className="space-y-4">
           {/* Search bar */}
-          <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-400" />
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
             <input
               type="text"
-              placeholder="Search by title, organization or skill..."
+              placeholder="Search opportunities by title, organisation or keyword…"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-neutral-50 border border-neutral-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-neutral-700 outline-none focus:ring-2 focus:ring-[#001a54] transition-all"
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full bg-white border border-neutral-200 rounded-2xl pl-11 pr-4 py-3.5 text-xs text-neutral-800 placeholder-neutral-400 outline-none focus:ring-2 focus:ring-[#001a54] shadow-xs"
             />
           </div>
 
-          {/* Filters Selects */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="appearance-none bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2.5 text-xs font-bold text-neutral-600 outline-none focus:ring-2 focus:ring-[#001a54]"
-            >
-              <option value="All">Category: All</option>
-              {categoriesList.filter(c => c.name !== 'All').map(c => (
-                <option key={c.name} value={c.name}>{c.name}</option>
-              ))}
-            </select>
+          {/* Category filter chips */}
+          <div className="flex flex-wrap gap-2">
+            {categoriesList.map(cat => {
+              const Icon = cat.icon;
+              const isActive = selectedCategory === cat.name;
+              return (
+                <button
+                  key={cat.name}
+                  onClick={() => setSelectedCategory(cat.name)}
+                  className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[11px] font-bold border transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-[#001a54] text-white border-[#001a54]'
+                      : 'bg-white text-neutral-600 border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
+                  }`}
+                >
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#B8860B]' : cat.color}`} strokeWidth={2} />
+                  {cat.name}
+                </button>
+              );
+            })}
+          </div>
 
+          {/* Dropdowns: Deadline, Location, Sort */}
+          <div className="flex flex-wrap gap-3">
             <select
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              className="appearance-none bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2.5 text-xs font-bold text-neutral-600 outline-none focus:ring-2 focus:ring-[#001a54]"
+              value={selectedDeadline}
+              onChange={e => setSelectedDeadline(e.target.value)}
+              className="bg-white border border-neutral-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-neutral-700 outline-none focus:ring-2 focus:ring-[#001a54]"
             >
-              <option value="All">Type: All</option>
-              {types.filter(t => t !== 'All').map(t => (
-                <option key={t} value={t}>{t}</option>
-              ))}
+              <option value="All">Deadline: Any time</option>
+              <option value="This week">This week</option>
+              <option value="This month">This month</option>
             </select>
-
             <select
               value={selectedLocation}
-              onChange={(e) => setSelectedLocation(e.target.value)}
-              className="appearance-none bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2.5 text-xs font-bold text-neutral-600 outline-none focus:ring-2 focus:ring-[#001a54] col-span-2 sm:col-span-1"
+              onChange={e => setSelectedLocation(e.target.value)}
+              className="bg-white border border-neutral-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-neutral-700 outline-none focus:ring-2 focus:ring-[#001a54]"
             >
-              <option value="All">Location: All</option>
-              {locations.filter(l => l !== 'All').map(l => (
-                <option key={l} value={l}>{l}</option>
-              ))}
+              <option value="All">Location: Any</option>
+              {locations.filter(l => l !== 'All').map(l => <option key={l}>{l}</option>)}
+            </select>
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value)}
+              className="bg-white border border-neutral-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-neutral-700 outline-none focus:ring-2 focus:ring-[#001a54]"
+            >
+              <option value="closing-soon">Sort: Closing soon</option>
+              <option value="newest">Sort: Newest first</option>
             </select>
           </div>
         </div>
 
-        {/* Empty state */}
+        {/* ───── 4. EMPTY STATE ───── */}
         {filteredOpportunities.length === 0 && (
-          <div className="text-center py-20 bg-neutral-50 rounded-2xl border border-neutral-100 space-y-3">
-            <HelpCircle className="w-12 h-12 text-neutral-400 mx-auto" />
-            <h3 className="text-lg font-bold text-neutral-800">No opportunities match your search</h3>
-            <p className="text-sm text-neutral-500 max-w-sm mx-auto">
-              Try adjusting your query or reset the category filters to browse all active listings.
+          <div className="text-center py-20 bg-neutral-50 rounded-2xl border border-neutral-200 space-y-3">
+            <HelpCircle className="w-12 h-12 text-neutral-300 mx-auto" />
+            <h3 className="text-base font-bold text-neutral-700">No opportunities match your search</h3>
+            <p className="text-xs text-neutral-500 max-w-sm mx-auto">
+              Try adjusting your filters or keywords.
             </p>
             <button
-              onClick={() => { setSearchQuery(''); setSelectedCategory('All'); setSelectedType('All'); setSelectedLocation('All'); }}
-              className="text-[#B8860B] font-bold text-sm hover:underline"
+              onClick={() => { setSearchQuery(''); setSelectedCategory('All'); setSelectedDeadline('All'); setSelectedLocation('All'); }}
+              className="text-[#B8860B] font-bold text-xs hover:underline cursor-pointer"
             >
               Reset Filters
             </button>
           </div>
         )}
 
-        {/* FEATURED OPPORTUNITY */}
-        {featuredOpportunity && (
-          <div className="space-y-4">
-            <p className="text-xs font-bold text-[#B8860B] uppercase tracking-widest text-left">Featured Opportunity</p>
-            <div className="bg-[#001a54] text-white rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row items-stretch min-h-[350px]">
-              
-              {/* Left Column: Image/Banner */}
-              <div className="w-full md:w-[45%] relative min-h-[220px] md:min-h-0 bg-[#0b2b73] flex items-center justify-center p-8">
+        {/* ───── 5. FEATURED OPPORTUNITY ───── */}
+        {statusTab === 'Open' && featuredOpportunity && !searchQuery && selectedCategory === 'All' && (
+          <section className="space-y-3">
+            <p className="text-[10px] font-extrabold text-[#B8860B] uppercase tracking-widest">Featured Opportunity</p>
+            <div className="bg-[#001a54] text-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col md:flex-row min-h-[300px]">
+              {/* Left: Org logo / image */}
+              <div className="w-full md:w-[38%] relative min-h-[200px] bg-[#0b2b73] flex items-center justify-center p-10">
                 {featuredOpportunity.image_url ? (
-                  <Image 
-                    src={featuredOpportunity.image_url} 
-                    alt={featuredOpportunity.title}
-                    fill
-                    className="object-cover"
-                  />
+                  <Image src={featuredOpportunity.image_url} alt={featuredOpportunity.title} fill className="object-cover" />
                 ) : (
-                  <div className="flex flex-col items-center text-center gap-4 opacity-80">
+                  <div className="flex flex-col items-center text-center gap-3 opacity-80">
                     <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center text-[#B8860B]">
                       <GraduationCap className="w-8 h-8" />
                     </div>
-                    <span className="text-lg font-bold tracking-wide uppercase">{featuredOpportunity.company}</span>
+                    <span className="text-base font-bold tracking-wide uppercase">{featuredOpportunity.company}</span>
                   </div>
                 )}
-                <div className="absolute top-4 left-4 z-20">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-[#B8860B] px-3 py-1 text-[10px] font-bold text-white uppercase tracking-wider">
-                    {featuredOpportunity.category}
-                  </span>
-                </div>
+                <span className="absolute top-4 left-4 bg-[#B8860B] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                  {featuredOpportunity.category}
+                </span>
+                <span className="absolute top-4 right-4 bg-emerald-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                  {getOppStatus(featuredOpportunity)}
+                </span>
               </div>
 
-              {/* Right Column: Copy & Details */}
-              <div className="w-full md:w-[55%] p-8 sm:p-10 flex flex-col justify-between text-left space-y-6">
-                <div className="space-y-4">
+              {/* Right: Details */}
+              <div className="w-full md:w-[62%] p-8 sm:p-10 flex flex-col justify-between text-left space-y-5">
+                <div className="space-y-3">
                   <span className="text-xs text-blue-200/80 font-bold block uppercase tracking-wider">{featuredOpportunity.company}</span>
                   <h3 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
                     {featuredOpportunity.title}
                   </h3>
-                  
-                  {/* Metadata Row */}
-                  <div className="flex flex-wrap gap-y-2 gap-x-4 text-xs sm:text-sm text-blue-100/90 font-medium">
-                    <span className="flex items-center gap-1"><MapPin className="w-4 h-4 text-[#B8860B]" /> {featuredOpportunity.location || 'Accra'}</span>
-                    <span className="flex items-center gap-1"><DollarSign className="w-4 h-4 text-[#B8860B]" /> {featuredOpportunity.type || 'Fully Funded'}</span>
-                    {(featuredOpportunity as any).deadline && (
-                      <span className="flex items-center gap-1"><Calendar className="w-4 h-4 text-[#B8860B]" /> {getDaysLeftLabel((featuredOpportunity as any).deadline)}</span>
-                    )}
+                  <p className="text-xs text-blue-100/80 leading-relaxed line-clamp-2">
+                    {featuredOpportunity.description?.replace(/<[^>]*>/g, '').slice(0, 180) || 'No description provided.'}
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs text-blue-100/90 font-medium pt-2">
+                    <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-[#B8860B]" />{featuredOpportunity.location || 'Accra'}</span>
+                    <span className="flex items-center gap-1.5"><GraduationCap className="w-3.5 h-3.5 text-[#B8860B]" />Graduate students</span>
+                    <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-[#B8860B]" />{getDaysLeftLabel((featuredOpportunity as any).deadline)}</span>
+                    <span className="flex items-center gap-1.5"><DollarSign className="w-3.5 h-3.5 text-[#B8860B]" />{featuredOpportunity.type || 'See details'}</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4 pt-4 border-t border-white/10">
-                  <button 
+                  <button
                     onClick={() => setActiveOpportunity(featuredOpportunity)}
-                    className="bg-[#B8860B] hover:bg-[#a6790a] text-white font-bold px-8 py-3 rounded-full text-xs transition-colors shadow-sm"
+                    className="bg-[#B8860B] hover:bg-[#a6790a] text-white font-bold px-6 py-2.5 rounded-full text-xs transition-colors cursor-pointer"
                   >
-                    View Details
+                    View details →
                   </button>
                   {featuredOpportunity.apply_url && (
-                    <a 
-                      href={featuredOpportunity.apply_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="inline-flex items-center gap-1 text-xs font-bold text-white hover:underline"
+                    <a
+                      href={featuredOpportunity.apply_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs font-bold text-white/80 hover:text-white"
                     >
-                      Apply Now <ArrowRight className="w-4 h-4" />
+                      Apply now <ExternalLink className="w-3.5 h-3.5" />
                     </a>
                   )}
                 </div>
               </div>
             </div>
-          </div>
+          </section>
         )}
 
-        {/* LATEST OPPORTUNITIES */}
-        {latestOpportunities.length > 0 && (
-          <div className="space-y-6 pt-6">
-            <h3 className="text-xl font-bold text-[#001a54] text-left">Latest Openings</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {latestOpportunities.map((opp) => (
-                <article 
-                  key={opp.id} 
-                  className="bg-white border border-neutral-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 text-left flex flex-col justify-between h-[360px]"
+        {/* ───── 6. COMPACT 3-COLUMN GRID ───── */}
+        {filteredOpportunities.length > 0 && (
+          <section className="space-y-5">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold text-[#001a54]">
+                {statusTab === 'Open' ? 'All Open Opportunities' : statusTab === 'Closing Soon' ? 'Closing Soon' : 'Archived Opportunities'}
+              </h2>
+              <span className="text-xs text-neutral-400 font-semibold">
+                {filteredOpportunities.length} listing{filteredOpportunities.length !== 1 ? 's' : ''}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
+              {visibleGrid.map(opp => {
+                const archived = isArchived(opp);
+                const oppStatus = getOppStatus(opp);
+                const isSaved = opp.id ? savedIds.includes(opp.id) : false;
+                const deadline = (opp as any).deadline;
+                const daysLeft = deadline ? getDaysLeft(deadline) : null;
+                const isUrgent = daysLeft !== null && daysLeft >= 0 && daysLeft <= 5;
+
+                return (
+                  <article
+                    key={opp.id}
+                    onClick={() => setActiveOpportunity(opp)}
+                    className="group bg-white border border-[#E8E8E8] rounded-2xl overflow-hidden flex flex-col shadow-xs hover:shadow-xl hover:border-[#001a54]/25 transition-all duration-300 cursor-pointer text-left"
+                  >
+                    {/* Top coloured stripe by category */}
+                    <div className="px-5 pt-5 pb-4 flex-1 space-y-3">
+                      {/* Top row: category + status + save */}
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="inline-flex items-center gap-1 rounded-md bg-[#FAF6EC] border border-[#F5EAD2] px-2 py-0.5 text-[10px] font-extrabold text-[#B8860B] uppercase tracking-wider">
+                          {opp.category}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold border uppercase tracking-wider ${
+                            archived
+                              ? statusColors['Application Closed']
+                              : isUrgent
+                                ? statusColors['Closing Soon']
+                                : statusColors['Open']
+                          }`}>
+                            {archived ? 'Closed' : isUrgent ? 'Urgent' : 'Open'}
+                          </span>
+                          <button
+                            onClick={e => { e.stopPropagation(); if (opp.id) handleSave(opp.id); }}
+                            className="text-neutral-300 hover:text-[#B8860B] transition-colors cursor-pointer"
+                            title={isSaved ? 'Remove bookmark' : 'Save opportunity'}
+                          >
+                            {isSaved ? <BookmarkCheck className="w-4 h-4 text-[#B8860B]" /> : <Bookmark className="w-4 h-4" />}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Organisation */}
+                      <p className="text-xs font-bold text-neutral-500 flex items-center gap-1">
+                        <Building className="w-3 h-3 text-neutral-400 shrink-0" />
+                        {opp.company}
+                      </p>
+
+                      {/* Title */}
+                      <h4 className="font-extrabold text-[#001a54] text-base leading-snug line-clamp-2 group-hover:text-[#B8860B] transition-colors">
+                        {opp.title}
+                      </h4>
+
+                      {/* Short summary - 2 lines max */}
+                      <p className="text-xs text-neutral-500 leading-relaxed line-clamp-2">
+                        {opp.description?.replace(/<[^>]*>/g, '').slice(0, 110) || 'See details for full description.'}
+                      </p>
+
+                      {/* Structured metadata */}
+                      <div className="space-y-1.5 pt-1">
+                        <div className="flex items-center gap-1.5 text-xs text-neutral-600 font-medium">
+                          <MapPin className="w-3.5 h-3.5 text-[#B8860B] shrink-0" />
+                          <span>{opp.location || 'Accra'}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-xs text-neutral-600 font-medium">
+                          <GraduationCap className="w-3.5 h-3.5 text-[#B8860B] shrink-0" />
+                          <span>Graduate students and recent graduates</span>
+                        </div>
+                        <div className={`flex items-center gap-1.5 text-xs font-bold ${isUrgent ? 'text-red-600' : 'text-neutral-600'}`}>
+                          <Calendar className={`w-3.5 h-3.5 shrink-0 ${isUrgent ? 'text-red-500' : 'text-[#B8860B]'}`} />
+                          <span>{getDaysLeftLabel(deadline)}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card footer action */}
+                    <div className="px-5 pb-5 pt-3 border-t border-neutral-100">
+                      <div className="flex items-center justify-between text-xs font-bold">
+                        <span className="text-[#001a54] group-hover:text-[#B8860B] transition-colors flex items-center gap-1">
+                          View details <ArrowRight className="w-3.5 h-3.5" />
+                        </span>
+                        {!archived && opp.apply_url && (
+                          <a
+                            href={opp.apply_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={e => e.stopPropagation()}
+                            className="bg-[#001a54] hover:bg-[#B8860B] text-white px-3 py-1.5 rounded-lg text-[10px] transition-colors flex items-center gap-1"
+                          >
+                            Apply now <ExternalLink className="w-3 h-3" />
+                          </a>
+                        )}
+                        {archived && (
+                          <span className="text-neutral-400 text-[10px] font-medium">Application closed</span>
+                        )}
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+
+            {/* Load More */}
+            {visibleCount < gridOpportunities.length && (
+              <div className="text-center pt-4">
+                <button
+                  onClick={() => setVisibleCount(prev => prev + 6)}
+                  className="bg-[#001a54] hover:bg-[#0b2b73] text-white font-bold px-8 py-3 rounded-full text-xs transition-all shadow-xs cursor-pointer"
                 >
-                  <div className="p-6 space-y-4">
-                    {/* Header: Organization & Badge */}
-                    <div className="flex justify-between items-center gap-4">
-                      <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest truncate">{opp.company}</span>
-                      <span className="inline-flex items-center gap-1 rounded-full bg-[#FAF6EC] border border-[#F5EAD2] px-2.5 py-0.5 text-[9px] font-bold text-[#B8860B] uppercase tracking-wider">
-                        {opp.category}
-                      </span>
-                    </div>
-
-                    <h4 className="font-extrabold text-[#001a54] text-lg line-clamp-2 leading-snug group-hover:underline">
-                      {opp.title}
-                    </h4>
-
-                    {/* Metadata elements */}
-                    <div className="space-y-2 text-xs text-neutral-500 font-medium">
-                      <div className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-neutral-400" /> {opp.location || 'Accra'}</div>
-                      <div className="flex items-center gap-1.5"><DollarSign className="w-3.5 h-3.5 text-neutral-400" /> {opp.type || 'Fully Funded'}</div>
-                      {(opp as any).deadline && (
-                        <div className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-neutral-400" /> {getDaysLeftLabel((opp as any).deadline)}</div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Actions footer */}
-                  <div className="p-6 pt-0 flex justify-between items-center border-t border-neutral-50">
-                    <button 
-                      onClick={() => setActiveOpportunity(opp)}
-                      className="text-xs font-bold text-[#001a54] hover:text-[#B8860B] transition-colors"
-                    >
-                      Read Details
-                    </button>
-                    {opp.apply_url && (
-                      <a 
-                        href={opp.apply_url} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="inline-flex items-center gap-0.5 text-xs font-bold text-[#B8860B] hover:underline"
-                      >
-                        Apply <ArrowRight className="w-3 h-3" />
-                      </a>
-                    )}
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        )}
-      </section>
-
-      {/* Grouped sections by opportunity types */}
-      <section className="max-w-5xl mx-auto px-4 pt-24 space-y-16">
-        
-        {/* Latest Scholarships Section */}
-        {scholarships.length > 0 && (
-          <div className="space-y-6 text-left">
-            <h3 className="text-2xl font-bold text-[#001a54] tracking-tight">Latest Scholarships</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {scholarships.map((opp) => (
-                <div key={opp.id} className="bg-white border border-neutral-100 p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between h-[240px]">
-                  <div className="space-y-3">
-                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block">{opp.company}</span>
-                    <h4 className="font-bold text-[#001a54] text-base line-clamp-2">{opp.title}</h4>
-                    <div className="flex items-center gap-4 text-xs text-neutral-500 font-medium">
-                      <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-neutral-400" /> {opp.location || 'Accra'}</span>
-                      <span className="flex items-center gap-1"><DollarSign className="w-3.5 h-3.5 text-neutral-400" /> {opp.type || 'Fully Funded'}</span>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => setActiveOpportunity(opp)}
-                    className="w-full bg-[#FAF6EC] hover:bg-[#F5EAD2] text-[#B8860B] font-bold py-2.5 rounded-xl text-xs transition-colors flex items-center justify-center gap-1"
-                  >
-                    View Details
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Latest Jobs Section */}
-        {jobs.length > 0 && (
-          <div className="space-y-6 text-left">
-            <h3 className="text-2xl font-bold text-[#001a54] tracking-tight">Latest Jobs & Careers</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {jobs.map((opp) => (
-                <div key={opp.id} className="bg-white border border-neutral-100 p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between h-[240px]">
-                  <div className="space-y-3">
-                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block">{opp.company}</span>
-                    <h4 className="font-bold text-[#001a54] text-base line-clamp-2">{opp.title}</h4>
-                    <div className="flex items-center gap-4 text-xs text-neutral-500 font-medium">
-                      <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-neutral-400" /> {opp.location || 'Accra'}</span>
-                      <span className="flex items-center gap-1"><DollarSign className="w-3.5 h-3.5 text-neutral-400" /> {opp.type || 'Full-time'}</span>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => setActiveOpportunity(opp)}
-                    className="w-full bg-[#001a54]/5 hover:bg-[#001a54]/10 text-[#001a54] font-bold py-2.5 rounded-xl text-xs transition-colors flex items-center justify-center gap-1"
-                  >
-                    View Details
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Research Opportunities Section */}
-        {research.length > 0 && (
-          <div className="space-y-6 text-left">
-            <h3 className="text-2xl font-bold text-[#001a54] tracking-tight">Research Opportunities</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {research.map((opp) => (
-                <div key={opp.id} className="bg-white border border-neutral-100 p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between h-[240px]">
-                  <div className="space-y-3">
-                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block">{opp.company}</span>
-                    <h4 className="font-bold text-[#001a54] text-base line-clamp-2">{opp.title}</h4>
-                    <div className="flex items-center gap-4 text-xs text-neutral-500 font-medium">
-                      <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-neutral-400" /> {opp.location || 'Accra'}</span>
-                      <span className="flex items-center gap-1"><DollarSign className="w-3.5 h-3.5 text-neutral-400" /> {opp.type || 'Research Grant'}</span>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => setActiveOpportunity(opp)}
-                    className="w-full bg-[#eefcf5] hover:bg-[#d2f5e3] text-emerald-700 font-bold py-2.5 rounded-xl text-xs transition-colors flex items-center justify-center gap-1"
-                  >
-                    View Details
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </section>
-
-      {/* Section 8: Upcoming Deadlines Timeline */}
-      {upcomingDeadlines.length > 0 && (
-        <section className="max-w-5xl mx-auto px-4 pt-24 space-y-8 text-left">
-          <div>
-            <h3 className="text-2xl font-bold text-[#001a54] tracking-tight">Upcoming Deadlines</h3>
-            <p className="text-xs text-neutral-500 font-medium">Ensure your applications are completed before these upcoming close dates.</p>
-          </div>
-
-          <div className="relative border-l border-neutral-200 pl-6 ml-4 space-y-8">
-            {upcomingDeadlines.map(({ opp, date }, index) => (
-              <div key={index} className="relative group">
-                {/* Timeline node */}
-                <div className="absolute left-[-33px] top-1 w-4.5 h-4.5 rounded-full bg-white border-2 border-[#B8860B] flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#B8860B]" />
-                </div>
-
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                  <div className="space-y-1">
-                    <span className="text-xs font-bold text-neutral-400 uppercase tracking-widest">{opp.company}</span>
-                    <h4 
-                      onClick={() => setActiveOpportunity(opp)}
-                      className="font-bold text-[#001a54] text-sm sm:text-base hover:underline cursor-pointer"
-                    >
-                      {opp.title}
-                    </h4>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-red-50 text-red-600 px-3 py-1 text-xs font-bold uppercase tracking-wider">
-                      <Clock className="w-3.5 h-3.5" />
-                      {getDaysLeftLabel((opp as any).deadline)}
-                    </span>
-                  </div>
-                </div>
+                  Load More Opportunities
+                </button>
               </div>
-            ))}
+            )}
+          </section>
+        )}
+
+        {/* ───── 7. OPPORTUNITY ALERTS SUBSCRIPTION ───── */}
+        <section>
+          <div className="bg-[#000830] text-white p-8 sm:p-12 rounded-3xl relative overflow-hidden">
+            <div className="relative z-10 space-y-5">
+              <div className="space-y-2 text-left">
+                <h3 className="text-xl sm:text-2xl font-extrabold tracking-tight">Never Miss an Opportunity</h3>
+                <p className="text-neutral-400 text-xs max-w-md">
+                  Subscribe to receive weekly opportunity alerts — scholarships, grants, jobs, fellowships and more, selected for UPSA graduate students.
+                </p>
+              </div>
+              {subscribed ? (
+                <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-5 py-3 rounded-xl w-fit">
+                  <CheckCircle className="w-5 h-5 text-emerald-400" />
+                  <span className="font-bold text-sm">You're subscribed! We'll keep you posted.</span>
+                </div>
+              ) : (
+                <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 max-w-md">
+                  <div className="relative flex-1">
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+                    <input
+                      type="email"
+                      placeholder="Enter your email address"
+                      required
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                      className="w-full bg-white/5 border border-white/15 rounded-xl pl-11 pr-4 py-3 text-xs text-white placeholder-neutral-500 outline-none focus:ring-2 focus:ring-[#B8860B]"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="bg-[#B8860B] hover:bg-[#a6790a] text-white font-bold px-7 py-3 rounded-xl text-xs transition-colors shadow-sm cursor-pointer"
+                  >
+                    Subscribe
+                  </button>
+                </form>
+              )}
+            </div>
+            <div className="absolute top-[-50px] right-[-50px] w-48 h-48 rounded-full bg-white/5 blur-2xl pointer-events-none" />
+            <div className="absolute bottom-[-50px] left-[-50px] w-48 h-48 rounded-full bg-[#B8860B]/10 blur-2xl pointer-events-none" />
           </div>
         </section>
-      )}
 
-      {/* Section 9: Career Resources Section */}
-      <section className="max-w-5xl mx-auto px-4 pt-24 space-y-8 text-left">
-        <div>
-          <h3 className="text-2xl font-bold text-[#001a54] tracking-tight">Career Resources</h3>
-          <p className="text-xs text-neutral-500 font-medium">Essential toolkits to empower your graduate applications.</p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div className="bg-white border border-neutral-100 p-6 rounded-2xl shadow-sm flex flex-col justify-between items-start gap-4">
-            <div className="p-3 bg-[#001a54]/5 rounded-xl text-[#001a54]">
-              <FileText className="w-6 h-6" />
-            </div>
-            <div>
-              <span className="font-extrabold text-[#001a54] block mb-1 text-sm sm:text-base">CV Templates</span>
-              <p className="text-xs text-neutral-500 leading-relaxed">Download professionally designed CV templates approved for graduate applications.</p>
-            </div>
-            <a href="#" className="text-xs font-bold text-[#B8860B] hover:underline flex items-center gap-1">Download PDF <ExternalLink className="w-3 h-3" /></a>
-          </div>
-
-          <div className="bg-white border border-neutral-100 p-6 rounded-2xl shadow-sm flex flex-col justify-between items-start gap-4">
-            <div className="p-3 bg-[#001a54]/5 rounded-xl text-[#001a54]">
-              <BookOpen className="w-6 h-6" />
-            </div>
-            <div>
-              <span className="font-extrabold text-[#001a54] block mb-1 text-sm sm:text-base">Research Proposal Guide</span>
-              <p className="text-xs text-neutral-500 leading-relaxed">A comprehensive checklist and methodology guide for thesis and grant proposals.</p>
-            </div>
-            <a href="#" className="text-xs font-bold text-[#B8860B] hover:underline flex items-center gap-1">Download PDF <ExternalLink className="w-3 h-3" /></a>
-          </div>
-
-          <div className="bg-white border border-neutral-100 p-6 rounded-2xl shadow-sm flex flex-col justify-between items-start gap-4">
-            <div className="p-3 bg-[#001a54]/5 rounded-xl text-[#001a54]">
-              <Users className="w-6 h-6" />
-            </div>
-            <div>
-              <span className="font-extrabold text-[#001a54] block mb-1 text-sm sm:text-base">Interview Tips</span>
-              <p className="text-xs text-neutral-500 leading-relaxed">Master graduate entry interviews with standard question reviews and tips.</p>
-            </div>
-            <a href="#" className="text-xs font-bold text-[#B8860B] hover:underline flex items-center gap-1">Read Article <ExternalLink className="w-3 h-3" /></a>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 10: Premium Newsletter Subscription CTA */}
-      <section className="max-w-5xl mx-auto px-4 pt-24">
-        <div className="bg-[#000830] text-white p-8 sm:p-12 rounded-3xl text-center space-y-6 relative overflow-hidden">
-          <div className="space-y-2 relative z-10">
-            <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Never Miss An Opportunity</h3>
-            <p className="text-neutral-400 text-xs sm:text-sm max-w-md mx-auto">
-              Subscribe to receive weekly newsletters containing the latest Scholarships, Conferences, Grants, and Jobs.
+        {/* ───── 8. SUBMIT AN OPPORTUNITY CTA ───── */}
+        <section className="bg-neutral-50 border border-neutral-200 rounded-2xl p-6 sm:p-8 text-left space-y-4">
+          <div className="space-y-2">
+            <h3 className="text-lg font-extrabold text-[#001a54]">Know of an opportunity for graduate students?</h3>
+            <p className="text-xs text-neutral-500 leading-relaxed max-w-xl">
+              GRASAG-UPSA curates verified opportunities for our members. Submit a listing for the executive team to review before publication.
             </p>
           </div>
+          <button
+            onClick={() => setIsSubmitOpen(true)}
+            className="bg-[#001a54] hover:bg-[#0b2b73] text-white font-bold px-6 py-2.5 rounded-xl text-xs transition-colors flex items-center gap-2 cursor-pointer"
+          >
+            <PlusCircle className="w-4 h-4" />
+            Submit an Opportunity
+          </button>
+        </section>
 
-          {subscribed ? (
-            <div className="max-w-md mx-auto bg-white/5 border border-white/10 p-6 rounded-2xl flex flex-col items-center gap-2 relative z-10 animate-fade-in">
-              <CheckCircle className="w-10 h-10 text-emerald-500" />
-              <span className="font-bold text-sm">Successfully Subscribed!</span>
-              <p className="text-xs text-neutral-400">You will now receive opportunities straight to your inbox.</p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubscribe} className="max-w-md mx-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3 relative z-10">
-              <div className="relative flex-1">
-                <Mail className="absolute left-3.5 top-1/2 transform -translate-y-1/2 w-4.5 h-4.5 text-neutral-500" />
-                <input
-                  type="email"
-                  placeholder="Enter your email address"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-white/5 border border-white/15 rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-neutral-500 outline-none focus:ring-2 focus:ring-[#B8860B]"
-                />
-              </div>
-              <button 
-                type="submit"
-                className="bg-[#B8860B] hover:bg-[#a6790a] text-white font-bold px-8 py-3 rounded-xl text-sm transition-colors shadow-sm"
-              >
-                Subscribe
-              </button>
-            </form>
-          )}
+        {/* ───── 9. TRUST DISCLAIMER ───── */}
+        <section className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3 text-left">
+          <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <p className="text-xs text-amber-800 leading-relaxed font-medium">
+            <strong>Important notice:</strong> GRASAG-UPSA shares opportunities for informational purposes only. Always confirm requirements, eligibility and deadlines directly on the official organisation's website before applying. GRASAG-UPSA bears no responsibility for outcomes arising from third-party listings.
+          </p>
+        </section>
 
-          {/* Decorative backdrop elements */}
-          <div className="absolute top-[-50px] right-[-50px] w-48 h-48 rounded-full bg-white/5 blur-xl pointer-events-none" />
-          <div className="absolute bottom-[-50px] left-[-50px] w-48 h-48 rounded-full bg-[#B8860B]/10 blur-xl pointer-events-none" />
-        </div>
-      </section>
+      </div>
 
-      {/* DETAIL MODAL PANEL (Slide-over details card) */}
+      {/* ───── DETAIL MODAL ───── */}
       {activeOpportunity && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/60 backdrop-blur-xs animate-fade-in p-4 sm:p-6">
           <div className="bg-white rounded-3xl w-full max-w-2xl h-[90vh] overflow-hidden shadow-2xl flex flex-col animate-slide-in text-left">
-            {/* Modal Header */}
+            {/* Header */}
             <div className="bg-[#FAF6EC] p-6 border-b border-[#F5EAD2] flex justify-between items-start gap-4">
               <div className="space-y-2">
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#001a54]/5 px-2.5 py-0.5 text-[10px] font-bold text-[#001a54] uppercase tracking-wider">
-                  {activeOpportunity.category}
-                </span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="rounded-full bg-[#001a54]/5 border border-[#001a54]/10 px-2.5 py-0.5 text-[10px] font-bold text-[#001a54] uppercase tracking-wider">
+                    {activeOpportunity.category}
+                  </span>
+                  <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold border uppercase tracking-wider ${
+                    isArchived(activeOpportunity) ? statusColors['Application Closed'] : statusColors['Open']
+                  }`}>
+                    {isArchived(activeOpportunity) ? 'Application Closed' : getOppStatus(activeOpportunity)}
+                  </span>
+                </div>
                 <h3 className="text-xl sm:text-2xl font-extrabold text-[#001a54] leading-tight">
                   {activeOpportunity.title}
                 </h3>
@@ -656,98 +666,179 @@ export default function OpportunitiesClient({ initialOpportunities }: Opportunit
                   <Building className="w-4 h-4 text-[#B8860B]" /> {activeOpportunity.company}
                 </span>
               </div>
-              <button 
-                onClick={() => setActiveOpportunity(null)}
-                className="w-8 h-8 rounded-full bg-white/80 hover:bg-white text-neutral-600 font-bold border border-neutral-200 flex items-center justify-center transition-colors cursor-pointer"
-              >
-                ✕
-              </button>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => handleShare(activeOpportunity)}
+                  title="Copy link"
+                  className="w-8 h-8 rounded-full bg-white/80 hover:bg-white text-neutral-500 border border-neutral-200 flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  {copiedShareId === activeOpportunity.id ? <CheckCircle className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                </button>
+                <button
+                  onClick={() => setReportId(activeOpportunity.id || null)}
+                  title="Report expired listing"
+                  className="w-8 h-8 rounded-full bg-white/80 hover:bg-red-50 text-neutral-400 hover:text-red-500 border border-neutral-200 flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  <Flag className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setActiveOpportunity(null)}
+                  className="w-8 h-8 rounded-full bg-white/80 hover:bg-white text-neutral-600 border border-neutral-200 flex items-center justify-center transition-colors cursor-pointer font-bold"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
-            {/* Modal Scroll Content */}
+            {/* Scrollable Body */}
             <div className="p-6 sm:p-8 flex-1 overflow-y-auto space-y-6">
-              
-              {/* Metadata panel */}
-              <div className="grid grid-cols-2 gap-4 bg-neutral-50 p-5 rounded-2xl border border-neutral-100 text-xs sm:text-sm font-medium text-neutral-600">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4.5 h-4.5 text-[#B8860B]" />
-                  <div>
-                    <span className="text-[10px] font-bold text-neutral-400 block uppercase tracking-wider">Location</span>
-                    <span>{activeOpportunity.location || 'Accra'}</span>
+              {/* Metadata grid */}
+              <div className="grid grid-cols-2 gap-4 bg-neutral-50 p-5 rounded-2xl border border-neutral-100 text-xs font-medium text-neutral-600">
+                {[
+                  { icon: MapPin, label: 'Location', value: activeOpportunity.location || 'Accra' },
+                  { icon: DollarSign, label: 'Funding / Type', value: activeOpportunity.type || 'See details' },
+                  { icon: Calendar, label: 'Start Date', value: (activeOpportunity as any).start_date ? new Date((activeOpportunity as any).start_date).toLocaleDateString() : 'Immediate / Open' },
+                  { icon: Calendar, label: 'Deadline', value: getDaysLeftLabel((activeOpportunity as any).deadline) },
+                  ...((activeOpportunity as any).end_date ? [{ icon: Calendar, label: 'End Date', value: new Date((activeOpportunity as any).end_date).toLocaleDateString() }] : []),
+                ].map(({ icon: Icon, label, value }) => (
+                  <div key={label} className="flex items-start gap-2">
+                    <Icon className="w-4 h-4 text-[#B8860B] mt-0.5 shrink-0" />
+                    <div>
+                      <span className="text-[10px] font-bold text-neutral-400 block uppercase tracking-wider">{label}</span>
+                      <span className="text-neutral-700">{value}</span>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <DollarSign className="w-4.5 h-4.5 text-[#B8860B]" />
-                  <div>
-                    <span className="text-[10px] font-bold text-neutral-400 block uppercase tracking-wider">Funding / Type</span>
-                    <span>{activeOpportunity.type || 'Fully Funded'}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4.5 h-4.5 text-[#B8860B]" />
-                  <div>
-                    <span className="text-[10px] font-bold text-neutral-400 block uppercase tracking-wider">Duration</span>
-                    <span>1 Week / 3 Months</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4.5 h-4.5 text-[#B8860B]" />
-                  <div>
-                    <span className="text-[10px] font-bold text-neutral-400 block uppercase tracking-wider">Deadline</span>
-                    <span>{(activeOpportunity as any).deadline ? new Date((activeOpportunity as any).deadline).toLocaleDateString() : 'N/A'}</span>
-                  </div>
-                </div>
+                ))}
               </div>
 
-              {/* Description */}
+              {/* About the Opportunity */}
               <div className="space-y-3">
-                <h4 className="font-bold text-neutral-900 border-b pb-2">Description & Scope</h4>
-                <div 
-                  className="text-sm text-neutral-600 leading-relaxed space-y-2 rich-text" 
-                  dangerouslySetInnerHTML={{ __html: activeOpportunity.description || 'No description provided.' }}
+                <h4 className="font-bold text-[#001a54] border-b pb-2">About this Opportunity</h4>
+                <div
+                  className="text-xs sm:text-sm text-neutral-600 leading-relaxed space-y-2"
+                  dangerouslySetInnerHTML={{ __html: activeOpportunity.description || '<p>No description provided.</p>' }}
                 />
               </div>
 
               {/* Requirements */}
               <div className="space-y-3">
-                <h4 className="font-bold text-neutral-900 border-b pb-2">Key Requirements</h4>
-                <ul className="list-disc list-inside text-sm text-neutral-600 space-y-2.5">
-                  <li>Applicants must be currently registered postgraduate students of UPSA.</li>
-                  <li>Demonstrate a strong academic record or relevant sector-specific professional skills.</li>
-                  <li>Prepare CV templates and references ahead of applying.</li>
+                <h4 className="font-bold text-[#001a54] border-b pb-2">Key Requirements</h4>
+                <ul className="list-disc list-inside text-xs text-neutral-600 space-y-2">
+                  <li>Applicants must be currently enrolled or recently graduated postgraduate students at UPSA.</li>
+                  <li>A strong academic record or relevant professional background is required.</li>
+                  <li>Prepare your CV, personal statement and references before applying.</li>
                 </ul>
               </div>
 
-            </div>
+              {/* Application process */}
+              <div className="space-y-3">
+                <h4 className="font-bold text-[#001a54] border-b pb-2">Application Process</h4>
+                <ol className="list-decimal list-inside text-xs text-neutral-600 space-y-2">
+                  <li>Review the full requirements on the official organisation's website.</li>
+                  <li>Prepare all required documents.</li>
+                  <li>Submit your application using the Apply Now button below before the deadline.</li>
+                </ol>
+              </div>
 
-            {/* Modal Actions Footer */}
-            <div className="p-6 border-t border-neutral-100 flex justify-end items-center gap-3 bg-neutral-50/50">
-              <button 
-                onClick={() => setActiveOpportunity(null)}
-                className="px-5 py-2.5 rounded-xl border border-neutral-200 text-xs font-bold text-neutral-500 hover:bg-neutral-100 transition-colors"
-              >
-                Close
-              </button>
-              {activeOpportunity.apply_url && (
-                <a 
-                  href={activeOpportunity.apply_url} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="bg-[#001a54] hover:bg-[#0b2b73] text-white font-bold px-6 py-2.5 rounded-xl text-xs transition-colors flex items-center gap-1.5"
-                >
-                  Apply Now <ExternalLink className="w-4 h-4" />
-                </a>
+              {/* Disclaimer */}
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <p className="text-[11px] text-amber-800 leading-relaxed">
+                  Always verify eligibility, deadline and requirements directly on the{' '}
+                  {activeOpportunity.apply_url ? (
+                    <a href={activeOpportunity.apply_url} target="_blank" rel="noopener noreferrer" className="underline font-bold">
+                      official organisation's website
+                    </a>
+                  ) : (
+                    "official organisation's website"
+                  )}{' '}
+                  before applying. GRASAG-UPSA curates listings for informational purposes only.
+                </p>
+              </div>
+
+              {/* Report confirmation */}
+              {reportId === activeOpportunity.id && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-3.5 flex items-center justify-between">
+                  <p className="text-xs text-red-700 font-medium">Thanks — this listing has been flagged for review.</p>
+                  <button onClick={() => setReportId(null)} className="text-red-400 hover:text-red-700 text-xs font-bold">Dismiss</button>
+                </div>
               )}
             </div>
+
+            {/* Footer Actions */}
+            <div className="p-5 border-t border-neutral-100 flex flex-wrap justify-between items-center gap-3 bg-neutral-50/60">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => { setReportId(activeOpportunity.id || null); }}
+                  className="text-xs text-neutral-400 hover:text-red-500 flex items-center gap-1 transition-colors cursor-pointer"
+                >
+                  <Flag className="w-3.5 h-3.5" /> Report expired listing
+                </button>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setActiveOpportunity(null)}
+                  className="px-4 py-2.5 rounded-xl border border-neutral-200 text-xs font-bold text-neutral-500 hover:bg-neutral-100 transition-colors cursor-pointer"
+                >
+                  Close
+                </button>
+                {!isArchived(activeOpportunity) && activeOpportunity.apply_url && (
+                  <a
+                    href={activeOpportunity.apply_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-[#001a54] hover:bg-[#B8860B] text-white font-bold px-6 py-2.5 rounded-xl text-xs transition-colors flex items-center gap-1.5"
+                  >
+                    Apply now <ExternalLink className="w-4 h-4" />
+                  </a>
+                )}
+                {isArchived(activeOpportunity) && (
+                  <span className="bg-neutral-100 text-neutral-400 font-bold px-5 py-2.5 rounded-xl text-xs">
+                    Application Closed
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ───── SUBMIT OPPORTUNITY MODAL ───── */}
+      {isSubmitOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-3xl w-full max-w-md p-6 sm:p-8 space-y-5 relative text-left">
+            <button
+              onClick={() => setIsSubmitOpen(false)}
+              className="absolute top-4 right-4 text-neutral-400 hover:text-neutral-700 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="space-y-1">
+              <h3 className="text-xl font-extrabold text-[#001a54]">Submit an Opportunity</h3>
+              <p className="text-xs text-neutral-500">The GRASAG executive team will review your submission before it is published.</p>
+            </div>
+            <form
+              onSubmit={e => { e.preventDefault(); setIsSubmitOpen(false); alert('Opportunity submitted for review. Thank you!'); }}
+              className="space-y-3"
+            >
+              <input type="text" placeholder="Opportunity Title" required className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2.5 text-xs outline-none" />
+              <input type="text" placeholder="Organisation / Company" required className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2.5 text-xs outline-none" />
+              <select className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2.5 text-xs outline-none text-neutral-700">
+                <option value="">Category</option>
+                {categoriesList.filter(c => c.name !== 'All').map(c => <option key={c.name}>{c.name}</option>)}
+              </select>
+              <input type="date" placeholder="Application Deadline" className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2.5 text-xs outline-none" />
+              <input type="url" placeholder="Official Application URL (https://…)" required className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2.5 text-xs outline-none" />
+              <textarea rows={3} placeholder="Brief description (2–3 sentences)" required className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2.5 text-xs outline-none" />
+              <input type="email" placeholder="Your email (for follow-up)" className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2.5 text-xs outline-none" />
+              <button type="submit" className="w-full bg-[#001a54] hover:bg-[#0b2b73] text-white font-bold py-3 rounded-xl text-xs transition-colors cursor-pointer">
+                Submit for Review
+              </button>
+            </form>
           </div>
         </div>
       )}
 
     </div>
   );
-}
-
-function handleScrollToSection(id: string) {
-  const el = document.getElementById(id);
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }

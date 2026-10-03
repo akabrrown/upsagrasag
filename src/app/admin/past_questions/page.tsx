@@ -10,6 +10,7 @@ import {
   ArrowLeft, FileText, Calendar, Link as LinkIcon
 } from 'lucide-react';
 import CloudinaryUpload from '@/components/CloudinaryUpload';
+import { AdminTableSkeleton } from '@/components/admin/AdminTableSkeleton';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -34,7 +35,8 @@ export default function AdminPastQuestionsPage() {
     setView('add');
   };
 
-  const handleOpenEdit = (item: PastQuestion) => {
+  const handleOpenEdit = (raw_item: PastQuestion) => {
+    const item = Object.fromEntries(Object.entries(raw_item).map(([k, v]) => [k, v === null ? '' : v])) as any;
     const formatted = { ...item };
     if (formatted.exam_date) {
       const d = new Date(formatted.exam_date);
@@ -79,7 +81,7 @@ export default function AdminPastQuestionsPage() {
   };
 
   const tabs = ['All Questions', 'Exams', 'Assignments'];
-  const filtered = (Array.isArray(records) ? records : []).filter(r => {
+  const filtered = (records || []).filter(r => {
     if (activeTab === 'All Questions') return true;
     if (activeTab === 'Exams') return r.type === 'exam';
     if (activeTab === 'Assignments') return r.type === 'assignment';
@@ -126,7 +128,7 @@ export default function AdminPastQuestionsPage() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {isLoading ? (
-                <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">Loading…</td></tr>
+                <AdminTableSkeleton columns={4} />
               ) : filtered.length === 0 ? (
                 <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">No records found.</td></tr>
               ) : (
