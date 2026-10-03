@@ -36,11 +36,7 @@ function extractSemester(record: any): string {
   return 'First Semester';
 }
 
-interface AcademicTimetableClientProps {
-  downloadableTimetables: Resource[];
-}
-
-export default function AcademicTimetableClient({ downloadableTimetables }: AcademicTimetableClientProps) {
+export default function AcademicTimetableClient() {
   const [timetables, setTimetables] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -296,48 +292,8 @@ export default function AcademicTimetableClient({ downloadableTimetables }: Acad
                     </button>
                   ))}
                 </div>
-              </div>
-            </div>
           )}
         </div>
-
-        {/* Downloadable Timetables Section (From Resources) */}
-        {downloadableTimetables && downloadableTimetables.length > 0 && (
-          <div className="mb-10 print:hidden">
-            <h2 className="text-lg font-bold text-[#001a54] mb-4 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-[#B8860B]" />
-              Official Provisional Timetables (Downloads)
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {downloadableTimetables.map((res) => (
-                <a 
-                  key={res.id} 
-                  href={res.file_url || res.link_url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="group flex flex-col justify-between bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm hover:shadow-md hover:border-blue-200 transition-all"
-                >
-                  <div>
-                    <h3 className="font-bold text-sm text-gray-900 group-hover:text-[#001a54] transition-colors line-clamp-2">
-                      {res.title}
-                    </h3>
-                    {res.description && (
-                      <p className="text-xs text-gray-500 mt-1 line-clamp-1">{res.description}</p>
-                    )}
-                  </div>
-                  <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-[#B8860B] uppercase bg-amber-50 px-2 py-0.5 rounded border border-amber-100">
-                      DOCUMENT
-                    </span>
-                    <span className="text-xs font-bold text-blue-600 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                      Download <Download className="w-3 h-3" />
-                    </span>
-                  </div>
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* ========================================================================= */}
         {/* PRINT-ONLY OFFICIAL DOCUMENT HEADER (Formatted like official UPSA document) */}
