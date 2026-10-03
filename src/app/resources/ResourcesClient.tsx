@@ -15,7 +15,8 @@ import {
   ShieldCheck, 
   Building,
   HelpCircle,
-  ArrowUpRight
+  ArrowUpRight,
+  Layers
 } from 'lucide-react';
 
 interface ResourcesClientProps {
@@ -226,6 +227,67 @@ export default function ResourcesClient({ initialResources }: ResourcesClientPro
 
       {/* Main Container max-w-6xl (~1200px) */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 pt-10">
+
+        {/* 1.5 Premium Visual Guides / Posters Section */}
+        <section className="w-full">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-xl font-bold text-[#001a54] flex items-center gap-2">
+                <Layers className="w-5 h-5 text-[#B8860B]" />
+                Featured Visual Guides
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">
+                Quick reference posters and step-by-step visual instructions.
+              </p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              {
+                id: 'guide-1',
+                title: 'Student Resource Guide 1',
+                src: '/images/resources/resource-1.jpg'
+              },
+              {
+                id: 'guide-2',
+                title: 'Student Resource Guide 2',
+                src: '/images/resources/resource-2.jpg'
+              }
+            ].map((img, idx) => (
+              <a 
+                key={img.id}
+                href={img.src}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative block overflow-hidden rounded-2xl border border-gray-200/80 bg-gray-50 aspect-video shadow-sm hover:shadow-xl transition-all duration-500"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img 
+                  src={img.src} 
+                  alt={img.title}
+                  className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                />
+                
+                {/* Overlay gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#001a54]/90 via-[#001a54]/20 to-transparent opacity-80 transition-opacity duration-300" />
+                
+                {/* Hover UI */}
+                <div className="absolute bottom-0 left-0 right-0 p-6 flex items-end justify-between translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                  <div>
+                    <h3 className="text-white font-bold text-lg">{img.title}</h3>
+                    <p className="text-blue-200 text-sm font-medium mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
+                      Click to view full image
+                    </p>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-150">
+                    <ArrowUpRight className="w-5 h-5" />
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
         
         {/* 2. Search Bar & 3. Category Filter Chips */}
         <div className="space-y-6 text-left">
