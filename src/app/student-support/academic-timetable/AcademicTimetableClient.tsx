@@ -292,6 +292,8 @@ export default function AcademicTimetableClient() {
                     </button>
                   ))}
                 </div>
+              </div>
+            </div>
           )}
         </div>
 
