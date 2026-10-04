@@ -36,12 +36,21 @@ function extractSemester(record: any): string {
   return 'First Semester';
 }
 
+// Helper to extract clean year label from a record
+function extractYear(record: any): string {
+  const str = record.level_semester_group || '';
+  if (/year\s*(one|1)/i.test(str)) return 'Year 1';
+  if (/year\s*(two|2)/i.test(str)) return 'Year 2';
+  return 'Unknown Year';
+}
+
 export default function AcademicTimetableClient() {
   const [timetables, setTimetables] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
   const [activeSemester, setActiveSemester] = useState('First Semester');
   const [activeSession, setActiveSession] = useState('Evening Session');
+  const [activeYear, setActiveYear] = useState('All');
   const [activeProgram, setActiveProgram] = useState('All');
   const [activeGroup, setActiveGroup] = useState('All');
 
@@ -83,27 +92,38 @@ export default function AcademicTimetableClient() {
     return activeSession === 'All' ? semesterTimetables : semesterTimetables.filter(t => t.session_type === activeSession);
   }, [semesterTimetables, activeSession]);
 
-  // Distinct programs available in this semester and session
-  const programs = useMemo(() => {
-    return ['All', ...Array.from(new Set(sessionTimetables.map(t => t.program))).filter(Boolean)];
+  // Distinct years available
+  const availableYears = useMemo(() => {
+    const years = new Set(sessionTimetables.map(t => extractYear(t)).filter(y => y !== 'Unknown Year'));
+    return ['All', ...Array.from(years).sort()];
   }, [sessionTimetables]);
+
+  // Filter by Year
+  const yearTimetables = useMemo(() => {
+    return activeYear === 'All' ? sessionTimetables : sessionTimetables.filter(t => extractYear(t) === activeYear);
+  }, [sessionTimetables, activeYear]);
+
+  // Distinct programs available in this semester, session, and year
+  const programs = useMemo(() => {
+    return ['All', ...Array.from(new Set(yearTimetables.map(t => t.program))).filter(Boolean)];
+  }, [yearTimetables]);
 
   // Distinct groups available for the selected program
   const programGroups = useMemo(() => {
     if (activeProgram === 'All') return [];
-    const proRecords = sessionTimetables.filter(t => t.program === activeProgram);
+    const proRecords = yearTimetables.filter(t => t.program === activeProgram);
     const groups = Array.from(new Set(proRecords.map(t => t.level_semester_group).filter(Boolean)));
     return groups;
-  }, [sessionTimetables, activeProgram]);
+  }, [yearTimetables, activeProgram]);
 
-  // Filtered records based on semester, session, program, and group
+  // Filtered records based on semester, session, year, program, and group
   const filteredRecords = useMemo(() => {
-    return sessionTimetables.filter(r => {
+    return yearTimetables.filter(r => {
       if (activeProgram !== 'All' && r.program !== activeProgram) return false;
       if (activeGroup !== 'All' && r.level_semester_group !== activeGroup) return false;
       return true;
     });
-  }, [sessionTimetables, activeProgram, activeGroup]);
+  }, [yearTimetables, activeProgram, activeGroup]);
 
   // Group records by Day for the schedule grid
   const recordsByDay = useMemo(() => {
@@ -227,6 +247,35 @@ export default function AcademicTimetableClient() {
             </div>
           </div>
 
+          {/* Year Tabs */}
+          {availableYears.length > 1 && (
+            <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-200/80">
+              <div className="flex items-center gap-2 mb-2 px-1 text-xs font-bold uppercase tracking-wider text-gray-500">
+                <span>Academic Year:</span>
+                <span className="text-[#001a54] normal-case font-semibold">{activeYear}</span>
+              </div>
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+                {availableYears.map(y => (
+                  <button
+                    key={y}
+                    onClick={() => {
+                      setActiveYear(y);
+                      setActiveProgram('All');
+                      setActiveGroup('All');
+                    }}
+                    className={`flex-none px-6 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-150 whitespace-nowrap ${
+                      activeYear === y
+                        ? 'bg-[#B8860B] text-white shadow-sm ring-1 ring-black/5 font-semibold'
+                        : 'bg-gray-100/70 text-gray-700 hover:bg-gray-200/70'
+                    }`}
+                  >
+                    {y}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Program Tabs */}
           <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-200/80">
             <div className="flex items-center gap-2 mb-2 px-1 text-xs font-bold uppercase tracking-wider text-gray-500">
@@ -317,6 +366,8 @@ export default function AcademicTimetableClient() {
             <span>•</span>
             <span>SESSION: <strong className="text-[#001a54]">{activeSession}</strong></span>
             <span>•</span>
+            <span>YEAR: <strong className="text-[#001a54]">{activeYear === 'All' ? 'ALL YEARS' : activeYear.toUpperCase()}</strong></span>
+            <span>•</span>
             <span>PROGRAM: <strong className="text-[#001a54]">{activeProgram === 'All' ? 'ALL PROGRAMS' : activeProgram}</strong></span>
             {activeGroup !== 'All' && (
               <>
@@ -324,8 +375,6 @@ export default function AcademicTimetableClient() {
                 <span>GROUP: <strong className="text-[#B8860B]">{extractGroupLabel(activeGroup)}</strong></span>
               </>
             )}
-            <span>•</span>
-            <span>YEAR: <strong>2026/2027</strong></span>
           </div>
         </div>
 
