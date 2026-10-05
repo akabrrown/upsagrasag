@@ -435,9 +435,18 @@ export default function AcademicTimetableClient() {
                         </thead>
                         <tbody className="divide-y divide-gray-200/80 text-sm">
                           {dayRecords.map((record, idx) => {
-                            const parts = (record.subject_lecturer || '').split(' - ');
-                            const courseName = parts[0] || record.subject_lecturer;
-                            const lecturerName = parts.slice(1).join(' - ') || 'TBA';
+                            let courseName = record.subject_lecturer || '';
+                            let lecturerName = 'TBA';
+                            
+                            const lecMatch = courseName.match(/Lecturer\s*:\s*(.*)/i);
+                            if (lecMatch) {
+                              lecturerName = lecMatch[1].trim();
+                              courseName = courseName.replace(/Lecturer\s*:\s*(.*)/i, '').trim();
+                            } else if (courseName.includes(' - ')) {
+                              const parts = courseName.split(' - ');
+                              courseName = parts[0].trim();
+                              lecturerName = parts.slice(1).join(' - ').trim() || 'TBA';
+                            }
                             const groupLabel = extractGroupLabel(record.level_semester_group);
 
                             return (
