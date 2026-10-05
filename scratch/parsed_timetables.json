@@ -1,0 +1,902 @@
+[
+  {
+    "session_type": "Distance Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP ONE (1)",
+    "day": "MONDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAF 601 Financial Reporting Lecturer: Mrs. Ivy Eklement",
+    "venue": "Virtual - Link to be provided by lecturer"
+  },
+  {
+    "session_type": "Distance Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP ONE (1)",
+    "day": "TUESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAF603 Public Sector Accounting Lecturer: Dr. Prince Yeboah-Boateng",
+    "venue": "Virtual - Link to be provided by lecturer"
+  },
+  {
+    "session_type": "Distance Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP ONE (1)",
+    "day": "WEDNESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAF605 Corporate Finance Lecturer: Dr. Godwin Musah",
+    "venue": "Virtual - Link to be provided by lecturer"
+  },
+  {
+    "session_type": "Distance Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP ONE (1)",
+    "day": "THURSDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC613 Strategic Management Lecturer: Prof. Michael Boadi Nyamekye",
+    "venue": "Virtual - Link to be provided by lecturer"
+  },
+  {
+    "session_type": "Distance Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP ONE (1)",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC 611 Business Leadership and Ethics Lecturer: Dr. Dapaah",
+    "venue": "Virtual - Link to be provided by lecturer"
+  },
+  {
+    "session_type": "Distance Session",
+    "program": "MBA AUDITING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP ONE (1)",
+    "day": "MONDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAF 601 Financial Reporting Lecturer: Mrs. Ivy Eklemet",
+    "venue": "Virtual - Link to be provided by lecturer"
+  },
+  {
+    "session_type": "Distance Session",
+    "program": "MBA AUDITING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP ONE (1)",
+    "day": "TUESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAF603/MBIA607 Public Sector Accounting/Regulatory Framework Lecturer: Dr. Prince Yeboah- Boateng",
+    "venue": "Virtual - Link to be provided by lecturer"
+  },
+  {
+    "session_type": "Distance Session",
+    "program": "MBA AUDITING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP ONE (1)",
+    "day": "WEDNESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAU601 Conduct of Audit and Reporting Lecturer: Dr. Peter Ackah",
+    "venue": "Virtual - Link to be provided by lecturer"
+  },
+  {
+    "session_type": "Distance Session",
+    "program": "MBA AUDITING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP ONE (1)",
+    "day": "THURSDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC613 Strategic Management Lecturer:Prof. Michael Boadi Nyamekye",
+    "venue": "Virtual - Link to be provided by lecturer"
+  },
+  {
+    "session_type": "Distance Session",
+    "program": "MBA AUDITING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP ONE (1)",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC 611 Business Leadership and Ethics Lecturer: Dr. Dapaah",
+    "venue": "Virtual - Link to be provided by lecturer"
+  },
+  {
+    "session_type": "Distance Session",
+    "program": "MBA CORPORATE GOVERNANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "MONDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC 611 Business Leadership and Ethics Lecturer: Dr. Gamel Aganah",
+    "venue": "Virtual - Link to be provided by lecturer"
+  },
+  {
+    "session_type": "Distance Session",
+    "program": "MBA CORPORATE GOVERNANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "TUESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBCG601 Corporate Governance: Theories & Issues Lecturer: Dr. Mark Boadu",
+    "venue": "Virtual - Link to be provided by lecturer"
+  },
+  {
+    "session_type": "Distance Session",
+    "program": "MBA CORPORATE GOVERNANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "WEDNESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBCG603 Internal Audit and Controls Lecturer: Mr Prince Sunu",
+    "venue": "Virtual - Link to be provided by lecturer"
+  },
+  {
+    "session_type": "Distance Session",
+    "program": "MBA CORPORATE GOVERNANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "THURSDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC613 Strategic Management Lecturer: Prof. Michael Boadi Nyamekye",
+    "venue": "Virtual - Link to be provided by lecturer"
+  },
+  {
+    "session_type": "Distance Session",
+    "program": "MBA CORPORATE GOVERNANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBCG605 Project Management Lecturer: Mr. Kingsley Anagba Or MBCG617 International Corporate Governance Accountability Lecturer: Dr. Mark Boadu",
+    "venue": "Virtual - Link to be provided by lecturer"
+  },
+  {
+    "session_type": "Distance Session",
+    "program": "MBA MARKETING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "MONDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC613 Strategic Management Lecturer: Dr. Joyce Afriyie",
+    "venue": "Virtual - Link to be provided by lecturer"
+  },
+  {
+    "session_type": "Distance Session",
+    "program": "MBA MARKETING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "TUESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBMK605 Advanced Integrated Marketing Communication Lecturer: Dr. I.K Abdul-Hamid",
+    "venue": "Virtual - Link to be provided by lecturer"
+  },
+  {
+    "session_type": "Distance Session",
+    "program": "MBA MARKETING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "WEDNESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBMK603 Advanced Consumer Behavior Lecturer: Dr. Ghinwa Ghamloush",
+    "venue": "Virtual - Link to be provided by lecturer"
+  },
+  {
+    "session_type": "Distance Session",
+    "program": "MBA MARKETING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "THURSDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC 611 Business Leadership and Ethic Lecturer: Dr. Gamel Aganah",
+    "venue": "Virtual - Link to be provided by lecturer"
+  },
+  {
+    "session_type": "Distance Session",
+    "program": "MBA MARKETING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBMK601 Advanced International Marketing Strategy Lecturer: Prof. Albert Martins",
+    "venue": "Virtual - Link to be provided by lecturer"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP ONE (1)",
+    "day": "MONDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAF605 Corporate Finance Lecturer: Dr. James Ntiamoah Doku",
+    "venue": "ATB309"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP ONE (1)",
+    "day": "TUESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAF603 Public Sector Accounting Lecturer: Prof. Samuel Antwi",
+    "venue": "ATB309"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP ONE (1)",
+    "day": "WEDNESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAF 601 Financial Reporting Lecturer: Prof. J. K. M. Mawutor",
+    "venue": "ATB309"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP ONE (1)",
+    "day": "THURSDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC613 Strategic Management Lecturer: Dr. Jibreel Abubakar",
+    "venue": "ATB309"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP ONE (1)",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC 611 Business Leadership and Ethics Lecturer: Dr. Linus Kudos",
+    "venue": "ATB309"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP TWO (2)",
+    "day": "MONDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAF605 Corporate Finance Lecturer: Dr. Joseph Quarshie",
+    "venue": "ATB313"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP TWO (2)",
+    "day": "TUESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAF603 Public Sector Accounting Lecturer: Prof. Samuel Antwi/Mr. Thompson Kubaje*",
+    "venue": "ATB313"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP TWO (2)",
+    "day": "WEDNESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAF 601 Financial Reporting Lecturer: Mrs. Ivy Eklement",
+    "venue": "ATB313"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP TWO (2)",
+    "day": "THURSDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC613 Strategic Management Lecturer: Mr. Kwame Fosu-Boateng*",
+    "venue": "ATB313"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP TWO (2)",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC 611 Business Leadership and Ethics Lecturer: Hon. Muntaka Mohammed",
+    "venue": "ATB313"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA AUDITING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "MONDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBIA605 Information Systems and Fraud Lecturer: Mrs. Afful Eleanor",
+    "venue": "ATB605"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA AUDITING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "TUESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAF603/MBIA607 Public Sector Accounting/Regulatory Framework Lecturer: Mr. Thompson Kubaje",
+    "venue": "ATB313"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA AUDITING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "WEDNESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAF 601 Financial Reporting Lecturer: Mrs. Ivy Eklemet",
+    "venue": "ATB313"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA AUDITING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "THURSDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC613 Strategic Management Lecturer: Mr. Kwame Fosu Boateng*",
+    "venue": "ATB313"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA AUDITING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAU601 Conduct of Audit and Reporting Lecturer: Dr. Peter Ackah",
+    "venue": "ATB605"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA INTERNAL AUDITING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "MONDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBIA 605 Information Systems and Cyber Security Lecturer: Dr. Jeremiah Osei-kwakye",
+    "venue": "ATB310"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA INTERNAL AUDITING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "TUESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBIA609 Business Processes and Enterprise Risk Management Lecturer: Dr. Peter Ackah",
+    "venue": "ATB313"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA INTERNAL AUDITING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "WEDNESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAF 601 Financial Reporting Lecturer: Mrs. Ivy Eklemet",
+    "venue": "ATB313"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA INTERNAL AUDITING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "THURSDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC613 Strategic Management Lecturer: Mr. Kwame Fosu Boateng",
+    "venue": "ATB313"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA INTERNAL AUDITING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAU601 Audit and Reporting Lecturer: Dr. Peter Ackah",
+    "venue": "ATB605"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA CORPORATE GOVERNANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "MONDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC613 Strategic Management Lecturer: Dr. Stephen Engmen",
+    "venue": "ATB409"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA CORPORATE GOVERNANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "TUESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBCG601 Corporate Governance: Theories & Issues Lecturer: Dr. Mark Boadu",
+    "venue": "ATB409"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA CORPORATE GOVERNANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "WEDNESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBCG603 Internal Audit and Controls Lecturer: Mr Prince Sunu",
+    "venue": "ATB409"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA CORPORATE GOVERNANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "THURSDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC 611 Business Leadership and Ethics Lecturer: Dr. Gamel Aganah",
+    "venue": "ATB409"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA CORPORATE GOVERNANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBCG605 Project Management Lecturer: Mr. Kingsley Anagba Or MBCG617 International Corporate Governance Accountability Lecturer: Dr. Mark Boadu",
+    "venue": "ATB409"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA MARKETING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "MONDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC613 Strategic Management Lecturer: Dr. Joyce Afriyie",
+    "venue": "ATB413"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA MARKETING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "TUESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBMK605 Advanced Integrated Marketing Communication Lecturer: Dr. I.K Abdul-Hamid",
+    "venue": "ATB413"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA MARKETING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "WEDNESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBMK603 Advanced Consumer Behavior Lecturer: Dr. Ghinwa Ghamloush",
+    "venue": "ATB413"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA MARKETING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "THURSDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC 611 Business Leadership and Ethic Lecturer: Dr. Gamel Aganah",
+    "venue": "ATB413"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA MARKETING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBMK601 Advanced International Marketing Strategy Lecturer: Prof. Albert Martins",
+    "venue": "ATB413"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MPHIL LEADERSHIP",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "WEDNESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MPGL602 Financial Management for Leaders Lecturer: Mr. Desmond Aboagye",
+    "venue": "ATB410"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MPHIL LEADERSHIP",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MPGL609 Research Methods in Behavioral Sciences Lecturer: Dr Ebenezer Adjetey Sorsey",
+    "venue": "Virtual \u2013 Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA TOTAL QUALITY MANAGEMENT",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "MONDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAQ617 Quality Assurance, Control & Risk Management Lecturer:Dr. Gifty Ketemepi",
+    "venue": "A TA510"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA TOTAL QUALITY MANAGEMENT",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "TUESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAQ 613 Quality Management Systems and Excellence Models Lecturer: Dr. Akorfa Wuttor",
+    "venue": "Virtual \u2013 Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA TOTAL QUALITY MANAGEMENT",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "WEDNESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAQ 619 Managing Service Quality LecturerDr. Leeford Ameyibor",
+    "venue": "ATA510"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA TOTAL QUALITY MANAGEMENT",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "THURSDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAQ615 Quality in the Supply Chanin Management Lecturer: Dr Tiniwaah Mensah",
+    "venue": "ATA510"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MBA TOTAL QUALITY MANAGEMENT",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAQ 607 Quality in Documentation and Information Management Lecturer: Dr. Edwin Ayenor",
+    "venue": "Virtual \u2013 Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MSC. LEADERSHIP",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "MONDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MPGL 617 Organizational Development Lecturer: Prof. Esther Attiogbe",
+    "venue": "ATA505"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MSC. LEADERSHIP",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "TUESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBCG601 Corporate Governance: Theories & Issues Lecturer: Dr. Mark Boadu",
+    "venue": "ATA505"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MSC. LEADERSHIP",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "WEDNESDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MPGL602 Financial Management for Leaders Lecturer: Mr. Desmond Aboagye",
+    "venue": "ATB410"
+  },
+  {
+    "session_type": "Evening Session",
+    "program": "MSC. LEADERSHIP",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "THURSDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC 611 Business Leadership and Ethics Lecturer: Mr. Sylvester Mensah",
+    "venue": "Virtual \u2013 Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP ONE (1)",
+    "day": "FRIDAY",
+    "time": "5:30 \u2013 8:30",
+    "subject_lecturer": "MCPC613 Strategic Management Lecturer: Mr. Sylvester Mensah",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP ONE (1)",
+    "day": "SATURDAY",
+    "time": "7:30am \u2013 10:30am",
+    "subject_lecturer": "MBAF603 Public Sector Accounting Lecturer: Prof. Samuel Antwi/Amoasi Andoh Lecturer: Prof. J. K. M. Mawutor Lecturer: Dr. James Ntiamoah Doku Lecturer: Hon. Muntaka Mohammed",
+    "venue": "ATB309"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP TWO (2)",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC613 Strategic Management Lecturer: Dr. Stanislaus Adiaba",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP TWO (2)",
+    "day": "SATURDAY",
+    "time": "7:30am \u2013 10:30am",
+    "subject_lecturer": "MBAF603 Public Sector Accounting Lecturer: Prof. Samuel Antwi/Mr. Thompson Kubaje Lecturer: Dr. Godwin Musah Lecturer: Mr. Ahmed Issah Baba Lecturer:",
+    "venue": "ATB313"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP THREE (3)",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC613 Strategic Management Lecturer: Dr. Abdulai Munkaila",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP THREE (3)",
+    "day": "SATURDAY",
+    "time": "7:30am \u2013 10:30am",
+    "subject_lecturer": "MBAF603 Public Sector Accounting Lecturer: Dr Redeemer Krah Lecturer: Mrs Ivy Eklemet Lecturer: Dr. Gladys A. Nabieu Lecturer: Dr. Gamel Agana",
+    "venue": "ATB409"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP FOUR (4)",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC613 Strategic Management Lecturer: Rev. Dr. Boadi Nyamekye",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP FOUR (4)",
+    "day": "SATURDAY",
+    "time": "7:30am \u2013 10:30am",
+    "subject_lecturer": "MBAF603 Public Sector Accounting Lecturer: Prof. Samuel Antwi/Mr. Prince Yeboah Boateng Lecturer: Dr. Richard Amankwa Fosu Lecturer: Dr. Joseph Quarshie Lecturer:",
+    "venue": "ATB413"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP FIVE (5)",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC613 Strategic Management Lecturer: Mr Kwame Fosu Boateng",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE-GROUP FIVE (5)",
+    "day": "SATURDAY",
+    "time": "7:30am \u2013 10:30am",
+    "subject_lecturer": "MBAF603 Public Sector Accounting Lecturer: Prof. Samuel Antwi/Desmond Aboagye* Lecturer: Mr Baba Issah Ahmed Lecturer: Mr Baba Issah Ahmed Lecturer: Dr. Gamel Agana",
+    "venue": "ATB409"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA CORPORATE GOVERNANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBCG605 Project Management Lecturer: Mr. Kingsley Anagba MBCG617 International Corporate Governance Accountability Lecturer: Dr. Mark Boadu",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA CORPORATE GOVERNANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "SATURDAY",
+    "time": "7:30am \u2013 10:30am",
+    "subject_lecturer": "MCPC 611 Business Leadership and Ethics Lecturer: Dr. Thomas Ahotovi Ahoto Lecturer: Mr.Jerry Smith",
+    "venue": "ATB413"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA CORPORATE GOVERNANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "SUNDAY",
+    "time": "12:30pm \u2013 3:30pm",
+    "subject_lecturer": "MBCG603 Internal Audit and Controls Lecturer: Dr. Peter Ackah Lecturer: Dr. Mark Boadu",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA MARKETING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "SATURDAY",
+    "time": "7:30am \u2013 10:30am",
+    "subject_lecturer": "MCPC 611 Business Leadership and Ethics Lecturer: Dr. Abdulai Munkaila Lecturer: Mr. Kwame Fosu Boateng Lecturers: Dr.",
+    "venue": "ATB509"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA MARKETING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "SUNDAY",
+    "time": "12:30pm \u2013 3:30pm",
+    "subject_lecturer": "MBMK605 Advanced International Marketing Strategy Lecturer: Mr. Nathaniel Addy Lecturer: Prof. Abednego Okoe Feehi Amartey",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA AUDITING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC613 Strategic Management Lecturer: Mr Kwame Fosu Boateng",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA AUDITING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "SATURDAY",
+    "time": "7:30am \u2013 10:30am",
+    "subject_lecturer": "MBAF603 Public Sector Accounting Lecturer: Prof. Samuel Antwi/Desmond Aboagye* Lecturer: Mr Baba Issah Ahmed",
+    "venue": "ATB409"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA AUDITING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "SUNDAY",
+    "time": "12:30pm \u2013 3:30pm",
+    "subject_lecturer": "MBAU601 Conduct of Audit and Reporting Lecturer: Dr. Peter Ackah Lecturer: Dr. Gamel Agana",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA INTERNAL AUDITING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MCPC613 Strategic Management Lecturer: Mr Kwame Fosu Boateng Lecturer: Prof. Samuel Antwi/Desmond Aboagye* MBAF 601 Financial Reporting Lecturer: Mr Baba Issah Ahmed Lecturer: Dr. Samuel Lartey",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA INTERNAL AUDITING",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "SUNDAY",
+    "time": "12:30pm \u2013 3:30pm",
+    "subject_lecturer": "MBAU601 Conduct of Audit and Reporting Lecturer: Dr. Peter Ackah",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA PETROLEUM ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAP617 Advanced Corporate Finance Lecturer: Prof. James Ntiamoah Doku",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA PETROLEUM ACCOUNTING AND FINANCE",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "SATURDAY",
+    "time": "7:30am \u2013 10:30am",
+    "subject_lecturer": "MBAP609 Financial Reporting for Petroleum Operations Lecturer : Lecturer: Dr. Ernest Mensah Abraham Lecturer: Ing. Dr. Nii Ayitey Akoto, R. Lecturer: Dr. Gamel Aganah",
+    "venue": "ATB310"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA TOTAL QUALITY MANAGEMENT",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "FRIDAY",
+    "time": "5:30pm \u2013 8:30pm",
+    "subject_lecturer": "MBAQ 607 Quality in Documentation and Information Management Lecturer: Dr. Edwin Ayenor",
+    "venue": "Virtual \u2013 Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA TOTAL QUALITY MANAGEMENT",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "SATURDAY",
+    "time": "7:30am \u2013 10:30am",
+    "subject_lecturer": "MBAQ617 Quality Assurance, Control & Risk Management Lecturer: Dr. Gifty Ketemepi Lecturer: Dr Tiniwaah Mensah Lecturer: Dr. Leeford Ameyibor",
+    "venue": "ATA506"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA TOTAL QUALITY MANAGEMENT",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "SUNDAY",
+    "time": "12:30pm \u2013 3:30pm",
+    "subject_lecturer": "MBAQ 613 Quality Management Systems and Excellence Models Lecturer: Dr. Akorfa Wuttor",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA IMPACT ENTREPRENEURSHIP AND INNOVATION",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "SATURDAY",
+    "time": "7:30am \u2013 10:30am",
+    "subject_lecturer": "MBEI615 Project and Operations Management Lecturer: Kingsley Anagba Lecturer: Desmond Aboagye Lecturer: Dr. Mark Boadu",
+    "venue": "ATA510"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA IMPACT ENTREPRENEURSHIP AND INNOVATION",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "SUNDAY",
+    "time": "12:30pm \u2013 3:30pm",
+    "subject_lecturer": "MBEI605 Business Strategy for Innovation Lecturer: Dr. Andrews Ayiku",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA CORPORATE COMMUNICATIONS",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "FRIDAY",
+    "time": "5:30pm-8:30pm",
+    "subject_lecturer": "MBCC607 Communications for Non-Governmental Organisations Lecturer: Dr. Mohammend Sadat/Madam Sandra Yeboah MCPC613 Strategic Management Lecturer: Mr. Sylvester Mensah MBCC605 Communications for Public Sector Institutions Lecturer: Dr. Justice Issah Abudulai",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA CORPORATE COMMUNICATIONS",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "SATURDAY",
+    "time": "7:30am \u2013 10:30am",
+    "subject_lecturer": "MCPC 611 Business Leadership and Ethics Lecturer: Dr. Gamel Aganah Lecturer: Dr. Ibn Kailan Abdul-Hamid Lecturer: Dr. Justice Issah Abudulai",
+    "venue": "ATA501"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA CORPORATE COMMUNICATIONS",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "SUNDAY",
+    "time": "12:30pm \u2013 3:30pm",
+    "subject_lecturer": "MBCC613 Theories of Corporate Communications Lecturer: Dr. Martins Segtub Lecturer: Dr. Mohammend Sadat/Abena K Duah",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA ASSETS AND WEALTH MANAGEMENT",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "FRIDAY",
+    "time": "5:30pm-8:30pm",
+    "subject_lecturer": "MBAW607 Data Analytics and Forecasting (Using R and Python) Lecturer: Dr.Kofi Nyamekye or MBAW609 ESG in Asset and Wealth Management Lecturer: Dr. Eric Boachie Yiadom",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA ASSETS AND WEALTH MANAGEMENT",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "SATURDAY",
+    "time": "7:30am \u2013 10:30am",
+    "subject_lecturer": "MCPC 611 Business Leadership and Ethics Lecturer: Dr. Abdulai Munkaila Lecturer: Mr. Kwame Fosu Boateng Lecturer: Dr. Ebenezer M.Ashley",
+    "venue": "ATB509"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA ASSETS AND WEALTH MANAGEMENT",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "SUNDAY",
+    "time": "12:30pm \u2013 3:30pm",
+    "subject_lecturer": "MBAW605 Project Finance Lecturer: Dr. Joseph Quarshie Lecturer: Dr. Richard Opoku Takyi",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA MANAGEMENT INFORMATION SYSTEMS",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "FRIDAY",
+    "time": "5:30pm-8:30pm",
+    "subject_lecturer": "MBMI603 Information Systems Security Lecturer: Dr. Maud Ashong",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA MANAGEMENT INFORMATION SYSTEMS",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "SATURDAY",
+    "time": "7:30am \u2013 10:30am",
+    "subject_lecturer": "MCPC 611 Business Leadership and Ethics Lecturer: Dr. Gamel Aganah Lecturer: Mr. Kwame Fosu Boateng Lecturer: Dr. Emmanuel Owusu-Oware",
+    "venue": "ATA509"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA MANAGEMENT INFORMATION SYSTEMS",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "SUNDAY",
+    "time": "12:30pm \u2013 3:30pm",
+    "subject_lecturer": "MBMI601 Data Communication & Network Lecturer: Dr Samuel Attuquayefio / Mr. Emmanuel Atebawone",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA BUSINESS MANAGEMENT",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "FRIDAY",
+    "time": "5:30pm-8:30pm",
+    "subject_lecturer": "MBAE603 Digital Transformation and Strategy Lecturer:Dr.Fredrick O. Pobee or MBCG624 Business Sustainability Lecturer: Dr. Andrews Ayiku",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA BUSINESS MANAGEMENT",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "SATURDAY",
+    "time": "7:30am \u2013 10:30am",
+    "subject_lecturer": "MCPC 611 Business Leadership and Ethics Lecturer: Dr. Gamel Aganah Lecturer: Mr. Kwame Fosu Boateng Lecturer: Dr. Kingsely Anagba",
+    "venue": "ATA509"
+  },
+  {
+    "session_type": "Weekend Session",
+    "program": "MBA BUSINESS MANAGEMENT",
+    "level_semester_group": "YEAR TWO (2) \u2013 SEMESTER ONE",
+    "day": "SUNDAY",
+    "time": "12:30pm \u2013 3:30pm",
+    "subject_lecturer": "MBCG616 Company and Partnership Law Lecturer:",
+    "venue": "Virtual - Link to be provided by Lecturer"
+  }
+]

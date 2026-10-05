@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { adminUserSchema, AdminUser } from '@/types/admin';
 import { 
   Plus, Search, Filter, Eye, Pencil, Trash2, 
-  ArrowLeft, Shield, Mail, Key
+  ArrowLeft, Shield, Mail, Key, Copy, Check
 } from 'lucide-react';
 import { useAdminData } from '@/app/admin/AdminDataContext';
 
@@ -19,6 +19,8 @@ export default function AdminUsersPage() {
   const [view, setView] = useState<ViewState>('list');
   const [activeTab, setActiveTab] = useState('All Users');
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
+  const [credentialInfo, setCredentialInfo] = useState<{ email: string; password: string } | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<AdminUserForm>({
     resolver: zodResolver(adminUserSchema) as any
@@ -30,7 +32,8 @@ export default function AdminUsersPage() {
     setView('add');
   };
 
-  const handleOpenEdit = (user: AdminUser) => {
+  const handleOpenEdit = (raw_user: AdminUser) => {
+    const user = Object.fromEntries(Object.entries(raw_user).map(([k, v]) => [k, v === null ? '' : v])) as any;
     reset(user);
     setSelectedUser(user);
     setView('edit');
@@ -55,18 +58,28 @@ export default function AdminUsersPage() {
     try {
       if (view === 'edit' && selectedUser) {
         await updateAdminUser(selectedUser.id!, data);
+        setView('list');
       } else {
-        await createAdminUser(data);
+        const result = await createAdminUser(data);
+        setCredentialInfo({ email: data.email, password: result.tempPassword });
+        setView('list');
       }
-      setView('list');
     } catch (e: any) {
       alert(e.message);
     }
   };
 
+  const handleCopyCredentials = () => {
+    if (!credentialInfo) return;
+    const text = `Email: ${credentialInfo.email}\nTemporary Password: ${credentialInfo.password}\n\nPlease change your password after first login.`;
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const tabs = ['All Users', 'Administrators', 'Editors'];
   
-  const filteredRecords = (Array.isArray(adminUsers) ? adminUsers : []).filter(r => {
+  const filteredRecords = (adminUsers || []).filter(r => {
     if (activeTab === 'All Users') return true;
     if (activeTab === 'Administrators') return r.role === 'admin';
     if (activeTab === 'Editors') return r.role === 'editor';
@@ -137,10 +150,10 @@ export default function AdminUsersPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0 text-[#2563eb] font-bold uppercase">
-                          {record.email.charAt(0)}
+                          {(record.email || '?').charAt(0)}
                         </div>
                         <div>
-                          <p className="font-semibold text-gray-900">{record.email}</p>
+                          <p className="font-semibold text-gray-900">{record.email || 'No email'}</p>
                           <p className="text-xs text-gray-500 mt-0.5 font-mono">{record.id?.split('-')[0]}</p>
                         </div>
                       </div>
@@ -274,10 +287,10 @@ export default function AdminUsersPage() {
 
         <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center text-center">
            <div className="w-24 h-24 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-[#2563eb] text-3xl font-bold uppercase mb-4">
-             {selectedUser.email.charAt(0)}
+             {(selectedUser.email || '?').charAt(0)}
            </div>
            
-           <h2 className="text-2xl font-bold text-gray-900 mb-1">{selectedUser.email}</h2>
+           <h2 className="text-2xl font-bold text-gray-900 mb-1">{selectedUser.email || 'No email'}</h2>
            <p className="text-sm font-mono text-gray-500 mb-6">ID: {selectedUser.id}</p>
            
            <div className="flex gap-4">
@@ -306,6 +319,63 @@ export default function AdminUsersPage() {
       {view === 'list' && <ListView />}
       {(view === 'add' || view === 'edit') && <FormView />}
       {view === 'details' && <DetailsView />}
+
+      {/* Credential Display Modal */}
+      {credentialInfo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 w-full max-w-md mx-4 overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                  <Key className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">Admin Created Successfully</h3>
+                  <p className="text-emerald-100 text-sm">Share these credentials securely</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div className="bg-gray-50 rounded-xl p-4 space-y-3 border border-gray-100">
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</label>
+                  <p className="text-sm font-medium text-gray-900 mt-0.5">{credentialInfo.email}</p>
+                </div>
+                <div className="border-t border-gray-200 pt-3">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Temporary Password</label>
+                  <p className="text-sm font-mono font-bold text-gray-900 mt-0.5 select-all">{credentialInfo.password}</p>
+                </div>
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <p className="text-xs text-amber-800 leading-relaxed">
+                  <strong>Important:</strong> This password will not be shown again. Please copy and share it securely with the new admin. They should change it after their first login.
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={handleCopyCredentials}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-900 text-white rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors"
+                >
+                  {copied ? (
+                    <><Check className="w-4 h-4" /> Copied!</>
+                  ) : (
+                    <><Copy className="w-4 h-4" /> Copy Credentials</>
+                  )}
+                </button>
+                <button
+                  onClick={() => { setCredentialInfo(null); setCopied(false); }}
+                  className="px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors"
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

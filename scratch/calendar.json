@@ -1,0 +1,182 @@
+[
+  {
+    "program_type": "Masters",
+    "student_type": "First Year",
+    "academic_year": "2026/2027",
+    "semester": "First Semester",
+    "activity": "First Semester Begins",
+    "date_description": "Monday, 28th September, 2026",
+    "duration_weeks": "",
+    "sort_order": 1
+  },
+  {
+    "program_type": "Masters",
+    "student_type": "First Year",
+    "academic_year": "2026/2027",
+    "semester": "First Semester",
+    "activity": "Registration for Fresh Students",
+    "date_description": "Monday, 28th September, 2026",
+    "duration_weeks": "1",
+    "sort_order": 2
+  },
+  {
+    "program_type": "Masters",
+    "student_type": "First Year",
+    "academic_year": "2026/2027",
+    "semester": "First Semester",
+    "activity": "Orientation",
+    "date_description": "Friday, 2nd October, 2026 - Saturday, 3rd October, 2026",
+    "duration_weeks": "",
+    "sort_order": 3
+  },
+  {
+    "program_type": "Masters",
+    "student_type": "First Year",
+    "academic_year": "2026/2027",
+    "semester": "First Semester",
+    "activity": "Teaching Period",
+    "date_description": "Monday, 5th October, 2026 - Sunday, 20th December, 2026",
+    "duration_weeks": "11",
+    "sort_order": 4
+  },
+  {
+    "program_type": "Masters",
+    "student_type": "First Year",
+    "academic_year": "2026/2027",
+    "semester": "First Semester",
+    "activity": "Matriculation Ceremony for First Year Students",
+    "date_description": "Friday, 6th November, 2026",
+    "duration_weeks": "",
+    "sort_order": 5
+  },
+  {
+    "program_type": "Masters",
+    "student_type": "First Year",
+    "academic_year": "2026/2027",
+    "semester": "First Semester",
+    "activity": "Interim Assessment",
+    "date_description": "Monday, 9th November, 2026 - Sunday, 15th November, 2026",
+    "duration_weeks": "",
+    "sort_order": 6
+  },
+  {
+    "program_type": "Masters",
+    "student_type": "First Year",
+    "academic_year": "2026/2027",
+    "semester": "First Semester",
+    "activity": "Deadline for Submission of Examination Questions",
+    "date_description": "Monday 5th October, 2026",
+    "duration_weeks": "",
+    "sort_order": 7
+  },
+  {
+    "program_type": "Masters",
+    "student_type": "First Year",
+    "academic_year": "2026/2027",
+    "semester": "First Semester",
+    "activity": "Matriculation",
+    "date_description": "Friday, 6th November, 2026",
+    "duration_weeks": "",
+    "sort_order": 8
+  },
+  {
+    "program_type": "Masters",
+    "student_type": "First Year",
+    "academic_year": "2026/2027",
+    "semester": "First Semester",
+    "activity": "Evaluation of Lecturers/Courses",
+    "date_description": "Monday, 16th November, 2026 - Friday, 20th November, 2026",
+    "duration_weeks": "",
+    "sort_order": 9
+  },
+  {
+    "program_type": "Masters",
+    "student_type": "First Year",
+    "academic_year": "2026/2027",
+    "semester": "First Semester",
+    "activity": "Revision",
+    "date_description": "Monday 21st December, 2026 - Thursday, 7th January, 2027",
+    "duration_weeks": "",
+    "sort_order": 10
+  },
+  {
+    "program_type": "Masters",
+    "student_type": "First Year",
+    "academic_year": "2026/2027",
+    "semester": "First Semester",
+    "activity": "End of First Semester Examinations",
+    "date_description": "Monday, 11th January, 2027 - Sunday 31st January, 2027",
+    "duration_weeks": "3",
+    "sort_order": 11
+  },
+  {
+    "program_type": "Masters",
+    "student_type": "First Year",
+    "academic_year": "2026/2027",
+    "semester": "First Semester",
+    "activity": "Inter-Semester Break",
+    "date_description": "Monday, 1st February, 2027 - Sunday, 21st February, 2027",
+    "duration_weeks": "",
+    "sort_order": 12
+  },
+  {
+    "program_type": "Masters",
+    "student_type": "First Year",
+    "academic_year": "2026/2027",
+    "semester": "First Semester",
+    "activity": "Marking & Entering of Results",
+    "date_description": "Monday, 1st February, 2027 - Sunday, 7th March, 2027",
+    "duration_weeks": "5",
+    "sort_order": 13
+  },
+  {
+    "program_type": "Masters",
+    "student_type": "First Year",
+    "academic_year": "2026/2027",
+    "semester": "First Semester",
+    "activity": "Script Check",
+    "date_description": "Tuesday, 9th March, 2027 - Friday, 19th March, 2027",
+    "duration_weeks": "",
+    "sort_order": 14
+  },
+  {
+    "program_type": "Masters",
+    "student_type": "First Year",
+    "academic_year": "2026/2027",
+    "semester": "First Semester",
+    "activity": "Department Meeting to Consider First Semester Results",
+    "date_description": "Tuesday, 23rd March, 2027",
+    "duration_weeks": "",
+    "sort_order": 15
+  },
+  {
+    "program_type": "Masters",
+    "student_type": "First Year",
+    "academic_year": "2026/2027",
+    "semester": "First Semester",
+    "activity": "Faculty Board Meeting to Approve First Semester Results",
+    "date_description": "Thursday, 25th March, 2027",
+    "duration_weeks": "",
+    "sort_order": 16
+  },
+  {
+    "program_type": "Masters",
+    "student_type": "First Year",
+    "academic_year": "2026/2027",
+    "semester": "First Semester",
+    "activity": "Graduate Studies Committee Meeting",
+    "date_description": "Tuesday, 30th March, 2027",
+    "duration_weeks": "",
+    "sort_order": 17
+  },
+  {
+    "program_type": "Masters",
+    "student_type": "First Year",
+    "academic_year": "2026/2027",
+    "semester": "First Semester",
+    "activity": "Submission of Copies of Assessment Score Sheets and  Declaration of Results",
+    "date_description": "Wednesday, 31st March, 2027 and Thursday 1st April, 2027",
+    "duration_weeks": "",
+    "sort_order": 18
+  }
+]

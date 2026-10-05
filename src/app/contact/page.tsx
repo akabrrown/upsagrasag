@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin, Loader2, MessageSquare } from 'lucide-react';
+import { supabaseClient } from '@/lib/supabaseClient';
 
 export default function ContactPage() {
   const [firstName, setFirstName] = useState('');
@@ -12,6 +13,50 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [contactData, setContactData] = useState<any>(null);
+  const [selectedRole, setSelectedRole] = useState('');
+  const [roleOptions, setRoleOptions] = useState<{ role: string; name: string; email: string }[]>([]);
+
+  useEffect(() => {
+    const fetchContactData = async () => {
+      try {
+        const { data, error } = await supabaseClient
+          .from('platform_settings')
+          .select('contact_email, contact_phone, contact_address')
+          .limit(1)
+          .single();
+        if (!error && data) {
+          setContactData(data);
+        }
+      } catch (err) {
+        console.warn('Could not load dynamic contact info', err);
+      }
+    };
+    fetchContactData();
+
+    const fetchRoleOptions = async () => {
+      try {
+        const { data, error } = await supabaseClient
+          .from('leadership')
+          .select('role, name, contact_info')
+          .eq('type', 'executive')
+          .order('display_order', { ascending: true });
+        if (!error && data) {
+          const unique = data.reduce<{ role: string; name: string; email: string }[]>((acc, cur) => {
+            const email = cur.contact_info?.email;
+            if (email && !acc.find(r => r.role === cur.role)) {
+              acc.push({ role: cur.role, name: cur.name, email });
+            }
+            return acc;
+          }, []);
+          setRoleOptions(unique);
+        }
+      } catch (err) {
+        console.warn('Could not load role options', err);
+      }
+    };
+    fetchRoleOptions();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,6 +64,8 @@ export default function ContactPage() {
       setErrorMsg('All fields are required.');
       return;
     }
+
+    const targetEmail = roleOptions.find(r => r.role === selectedRole)?.email || '';
 
     setIsSubmitting(true);
     setErrorMsg('');
@@ -30,7 +77,7 @@ export default function ContactPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name: `${firstName} ${lastName}`, email, subject, message }),
+        body: JSON.stringify({ name: `${firstName} ${lastName}`, email, subject, message, targetEmail }),
       });
 
       const data = await res.json();
@@ -45,6 +92,7 @@ export default function ContactPage() {
       setEmail('');
       setSubject('');
       setMessage('');
+      setSelectedRole('');
     } catch (err: any) {
       setErrorMsg(err.message || 'Something went wrong. Please check your internet connection and try again.');
     } finally {
@@ -55,21 +103,21 @@ export default function ContactPage() {
   const contactInfo = [
     {
       title: 'Office Location',
-      details: 'University of Professional Studies Accra, First floor on the student centre',
+      details: contactData?.contact_address || 'University of Professional Studies Accra, First floor on the student centre',
       icon: MapPin,
       href: '#',
     },
     {
       title: 'Email Address',
-      details: 'grasagpresident@upsamail.edu.gh',
+      details: contactData?.contact_email || 'grasagpresident@upsamail.edu.gh',
       icon: Mail,
-      href: 'mailto:grasagpresident@upsamail.edu.gh',
+      href: contactData?.contact_email ? `mailto:${contactData.contact_email}` : 'mailto:grasagpresident@upsamail.edu.gh',
     },
     {
       title: 'Telephone',
-      details: '+233 (0) 55 860 1545',
+      details: contactData?.contact_phone || '+233 (0) 55 860 1545',
       icon: Phone,
-      href: 'tel:+233558601545',
+      href: contactData?.contact_phone ? `tel:${contactData.contact_phone.replace(/\s/g, '')}` : 'tel:+233558601545',
     },
   ];
 
@@ -135,7 +183,7 @@ export default function ContactPage() {
           <div className="bg-white rounded-3xl p-8 lg:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100 relative overflow-hidden h-full">
             {/* Decorative icon top right */}
             <div className="absolute top-6 right-6 opacity-20 hidden sm:block">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z" /><path d="M18 9h2a2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1" /></svg>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z" /><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1" /></svg>
             </div>
             <h2 className="text-xl font-bold text-accent flex items-center gap-2 mb-6">
               <MessageSquare className="h-5 w-5 text-accent" /> Send an Email Message
@@ -201,6 +249,25 @@ export default function ContactPage() {
                   />
                 </div>
               </div>
+
+              {/* Role Dropdown */}
+              {roleOptions.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-primary">Send To</label>
+                  <select
+                    value={selectedRole}
+                    onChange={(e) => setSelectedRole(e.target.value)}
+                    className="w-full rounded-xl border border-neutral-200 px-4 py-3 text-sm focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all bg-neutral-50/50 appearance-none"
+                  >
+                    <option value="">General Inquiry</option>
+                    {roleOptions.map((opt) => (
+                      <option key={opt.role} value={opt.role}>
+                        {opt.role}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               {/* Message */}
               <div className="flex flex-col gap-2">

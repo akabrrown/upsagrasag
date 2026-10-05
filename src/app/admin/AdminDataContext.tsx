@@ -76,20 +76,38 @@ export const AdminDataProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateAdminUser = async (id: string, data: Partial<AdminUser>) => {
-    const { error } = await supabaseClient
-      .from('admin_users')
-      .update(data)
-      .eq('id', id);
-    if (error) throw error;
+    const response = await fetch(`/api/admin/users/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      let err = 'Failed to update user';
+      try {
+        const body = await response.json();
+        err = body.error || err;
+      } catch {
+        err = await response.text() || err;
+      }
+      throw new Error(err);
+    }
     // Real‑time listener updates state
   };
 
   const deleteAdminUser = async (id: string) => {
-    const { error } = await supabaseClient
-      .from('admin_users')
-      .delete()
-      .eq('id', id);
-    if (error) throw error;
+    const response = await fetch(`/api/admin/users/${id}`, {
+      method: 'DELETE'
+    });
+    if (!response.ok) {
+      let err = 'Failed to delete user';
+      try {
+        const body = await response.json();
+        err = body.error || err;
+      } catch {
+        err = await response.text() || err;
+      }
+      throw new Error(err);
+    }
     // Real‑time listener updates state
   };
 

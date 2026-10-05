@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import { BookOpen, Layers, CheckSquare, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { getPageData } from '@/lib/pages';
+import { academicSupportService } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic'; // ensure fresh data
 
@@ -21,11 +22,18 @@ export default async function AcademicsPage() {
   }
   const { title = 'Academics', content = '', imageUrl = '' } = data;
 
-  const supports = [
-    { title: 'Thesis Guidelines', desc: 'Official word count limits, reference style manuals, formatting templates, and title page templates.', icon: BookOpen },
-    { title: 'Plagiarism Checking (Turnitin)', desc: 'Access codes and submission instructions to check drafts before final supervisor signature.', icon: CheckSquare },
-    { title: 'Supervisor Allocation', desc: 'Timelines, lists of faculty guides, specialization lists, and change-of-supervisor forms.', icon: Layers },
-  ];
+  let supports: any[] = [];
+  try {
+    const rawSupports = await academicSupportService.list('display_order', true);
+    supports = rawSupports;
+  } catch (error) {
+    console.error('Failed to load academic supports:', error);
+    supports = [
+      { title: 'Thesis Guidelines', description: 'Official word count limits, reference style manuals, formatting templates, and title page templates.', icon: 'BookOpen' },
+      { title: 'Plagiarism Checking (Turnitin)', description: 'Access codes and submission instructions to check drafts before final supervisor signature.', icon: 'CheckSquare' },
+      { title: 'Supervisor Allocation', description: 'Timelines, lists of faculty guides, specialization lists, and change-of-supervisor forms.', icon: 'Layers' },
+    ];
+  }
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8 space-y-12 bg-background text-foreground">
@@ -43,17 +51,26 @@ export default async function AcademicsPage() {
 
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {supports.map((sup) => {
-          const Icon = sup.icon;
+        {supports.map((sup, idx) => {
+          let IconComponent = BookOpen;
+          if (sup.icon && typeof sup.icon === 'function') {
+            IconComponent = sup.icon;
+          } else if (sup.icon && typeof sup.icon === 'string') {
+            try {
+               const lucide = require('lucide-react');
+               IconComponent = lucide[sup.icon] || BookOpen;
+            } catch(e) {}
+          }
+          
           return (
-            <div key={sup.title} className="site-card-light bg-white flex flex-col justify-between">
+            <div key={idx} className="site-card-light bg-white flex flex-col justify-between">
               <div className="space-y-4">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 text-accent">
-                  <Icon className="h-5 w-5" />
+                  <IconComponent className="h-5 w-5" />
                 </div>
                 <div>
                   <h3 className="font-bold text-primary text-base">{sup.title}</h3>
-                  <p className="mt-2 text-xs text-neutral-600 leading-relaxed">{sup.desc}</p>
+                  <p className="mt-2 text-xs text-neutral-600 leading-relaxed">{sup.description || sup.desc}</p>
                 </div>
               </div>
               <div className="mt-6 pt-4 border-t border-neutral-100 flex items-center gap-1 text-xs font-bold text-accent cursor-pointer hover:opacity-80 transition-opacity">
